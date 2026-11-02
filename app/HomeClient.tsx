@@ -40,7 +40,20 @@ export default function HomeClient() {
         </div>
       ),
     },
-    { id: 2, label: "Box 2" },
+    {
+      id: 2,
+      content: (
+        <div
+          onClick={() => navigate("/projects/revora")}
+          className="cursor-pointer flex absolute inset-0 rounded-xl items-center justify-center
+            bg-gradient-to-br from-[#2f9463] via-[#1f6f4d] to-[#164f37]"
+        >
+          <span className={`text-xl md:text-2xl ${interFontBold.className}`}>
+            Revora
+          </span>
+        </div>
+      ),
+    },
     { id: 3, label: "Box 3" },
     { id: 4, label: "Box 4" },
   ];
