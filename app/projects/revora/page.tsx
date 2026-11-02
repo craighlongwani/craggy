@@ -84,20 +84,20 @@ export default function Revora() {
           {/* Description */}
           <div className="flex-1">
             <p className="text-justify font-extralight text-sm md:text-base opacity-60">
-              Revora connects waste generators with upcyclers so surplus
-              materials go back into production instead of landfills. Before
-              anyone can take part, the platform verifies them: each person or
-              business registers with a government ID, businesses add a TIN and
-              branch details, and an administrator approves or rejects the
-              account.{" "}
+              Revora was envisioned as a platform that connects waste
+              generators with upcyclers, so surplus materials like plastics,
+              paper, and fabric scraps go back into production instead of
+              landfills. The material exchange itself was planned for a later
+              phase and was not built.{" "}
               <br className="hidden md:block" />
               <br className="hidden md:block" />
               <span className="block mt-3 md:mt-0">
-                I designed and built nearly all of it, including the SQL Server
-                database, the Node.js and Express API, and most of the
-                interface. My focus was putting the business rules and security
-                in the database itself, so they hold no matter which application
-                connects.
+                What was built is the verified onboarding it depends on: a
+                registration portal where people and businesses prove their
+                identity with a government ID or TIN, a user dashboard, and an
+                admin dashboard for approving accounts. I designed and built
+                nearly all of it, focusing on putting the business rules and
+                security in the SQL Server database itself.
               </span>
             </p>
           </div>
