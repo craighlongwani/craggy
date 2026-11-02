@@ -45,12 +45,16 @@ export default function HomeClient() {
       content: (
         <div
           onClick={() => navigate("/projects/revora")}
-          className="cursor-pointer flex absolute inset-0 rounded-xl items-center justify-center
-            bg-gradient-to-br from-[#2f9463] via-[#1f6f4d] to-[#164f37]"
+          className="cursor-pointer flex absolute inset-0 rounded-xl"
         >
-          <span className={`text-xl md:text-2xl ${interFontBold.className}`}>
-            Revora
-          </span>
+          <div className="relative w-full flex-1">
+            <Image
+              src="/assets/projects/Revora/logo.png"
+              fill
+              alt="Revora"
+              className="object-cover"
+            />
+          </div>
         </div>
       ),
     },
@@ -59,14 +63,16 @@ export default function HomeClient() {
       content: (
         <div
           onClick={() => navigate("/projects/barangay")}
-          className="cursor-pointer flex absolute inset-0 rounded-xl items-center justify-center
-            bg-gradient-to-br from-[#2b4c8c] via-[#1e3a6e] to-[#14284d] px-2 text-center"
+          className="cursor-pointer flex absolute inset-0 rounded-xl"
         >
-          <span className={`text-base md:text-lg leading-tight ${interFontBold.className}`}>
-            Barangay
-            <br />
-            Management
-          </span>
+          <div className="relative w-full flex-1">
+            <Image
+              src="/assets/projects/BMS/logo.png"
+              fill
+              alt="Barangay Management System"
+              className="object-cover"
+            />
+          </div>
         </div>
       ),
     },
