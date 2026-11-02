@@ -54,7 +54,22 @@ export default function HomeClient() {
         </div>
       ),
     },
-    { id: 3, label: "Box 3" },
+    {
+      id: 3,
+      content: (
+        <div
+          onClick={() => navigate("/projects/barangay")}
+          className="cursor-pointer flex absolute inset-0 rounded-xl items-center justify-center
+            bg-gradient-to-br from-[#2b4c8c] via-[#1e3a6e] to-[#14284d] px-2 text-center"
+        >
+          <span className={`text-base md:text-lg leading-tight ${interFontBold.className}`}>
+            Barangay
+            <br />
+            Management
+          </span>
+        </div>
+      ),
+    },
     { id: 4, label: "Box 4" },
   ];
 
