@@ -168,34 +168,34 @@ export default function HomeClient() {
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 flex-1">
                 {[
                   {
-                    title: "Web Development",
+                    title: "Full-Stack Development",
                     description:
-                      "React, Next.js, Tailwind — building responsive, modern interfaces from scratch.",
+                      "React, Next.js, and TypeScript front ends on ASP.NET Core, Django, Flask, or Express back ends.",
                   },
                   {
-                    title: "Database Management",
+                    title: "Database Design & SQL",
                     description:
-                      "SQL & NoSQL databases; schema design, queries, and basic normalization.",
+                      "Normalized SQL Server and MySQL schemas; T-SQL transactions, stored procedures, triggers, and EF Core.",
                   },
                   {
-                    title: "Data Analysis",
+                    title: "Security & Access Control",
                     description:
-                      "Python (pandas, NumPy), Excel, and basic visualization with Matplotlib or Seaborn.",
+                      "JWT auth with role-based access, least-privilege SQL logins, data masking, and audit logging.",
+                  },
+                  {
+                    title: "AI & API Integration",
+                    description:
+                      "Gemini answers checked against CrossRef, REST APIs, and server-side proxies that keep keys private.",
+                  },
+                  {
+                    title: "Testing & DevOps",
+                    description:
+                      "xUnit with Testcontainers, Playwright end-to-end tests, Docker, GitHub Actions CI, and Vercel.",
                   },
                   {
                     title: "Systems Analysis & Design",
                     description:
-                      "Use-case modeling, ERDs, DFDs, and systems documentation.",
-                  },
-                  {
-                    title: "Version Control",
-                    description:
-                      "Git workflows — branching, pull requests, and collaborative development on GitHub.",
-                  },
-                  {
-                    title: "Business Process Modeling",
-                    description:
-                      "Mapping and optimizing workflows using BPMN and process flow diagrams.",
+                      "SRS documents, use cases, ERDs, and data flow diagrams written before the code.",
                   },
                 ].map((skill, idx) => (
                   <div
