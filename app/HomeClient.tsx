@@ -151,10 +151,11 @@ export default function HomeClient() {
                 </Link>
               }
               className="col-span-1 md:col-span-2 row-span-1"
+              bodyClassName="flex flex-col"
             >
-              {/* Calendar scrolls horizontally on small screens */}
-              <div className="win95-sunken bg-white p-3 overflow-x-auto w-full">
-                <GithubCalendar />
+              {/* Calendar fills the window on md+ and scrolls horizontally */}
+              <div className="win95-sunken bg-white p-3 overflow-x-auto w-full relative flex-1 min-h-0">
+                <GithubCalendar fit />
               </div>
             </Window>
 
