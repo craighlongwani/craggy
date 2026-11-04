@@ -5,69 +5,9 @@ import "./globals.css";
 import GithubCalendar from "./components/GithubCalendar";
 import Window from "./components/Window";
 import { useState } from "react";
-import { useNavigate } from "./hooks/useNavigate";
 
 export default function HomeClient() {
-  const navigate = useNavigate();
   const [overlayMinimized, setOverlayMinimized] = useState(false);
-
-  const items = [
-    {
-      id: 1,
-      content: (
-        <div
-          onClick={() => navigate("/projects/verifai")}
-          className="cursor-pointer flex absolute inset-[2px]"
-        >
-          <div className="relative w-full flex-1">
-            <Image
-              src="/assets/projects/VerifAI/Logo.png"
-              fill
-              alt="VerifAI"
-              className="object-cover"
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      id: 2,
-      content: (
-        <div
-          onClick={() => navigate("/projects/revora")}
-          className="cursor-pointer flex absolute inset-[2px]"
-        >
-          <div className="relative w-full flex-1">
-            <Image
-              src="/assets/projects/Revora/logo.png"
-              fill
-              alt="Revora"
-              className="object-cover"
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      id: 3,
-      content: (
-        <div
-          onClick={() => navigate("/projects/barangay")}
-          className="cursor-pointer flex absolute inset-[2px]"
-        >
-          <div className="relative w-full flex-1">
-            <Image
-              src="/assets/projects/BMS/logo.png"
-              fill
-              alt="Barangay Management System"
-              className="object-cover"
-            />
-          </div>
-        </div>
-      ),
-    },
-    { id: 4, label: "Box 4" },
-  ];
 
   return (
     <main className="relative w-full h-screen font-win bg-[#008080]">
@@ -252,23 +192,24 @@ export default function HomeClient() {
               </div>
             </Window>
 
-            {/* Projects Card — spans 2 cols on md+ */}
+            {/* Projects Card — links to the full /projects page */}
             <Window
               title="Projects"
-              className="col-span-1 md:col-span-2 row-span-1"
+              className="col-span-1 row-span-1"
               bodyClassName="flex flex-col"
             >
-              {/* 2 cols on mobile, 4 cols on desktop */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 flex-1">
-                {items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="win95-sunken win95-focus relative overflow-hidden bg-white aspect-square md:aspect-auto md:h-full flex flex-col"
-                  >
-                    {item.content}
-                  </div>
-                ))}
-              </div>
+              <Link
+                href="/projects"
+                className="win95-sunken win95-focus relative block flex-1 aspect-video md:aspect-auto bg-[#00cc99]"
+              >
+                <Image
+                  src="/assets/ViewMyProjects.png"
+                  fill
+                  sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"
+                  alt="View my projects"
+                  className="object-contain p-3"
+                />
+              </Link>
             </Window>
 
             {/* Contact Card — col span 1 */}

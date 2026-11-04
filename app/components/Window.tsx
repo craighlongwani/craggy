@@ -18,7 +18,7 @@ export default function Window({
       <h2 className="win95-titlebar flex items-center gap-1.5 text-sm md:text-base shrink-0">
         {title}
       </h2>
-      <div className={`flex-1 min-h-0 p-3 md:p-4 ${bodyClassName}`}>
+      <div className={`flex-1 min-h-0 p-1.5 md:p-2 ${bodyClassName}`}>
         {children}
       </div>
     </section>
