@@ -6,9 +6,11 @@ import { prefersReducedMotion, restoreFromAnchor } from "../lib/anchor";
 // minimized window. `index` staggers siblings so they open one by one.
 export default function RestoreFromAnchor({
   index,
+  className = "",
   children,
 }: {
   index: number;
+  className?: string;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -25,7 +27,7 @@ export default function RestoreFromAnchor({
   }, [index]);
 
   return (
-    <div ref={ref} className="flex flex-col" style={{ opacity: 0 }}>
+    <div ref={ref} className={`flex flex-col ${className}`} style={{ opacity: 0 }}>
       {children}
     </div>
   );

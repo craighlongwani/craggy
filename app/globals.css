@@ -84,3 +84,64 @@ body {
   outline: 1px dotted #000;
   outline-offset: -4px;
 }
+
+/* Push button with a retro hover: it lights up in Win95 selection navy, a
+   blinking pixel arrow appears, and pressing sinks the bevel and nudges the
+   label down-right like a real button. */
+.retro-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: #000;
+  background: #c0c0c0;
+  box-shadow:
+    inset -1px -1px #0a0a0a,
+    inset 1px 1px #fff,
+    inset -2px -2px #808080,
+    inset 2px 2px #dfdfdf;
+}
+
+.retro-button::before {
+  content: "►";
+  display: none;
+  font-size: 0.625em;
+  animation: retro-blink 0.8s steps(1, end) infinite;
+}
+
+.retro-button:hover,
+.retro-button:focus-visible {
+  color: #fff;
+  background: #000080;
+  outline: 1px dotted #fff;
+  outline-offset: -4px;
+}
+
+.retro-button:hover::before,
+.retro-button:focus-visible::before {
+  display: inline;
+}
+
+.retro-button:active {
+  box-shadow:
+    inset -1px -1px #fff,
+    inset 1px 1px #0a0a0a,
+    inset -2px -2px #dfdfdf,
+    inset 2px 2px #808080;
+  padding-top: calc(0.25rem + 1px);
+  padding-left: calc(1rem + 1px);
+  padding-bottom: calc(0.25rem - 1px);
+  padding-right: calc(1rem - 1px);
+}
+
+@keyframes retro-blink {
+  50% {
+    visibility: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .retro-button::before {
+    animation: none;
+  }
+}
