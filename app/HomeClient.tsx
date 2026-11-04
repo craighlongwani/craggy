@@ -230,15 +230,17 @@ export default function HomeClient() {
                     type="button"
                     onClick={() => setOpenSkill(skill)}
                     aria-haspopup="dialog"
-                    className="win95-sunken win95-focus relative min-h-28 md:min-h-0 cursor-pointer"
+                    className="win95-raised win95-focus group relative min-h-28 md:min-h-0 cursor-pointer"
                     style={{ background: skill.color }}
                   >
+                    {/* Raised like a push button; pressing sinks the bevel
+                        and nudges the art down-right */}
                     <Image
                       src={skill.image}
                       fill
                       sizes="(min-width: 768px) 15vw, 50vw"
                       alt={skill.title}
-                      className="object-contain p-2"
+                      className="object-contain p-2 group-active:translate-x-px group-active:translate-y-px"
                     />
                   </button>
                 ))}
@@ -263,6 +265,9 @@ export default function HomeClient() {
                   alt="View my projects"
                   className="object-contain p-3"
                 />
+                <span aria-hidden className="click-me-badge font-win">
+                  Click me!
+                </span>
               </Link>
             </Window>
 

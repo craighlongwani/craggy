@@ -133,6 +133,31 @@ body {
   border-bottom: 1px solid #fff;
 }
 
+/* Geocities-style "Click me!" sticker: red and yellow, tilted, blinking */
+.click-me-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 2px 6px;
+  color: #ffff00;
+  background: #ff0000;
+  border: 2px solid #ffff00;
+  box-shadow: 2px 2px 0 #000;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: rotate(10deg);
+  pointer-events: none;
+  animation: retro-blink 1s steps(1, end) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .click-me-badge {
+    animation: none;
+  }
+}
+
 /* Win95's dotted focus rectangle, used as the hover state too */
 .win95-focus:hover,
 .win95-focus:focus-visible {
