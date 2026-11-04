@@ -77,6 +77,44 @@ body {
     inset 2px 2px #0a0a0a;
 }
 
+/* ── Starfield background ───────────────────────────────────────────────
+   steps() makes the twinkle blink between brightness levels instead of
+   fading smoothly, which suits the pixel look. */
+
+@keyframes star-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.15;
+  }
+}
+
+.star-twinkle {
+  animation-name: star-twinkle;
+  animation-iteration-count: infinite;
+  animation-timing-function: steps(3, jump-none);
+}
+
+/* A pixel cross built from 3px blocks, with dimmer tips on each arm */
+.star-sparkle {
+  width: 3px;
+  height: 3px;
+  background: #fff;
+  box-shadow:
+    0 -3px #fff, 0 -6px #cfd8ff,
+    0 3px #fff, 0 6px #cfd8ff,
+    -3px 0 #fff, -6px 0 #cfd8ff,
+    3px 0 #fff, 6px 0 #cfd8ff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-twinkle {
+    animation: none;
+  }
+}
+
 /* Win95's dotted focus rectangle, used as the hover state too */
 .win95-focus:hover,
 .win95-focus:focus-visible {

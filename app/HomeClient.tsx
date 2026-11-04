@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 import GithubCalendar from "./components/GithubCalendar";
+import Starfield from "./components/Starfield";
 import Window from "./components/Window";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "./hooks/useNavigate";
@@ -131,41 +132,10 @@ export default function HomeClient() {
     if (el) el.scrollLeft = el.scrollWidth;
   }, []);
 
-  const backgroundFilter = overlayMinimized
-    ? "brightness(0.8)"
-    : "brightness(0.2)";
-
   return (
     <main className="relative w-full h-screen font-win">
-      {/* Background: the sharp photo, with a pixelated copy faded in over it
-          while the windows are open. The pixelated copy is a tiny render of
-          the image scaled up with nearest-neighbor sampling. */}
-      <Image
-        src="/assets/Background.jpg"
-        fill
-        alt="Background Image"
-        style={{
-          objectFit: "cover",
-          objectPosition: "center",
-          transition: "filter 500ms ease-in-out",
-          filter: backgroundFilter,
-        }}
-      />
-      <Image
-        src="/assets/Background.jpg"
-        fill
-        sizes="96px"
-        alt=""
-        aria-hidden
-        style={{
-          objectFit: "cover",
-          objectPosition: "center",
-          imageRendering: "pixelated",
-          transition: "opacity 500ms ease-in-out, filter 500ms ease-in-out",
-          filter: backgroundFilter,
-          opacity: overlayMinimized ? 0 : 1,
-        }}
-      />
+      {/* Background */}
+      <Starfield />
 
       {/* Minimize/Expand Button */}
       <button
