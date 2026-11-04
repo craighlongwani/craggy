@@ -14,7 +14,7 @@ interface ThemeInput {
 }
 
 const palette: ColorPalette = [
-  'hsl(215, 35%, 13%)',
+  '#dcdcdc',
   '#6e1414',
   '#8b0000',
   '#b01818',

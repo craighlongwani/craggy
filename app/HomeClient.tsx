@@ -3,19 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 import GithubCalendar from "./components/GithubCalendar";
-import { motion } from "motion/react";
+import Window from "./components/Window";
 import { useEffect, useRef, useState } from "react";
-import { Inter, Poppins } from "next/font/google";
 import { useNavigate } from "./hooks/useNavigate";
-
-const interFontBold = Inter({
-  subsets: ["latin"],
-  weight: "800",
-});
-
-const poppins = Poppins({
-  weight: "300",
-});
 
 type TimelineEntry = {
   date: string;
@@ -83,7 +73,7 @@ export default function HomeClient() {
       content: (
         <div
           onClick={() => navigate("/projects/verifai")}
-          className="cursor-pointer flex absolute inset-0 rounded-xl"
+          className="cursor-pointer flex absolute inset-[2px]"
         >
           <div className="relative w-full flex-1">
             <Image
@@ -101,7 +91,7 @@ export default function HomeClient() {
       content: (
         <div
           onClick={() => navigate("/projects/revora")}
-          className="cursor-pointer flex absolute inset-0 rounded-xl"
+          className="cursor-pointer flex absolute inset-[2px]"
         >
           <div className="relative w-full flex-1">
             <Image
@@ -119,7 +109,7 @@ export default function HomeClient() {
       content: (
         <div
           onClick={() => navigate("/projects/barangay")}
-          className="cursor-pointer flex absolute inset-0 rounded-xl"
+          className="cursor-pointer flex absolute inset-[2px]"
         >
           <div className="relative w-full flex-1">
             <Image
@@ -141,10 +131,15 @@ export default function HomeClient() {
     if (el) el.scrollLeft = el.scrollWidth;
   }, []);
 
+  const backgroundFilter = overlayMinimized
+    ? "brightness(0.8)"
+    : "brightness(0.2)";
+
   return (
-    <main className="relative w-full h-screen">
-      {/* Background */}
-      {/* Background */}
+    <main className="relative w-full h-screen font-win">
+      {/* Background: the sharp photo, with a pixelated copy faded in over it
+          while the windows are open. The pixelated copy is a tiny render of
+          the image scaled up with nearest-neighbor sampling. */}
       <Image
         src="/assets/Background.jpg"
         fill
@@ -153,16 +148,29 @@ export default function HomeClient() {
           objectFit: "cover",
           objectPosition: "center",
           transition: "filter 500ms ease-in-out",
-          filter: overlayMinimized
-            ? "blur(0px) brightness(0.8)"
-            : "blur(3px) brightness(0.2)",
+          filter: backgroundFilter,
+        }}
+      />
+      <Image
+        src="/assets/Background.jpg"
+        fill
+        sizes="96px"
+        alt=""
+        aria-hidden
+        style={{
+          objectFit: "cover",
+          objectPosition: "center",
+          imageRendering: "pixelated",
+          transition: "opacity 500ms ease-in-out, filter 500ms ease-in-out",
+          filter: backgroundFilter,
+          opacity: overlayMinimized ? 0 : 1,
         }}
       />
 
       {/* Minimize/Expand Button */}
       <button
         onClick={() => setOverlayMinimized((v) => !v)}
-        className="fixed top-4 right-4 z-[60] bg-black/60 text-white px-3 py-1.5 rounded-md hover:bg-black/80 transition-colors text-sm"
+        className="win95-raised win95-focus fixed top-4 right-4 z-[60] w-8 h-7 text-black text-base leading-none"
         aria-label={overlayMinimized ? "Expand" : "Minimize"}
       >
         {overlayMinimized ? "+" : "−"}
@@ -184,27 +192,22 @@ export default function HomeClient() {
         >
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-5 md:min-h-full md:auto-rows-fr md:grid-flow-dense">
             {/* Me Card */}
-            <motion.div
-              className="col-span-1 row-span-1 overflow-hidden
-                  bg-black/70 backdrop-blur-sm rounded-2xl p-4 md:p-5 lg:p-6 flex flex-col justify-between"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            <Window
+              title="About Me"
+              className="col-span-1 row-span-1"
+              bodyClassName="flex flex-col justify-between"
             >
-              <div className={`text-base ${poppins.className}`}>
-                <h1
-                  className={`text-5xl md:text-6xl ${interFontBold.className}`}
-                >
-                  renzo
-                </h1>
-                <h2 className="opacity-50 text-sm md:text-base">
+              <div>
+                <h1 className="text-5xl md:text-6xl">renzo</h1>
+                <p className="font-code text-xs md:text-sm text-[#404040]">
                   Information Systems | Software Engineer
-                </h2>
+                </p>
 
                 {/* Education */}
-                <p className="mt-2 text-xs leading-snug">
+                <p className="mt-2 text-sm leading-snug">
                   BSIS, 3rd year · Dean&apos;s Lister
                 </p>
-                <p className="text-xs leading-snug opacity-50">
+                <p className="text-sm leading-snug text-[#404040]">
                   De La Salle-College of Saint Benilde
                 </p>
               </div>
@@ -261,91 +264,63 @@ export default function HomeClient() {
                   href="/Jed-Lawrence-Engbino-Resume.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`ml-auto rounded-full border border-white/30 px-3 py-1 text-xs
-                    hover:bg-white hover:text-black transition-colors ${interFontBold.className}`}
+                  className="win95-raised win95-focus ml-auto px-4 py-1 text-sm"
                 >
                   Résumé
                 </a>
               </div>
-            </motion.div>
+            </Window>
 
             {/* GitHub Card — spans 2 cols on md+ */}
-            <motion.div
-              className="col-span-1 md:col-span-2 row-span-1 overflow-hidden bg-black/70 backdrop-blur-sm rounded-2xl p-4 md:p-5 lg:p-6 flex flex-col"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            >
-              <div className="mb-2">
+            <Window
+              title={
                 <Link
                   href="https://github.com/renzoboyy"
                   target="_blank"
-                  className="items-center gap-3 inline-flex"
+                  className="inline-flex items-center gap-1.5 hover:underline"
                 >
                   <Image
                     src="/assets/icons/GitHub.png"
-                    width={28}
-                    height={28}
+                    width={16}
+                    height={16}
                     alt="GitHub Icon"
                   />
-                  <h2
-                    className={`text-2xl md:text-3xl ${interFontBold.className}`}
-                  >
-                    GitHub
-                  </h2>
+                  GitHub
                 </Link>
-              </div>
-
-              {/* Calendar scrolls horizontally on small screens */}
-              <div className="overflow-x-auto w-full">
-                <div className={`${poppins.className}`}>
-                  <GithubCalendar />
-                </div>
-              </div>
-            </motion.div>
-
-          
-            {/* Projects Card — spans 2 cols on md+ */}
-            <motion.div
-              className="col-span-1 md:col-span-2 row-span-1 overflow-hidden bg-black/70 backdrop-blur-sm rounded-2xl p-4 md:p-5 lg:p-6 flex flex-col"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              }
+              className="col-span-1 md:col-span-2 row-span-1"
             >
-              <h2
-                className={`text-2xl md:text-3xl ${interFontBold.className} mb-2`}
-              >
-                Projects
-              </h2>
+              {/* Calendar scrolls horizontally on small screens */}
+              <div className="win95-sunken bg-white p-3 overflow-x-auto w-full">
+                <GithubCalendar />
+              </div>
+            </Window>
 
+            {/* Projects Card — spans 2 cols on md+ */}
+            <Window
+              title="Projects"
+              className="col-span-1 md:col-span-2 row-span-1"
+              bodyClassName="flex flex-col"
+            >
               {/* 2 cols on mobile, 4 cols on desktop */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 flex-1">
                 {items.map((item) => (
-                  <motion.div
+                  <div
                     key={item.id}
-                    className="relative overflow-hidden bg-black/80 backdrop-blur-sm rounded-xl aspect-square md:aspect-auto md:h-full flex flex-col"
-                    whileHover={{ scale: 1.02 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 300,
-                      damping: 20,
-                    }}
+                    className="win95-sunken win95-focus relative overflow-hidden bg-white aspect-square md:aspect-auto md:h-full flex flex-col"
                   >
                     {item.content}
-                  </motion.div>
+                  </div>
                 ))}
               </div>
-            </motion.div>
+            </Window>
 
             {/* Skills Card — col span 2, row span 2 */}
-            <motion.div
-              className="col-span-1 md:col-span-2 row-span-2 overflow-hidden bg-black/70 backdrop-blur-sm rounded-2xl p-4 md:p-5 lg:p-6 flex flex-col"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            <Window
+              title="Skills"
+              className="col-span-1 md:col-span-2 row-span-2"
+              bodyClassName="flex flex-col"
             >
-              <h2
-                className={`text-2xl md:text-3xl ${interFontBold.className} mb-3`}
-              >
-                Skills
-              </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 flex-1">
                 {[
                   {
@@ -379,44 +354,25 @@ export default function HomeClient() {
                       "Mapping and optimizing workflows using BPMN and process flow diagrams.",
                   },
                 ].map((skill, idx) => (
-                  <motion.div
+                  <div
                     key={idx}
-                    className="relative overflow-hidden bg-black/80 rounded-xl p-4 flex flex-col justify-between"
-                    style={{ willChange: "transform" }}
-                    whileHover={{ scale: 1.04 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 300,
-                      damping: 20,
-                    }}
+                    className="win95-sunken bg-white p-3 md:p-4 flex flex-col justify-between"
                   >
-                    <h3
-                      className={`text-sm font-semibold text-white mb-2 ${interFontBold.className}`}
-                    >
-                      {skill.title}
-                    </h3>
-                    <p
-                      className={`text-xs text-white/50 leading-relaxed ${poppins.className}`}
-                    >
+                    <h3 className="text-base mb-2">{skill.title}</h3>
+                    <p className="text-sm text-[#404040] leading-relaxed">
                       {skill.description}
                     </p>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
-            </motion.div>
+            </Window>
 
             {/* Contact Card — col span 1 */}
-            <motion.div
-              className="col-span-1 row-span-1 min-h-0 overflow-hidden bg-black/70 backdrop-blur-sm rounded-2xl p-4 md:p-5 lg:p-6 flex flex-col gap-3"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            <Window
+              title="Contact Me"
+              className="col-span-1 row-span-1"
+              bodyClassName="flex flex-col gap-3 overflow-hidden"
             >
-              <h2
-                className={`text-2xl md:text-3xl ${interFontBold.className} shrink-0`}
-              >
-                Contact Me
-              </h2>
-
               <div className="flex flex-col gap-2 min-h-0 overflow-hidden flex-1">
                 {[
                   {
@@ -432,80 +388,60 @@ export default function HomeClient() {
                     href: "tel:+639459718300",
                   },
                 ].map((item, idx) => (
-                  <motion.a
+                  <a
                     key={idx}
                     href={item.href}
-                    className="flex items-center gap-3 bg-black/50 rounded-xl p-3 hover:bg-white/10 transition-colors group flex-1 min-h-0"
-                    whileHover={{ scale: 1.03 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 300,
-                      damping: 20,
-                    }}
+                    className="win95-sunken flex items-center gap-3 bg-white p-3 hover:bg-[#000080] hover:text-white group flex-1 min-h-0"
                   >
                     <span className="text-2xl shrink-0">{item.icon}</span>
                     <div className="min-w-0">
-                      <p
-                        className={`text-[10px] text-white/40 uppercase tracking-widest ${poppins.className}`}
-                      >
+                      <p className="text-xs text-[#606060] group-hover:text-white/80">
                         {item.label}
                       </p>
-                      <p
-                        className={`text-sm text-white/80 group-hover:text-white transition-colors truncate ${poppins.className}`}
-                      >
-                        {item.value}
-                      </p>
+                      <p className="font-code text-sm truncate">{item.value}</p>
                     </div>
-                  </motion.a>
+                  </a>
                 ))}
               </div>
 
-              <p
-                className={`text-[10px] text-white/30 shrink-0 ${poppins.className}`}
-              >
+              <p className="text-xs text-[#404040] shrink-0">
                 Open to IS, database & full-stack internships
               </p>
-            </motion.div>
+            </Window>
 
             {/* Timeline Card — spans 2 cols on md+ */}
-            <motion.div
-              className="col-span-1 md:col-span-2 row-span-1 min-h-0 overflow-hidden bg-black/70 backdrop-blur-sm rounded-2xl p-4 md:p-5 lg:p-6 flex flex-col"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            <Window
+              title="Timeline"
+              className="col-span-1 md:col-span-2 row-span-1"
+              bodyClassName="flex flex-col"
             >
-              <h2
-                className={`text-2xl md:text-3xl ${interFontBold.className} mb-3 shrink-0`}
-              >
-                Timeline
-              </h2>
-
               {/* Oldest to newest; opens scrolled to the newest entries */}
               <div ref={timelineRef} className="overflow-x-auto flex-1 min-h-0 pb-2">
                 <ol
-                  className={`relative flex min-w-max gap-5 ${poppins.className}
-                    before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-white/20`}
+                  className="relative flex min-w-max gap-5
+                    before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-[#808080]"
                 >
                   {timeline.map((entry) => {
                     const body = (
                       <>
                         <span
-                          className={`relative block w-[11px] h-[11px] rounded-full ${
+                          className={`relative block w-[11px] h-[11px] ${
                             entry.upcoming
-                              ? "border border-white/60 bg-black"
-                              : "bg-white"
+                              ? "border border-[#000080] bg-white"
+                              : "bg-[#000080]"
                           }`}
                         />
-                        <p className="mt-3 text-[10px] uppercase tracking-widest text-white/40">
+                        <p className="mt-3 font-code text-[10px] uppercase tracking-widest text-[#404040]">
                           {entry.date}
                         </p>
                         <p
-                          className={`mt-1 text-sm leading-snug ${interFontBold.className} ${
-                            entry.href ? "group-hover:underline" : ""
+                          className={`mt-1 text-sm leading-snug ${
+                            entry.href ? "text-[#000080] group-hover:underline" : ""
                           }`}
                         >
                           {entry.title}
                         </p>
-                        <p className="mt-1 text-xs leading-snug text-white/50">
+                        <p className="mt-1 text-xs leading-snug text-[#404040]">
                           {entry.detail}
                         </p>
                       </>
@@ -524,7 +460,7 @@ export default function HomeClient() {
                   })}
                 </ol>
               </div>
-            </motion.div>
+            </Window>
           </div>
         </div>
       </div>
