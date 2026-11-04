@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import RestoreFromAnchor from "../components/RestoreFromAnchor";
+import RestoreWindows from "../components/RestoreWindows";
+import Taskbar from "../components/Taskbar";
 import Window from "../components/Window";
 import { projects } from "./data";
 
@@ -12,33 +13,27 @@ export const metadata: Metadata = {
 
 // Every project in its own window, laid out as a bento grid like the home
 // page; each window's View button opens that project's page. The windows open
-// one by one out of the bottom middle of the screen.
+// one by one out of the taskbar's projects icon.
 export default function Projects() {
   return (
-    <main className="relative w-full h-screen font-body bg-[#008080] flex items-center justify-center">
+    <main className="relative w-full h-screen font-body bg-[#008080]">
       <h1 className="sr-only">Projects</h1>
 
-      <Link
-        href="/"
-        className="win95-raised win95-focus fixed top-4 right-4 z-[60] px-3 h-7 inline-flex items-center text-sm text-black"
-      >
-        ← Home
-      </Link>
-
-      <div
-        className="w-full h-[95vh] overflow-y-auto p-3 md:w-[95vw] md:p-6 lg:p-8
-          scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-5 md:min-h-full md:auto-rows-fr">
-          {projects.map((project, index) => (
-            <RestoreFromAnchor
-              key={project.slug}
-              index={index}
-              className={project.span}
-            >
+      <div className="absolute inset-x-0 top-0 bottom-10 flex items-center justify-center">
+        <div
+          className="w-full h-[95%] overflow-y-auto p-3 md:w-[95vw] md:p-6 lg:p-8
+            scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        >
+          <RestoreWindows
+            icon="projects"
+            always
+            className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-5 md:min-h-full md:auto-rows-fr"
+          >
+            {projects.map((project) => (
               <Window
+                key={project.slug}
                 title={project.name}
-                className="flex-1"
+                className={project.span}
                 bodyClassName="flex flex-col gap-2"
               >
                 <div
@@ -72,10 +67,12 @@ export default function Projects() {
                   </Link>
                 </div>
               </Window>
-            </RestoreFromAnchor>
-          ))}
+            ))}
+          </RestoreWindows>
         </div>
       </div>
+
+      <Taskbar current="projects" />
     </main>
   );
 }

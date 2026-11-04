@@ -78,6 +78,27 @@ body {
     inset 2px 2px #0a0a0a;
 }
 
+/* Taskbar: gray strip with a light line along its top edge */
+.win95-taskbar {
+  background: #c0c0c0;
+  box-shadow:
+    inset 0 1px #dfdfdf,
+    inset 0 2px #fff;
+}
+
+/* The current page's taskbar button: pressed in, with the checkered
+   highlight Win95 used for the active window's button */
+.win95-taskbar-active {
+  background-color: #fff;
+  background-image: repeating-conic-gradient(#c0c0c0 0% 25%, #fff 0% 50%);
+  background-size: 2px 2px;
+  box-shadow:
+    inset -1px -1px #fff,
+    inset 1px 1px #0a0a0a,
+    inset -2px -2px #dfdfdf,
+    inset 2px 2px #808080;
+}
+
 /* Win95's dotted focus rectangle, used as the hover state too */
 .win95-focus:hover,
 .win95-focus:focus-visible {

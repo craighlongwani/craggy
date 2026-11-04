@@ -3,34 +3,25 @@ import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 import GithubCalendar from "./components/GithubCalendar";
+import RestoreWindows from "./components/RestoreWindows";
+import Taskbar from "./components/Taskbar";
 import Window from "./components/Window";
-import { useRef, useState, type MouseEvent } from "react";
+import { useState, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
-import { minimizeToAnchor, prefersReducedMotion } from "./lib/anchor";
+import { minimizeAndGo } from "./lib/anchor";
 
 export default function HomeClient() {
   const router = useRouter();
   const [overlayMinimized, setOverlayMinimized] = useState(false);
-  const gridRef = useRef<HTMLDivElement>(null);
 
-  // Minimize every window into the bottom middle, then open /projects.
-  // Modified clicks (new tab, etc.) keep the link's normal behavior.
+  // Minimize every window into the taskbar's home icon, then open
+  // /projects. Modified clicks (new tab, etc.) keep the link's normal behavior.
   const openProjects = (e: MouseEvent<HTMLAnchorElement>) => {
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
       return;
     }
     e.preventDefault();
-    const windows = gridRef.current?.querySelectorAll<HTMLElement>(
-      ".win95-window"
-    );
-    if (!windows || prefersReducedMotion()) {
-      router.push("/projects");
-      return;
-    }
-    const animations = Array.from(windows, minimizeToAnchor);
-    Promise.all(animations.map((a) => a.finished)).then(() =>
-      router.push("/projects")
-    );
+    minimizeAndGo("home", () => router.push("/projects"));
   };
 
   return (
@@ -46,7 +37,7 @@ export default function HomeClient() {
 
       {/* Overlay */}
       <div
-        className={`fixed inset-0 flex items-center justify-center transition-all duration-500 ease-in-out
+        className={`fixed inset-x-0 top-0 bottom-10 flex items-center justify-center transition-all duration-500 ease-in-out
     ${
       overlayMinimized
         ? "opacity-0 pointer-events-none"
@@ -55,10 +46,13 @@ export default function HomeClient() {
         style={{ zIndex: 50 }}
       >
         <div
-          className="w-full h-[95vh] overflow-y-auto p-3 md:w-[95vw] md:p-6 lg:p-8
+          className="w-full h-[95%] overflow-y-auto p-3 md:w-[95vw] md:p-6 lg:p-8
       scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
-          <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-5 md:min-h-full md:auto-rows-fr md:grid-flow-dense">
+          <RestoreWindows
+            icon="home"
+            className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-5 md:min-h-full md:auto-rows-fr md:grid-flow-dense"
+          >
             {/* Me Card */}
             <Window
               title="About Me"
@@ -278,9 +272,11 @@ export default function HomeClient() {
                 Open to IS, database & full-stack internships
               </p>
             </Window>
-          </div>
+          </RestoreWindows>
         </div>
       </div>
+
+      <Taskbar current="home" />
     </main>
   );
 }

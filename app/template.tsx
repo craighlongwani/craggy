@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { ReactNode, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { arrivedFromMinimize } from "./lib/anchor";
 
 export default function Template({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -37,8 +38,15 @@ export default function Template({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("popstate", handlePopState);
   }, [router]);
 
-  // /projects runs its own animation: windows restoring from the bottom middle
-  if (pathname === "/projects") return <>{children}</>;
+  // Pages with a taskbar run their own animation instead: windows restoring
+  // from their taskbar icon. /projects always does; home does when you
+  // arrive from another taskbar page.
+  if (
+    pathname === "/projects" ||
+    (pathname === "/" && arrivedFromMinimize())
+  ) {
+    return <>{children}</>;
+  }
 
   return (
     <>
