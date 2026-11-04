@@ -99,6 +99,40 @@ body {
     inset 2px 2px #808080;
 }
 
+/* Properties dialog: a Win95 window in the top layer, with no dimmed
+   backdrop (Win95 dialogs just sat on top of the desktop) */
+.win95-dialog::backdrop {
+  background: transparent;
+}
+
+/* Tab and its panel: the tab's raised edges run into the panel's top edge */
+.win95-tab {
+  position: relative;
+  top: 1px;
+  background: #c0c0c0;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  box-shadow:
+    inset 1px 1px #fff,
+    inset -1px 0 #0a0a0a,
+    inset -2px 0 #808080;
+}
+
+.win95-tab-panel {
+  box-shadow:
+    inset -1px -1px #0a0a0a,
+    inset 1px 1px #fff,
+    inset -2px -2px #808080,
+    inset 2px 2px #dfdfdf;
+}
+
+/* Etched separator line */
+.win95-etched {
+  border: 0;
+  border-top: 1px solid #808080;
+  border-bottom: 1px solid #fff;
+}
+
 /* Win95's dotted focus rectangle, used as the hover state too */
 .win95-focus:hover,
 .win95-focus:focus-visible {

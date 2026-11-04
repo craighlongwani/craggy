@@ -3,6 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 import GithubCalendar from "./components/GithubCalendar";
+import PropertiesDialog, {
+  type PropertiesItem,
+} from "./components/PropertiesDialog";
 import RestoreWindows from "./components/RestoreWindows";
 import Taskbar from "./components/Taskbar";
 import Window from "./components/Window";
@@ -10,9 +13,63 @@ import { useState, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import { minimizeAndGo } from "./lib/anchor";
 
+// Each card shows its title art on a 90s web-safe color picked to contrast
+// with it; clicking opens a Properties dialog with the details.
+const skills: PropertiesItem[] = [
+  {
+    title: "Full-Stack Development",
+    image: "/assets/projects/FULLSTACKDEV.png",
+    color: "#99ccff",
+    description:
+      "Building complete web apps, from responsive interfaces to the APIs and servers behind them.",
+    usedIn: ["Bean-o", "Barangay Management System", "VerifAI", "Revora"],
+  },
+  {
+    title: "Database Design & SQL",
+    image: "/assets/projects/DBandSQL.png",
+    color: "#ffff99",
+    description:
+      "Designing normalized schemas and writing the queries and transactions that keep data consistent.",
+    usedIn: ["Revora", "Bean-o", "Barangay Management System"],
+  },
+  {
+    title: "Security & Access Control",
+    image: "/assets/projects/SECandAC.png",
+    color: "#ccffcc",
+    description:
+      "Authentication, role-based permissions, and least-privilege access that keep user data safe.",
+    usedIn: ["Bean-o", "Revora", "Barangay Management System"],
+  },
+  {
+    title: "AI & API Integration",
+    image: "/assets/projects/AIandAPI_Integration.png",
+    color: "#ff66cc",
+    description:
+      "Connecting apps to AI models and third-party APIs, and validating their output before users see it.",
+    usedIn: ["VerifAI"],
+  },
+  {
+    title: "Testing & DevOps",
+    image: "/assets/projects/TESTandDEVOPS.png",
+    color: "#00cc99",
+    description:
+      "Automated tests, containers, and CI pipelines that catch bugs early and make deploys repeatable.",
+    usedIn: ["Bean-o", "This portfolio"],
+  },
+  {
+    title: "Systems Analysis & Design",
+    image: "/assets/projects/SYSandDE.png",
+    color: "#ffcc66",
+    description:
+      "Turning requirements into use cases, data models, and documentation before writing code.",
+    usedIn: ["VerifAI", "Revora"],
+  },
+];
+
 export default function HomeClient() {
   const router = useRouter();
   const [overlayMinimized, setOverlayMinimized] = useState(false);
+  const [openSkill, setOpenSkill] = useState<PropertiesItem | null>(null);
 
   // Minimize every window into the taskbar's home icon, then open
   // /projects. Modified clicks (new tab, etc.) keep the link's normal behavior.
@@ -165,48 +222,25 @@ export default function HomeClient() {
               className="col-span-1 md:col-span-2 row-span-2"
               bodyClassName="flex flex-col"
             >
+              {/* Each card opens its Properties dialog */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 flex-1">
-                {[
-                  {
-                    title: "Full-Stack Development",
-                    description:
-                      "Building complete web apps, from responsive interfaces to the APIs and servers behind them.",
-                  },
-                  {
-                    title: "Database Design & SQL",
-                    description:
-                      "Designing normalized schemas and writing the queries and transactions that keep data consistent.",
-                  },
-                  {
-                    title: "Security & Access Control",
-                    description:
-                      "Authentication, role-based permissions, and least-privilege access that keep user data safe.",
-                  },
-                  {
-                    title: "AI & API Integration",
-                    description:
-                      "Connecting apps to AI models and third-party APIs, and validating their output before users see it.",
-                  },
-                  {
-                    title: "Testing & DevOps",
-                    description:
-                      "Automated tests, containers, and CI pipelines that catch bugs early and make deploys repeatable.",
-                  },
-                  {
-                    title: "Systems Analysis & Design",
-                    description:
-                      "Turning requirements into use cases, data models, and documentation before writing code.",
-                  },
-                ].map((skill, idx) => (
-                  <div
-                    key={idx}
-                    className="win95-sunken bg-white p-3 md:p-4 flex flex-col justify-between"
+                {skills.map((skill) => (
+                  <button
+                    key={skill.title}
+                    type="button"
+                    onClick={() => setOpenSkill(skill)}
+                    aria-haspopup="dialog"
+                    className="win95-sunken win95-focus relative min-h-28 md:min-h-0 cursor-pointer"
+                    style={{ background: skill.color }}
                   >
-                    <h3 className="text-base mb-2">{skill.title}</h3>
-                    <p className="text-sm text-[#404040] leading-relaxed">
-                      {skill.description}
-                    </p>
-                  </div>
+                    <Image
+                      src={skill.image}
+                      fill
+                      sizes="(min-width: 768px) 15vw, 50vw"
+                      alt={skill.title}
+                      className="object-contain p-2"
+                    />
+                  </button>
                 ))}
               </div>
             </Window>
@@ -276,6 +310,8 @@ export default function HomeClient() {
           </RestoreWindows>
         </div>
       </div>
+
+      <PropertiesDialog item={openSkill} onClose={() => setOpenSkill(null)} />
 
       <Taskbar current="home" />
     </main>
