@@ -183,9 +183,14 @@ export default function Revora() {
           wrong.
         </h2>
 
-        {/* Repository is private, so no public link */}
-        <h3 className={`text-right mt-5 text-sm opacity-60 ${interFont.className}`}>
-          Source code available on request
+        {/* GitHub link */}
+        <h3 className={`text-right mt-5 text-sm ${interFont.className}`}>
+          <Link
+            href="https://github.com/renzoboyy/INFODBM_REVORA"
+            target="_blank"
+          >
+            View on GitHub
+          </Link>
         </h3>
       </motion.div>
     </motion.main>
