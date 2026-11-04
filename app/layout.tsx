@@ -13,10 +13,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// A recreation of Chicago, the classic Mac OS system font
-const chicago = localFont({
-  src: "../public/fonts/chicago-12-1.otf",
-  variable: "--font-chicago",
+// W95FA, a free recreation of the Windows 95 system font
+const w95 = localFont({
+  src: "../public/fonts/W95F.otf",
+  variable: "--font-w95",
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${chicago.variable} ${jetbrainsMono.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} ${w95.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
       <head>
