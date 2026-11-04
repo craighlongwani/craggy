@@ -15,7 +15,7 @@ export default function Window({
 }) {
   return (
     <section className={`win95-window flex flex-col min-h-0 ${className}`}>
-      <h2 className="win95-titlebar flex items-center gap-1.5 text-sm md:text-base shrink-0">
+      <h2 className="win95-titlebar font-win flex items-center gap-1.5 text-sm md:text-base shrink-0">
         {title}
       </h2>
       <div className={`flex-1 min-h-0 p-1.5 md:p-2 ${bodyClassName}`}>

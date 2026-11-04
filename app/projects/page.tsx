@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 // Every project in its own window; each window opens that project's page.
 export default function Projects() {
   return (
-    <main className="min-h-screen w-full font-win bg-[#008080] p-3 md:p-6 lg:p-8">
+    <main className="min-h-screen w-full font-body bg-[#008080] p-3 md:p-6 lg:p-8">
       <h1 className="sr-only">Projects</h1>
 
       <Link

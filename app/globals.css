@@ -7,6 +7,7 @@
   --font-mono: var(--font-geist-mono);
   --text-tiny: 0.625rem;
   --font-win: var(--font-w95), "MS Sans Serif", Tahoma, sans-serif;
+  --font-body: "Times New Roman", Times, serif;
   --font-code: var(--font-jetbrains), ui-monospace, monospace;
 }
 
