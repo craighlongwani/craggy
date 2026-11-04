@@ -170,32 +170,32 @@ export default function HomeClient() {
                   {
                     title: "Full-Stack Development",
                     description:
-                      "React, Next.js, and TypeScript front ends on ASP.NET Core, Django, Flask, or Express back ends.",
+                      "Building complete web apps, from responsive interfaces to the APIs and servers behind them.",
                   },
                   {
                     title: "Database Design & SQL",
                     description:
-                      "Normalized SQL Server and MySQL schemas; T-SQL transactions, stored procedures, triggers, and EF Core.",
+                      "Designing normalized schemas and writing the queries and transactions that keep data consistent.",
                   },
                   {
                     title: "Security & Access Control",
                     description:
-                      "JWT auth with role-based access, least-privilege SQL logins, data masking, and audit logging.",
+                      "Authentication, role-based permissions, and least-privilege access that keep user data safe.",
                   },
                   {
                     title: "AI & API Integration",
                     description:
-                      "Gemini answers checked against CrossRef, REST APIs, and server-side proxies that keep keys private.",
+                      "Connecting apps to AI models and third-party APIs, and validating their output before users see it.",
                   },
                   {
                     title: "Testing & DevOps",
                     description:
-                      "xUnit with Testcontainers, Playwright end-to-end tests, Docker, GitHub Actions CI, and Vercel.",
+                      "Automated tests, containers, and CI pipelines that catch bugs early and make deploys repeatable.",
                   },
                   {
                     title: "Systems Analysis & Design",
                     description:
-                      "SRS documents, use cases, ERDs, and data flow diagrams written before the code.",
+                      "Turning requirements into use cases, data models, and documentation before writing code.",
                   },
                 ].map((skill, idx) => (
                   <div
