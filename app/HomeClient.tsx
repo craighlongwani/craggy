@@ -4,10 +4,34 @@ import Link from "next/link";
 import "./globals.css";
 import GithubCalendar from "./components/GithubCalendar";
 import Window from "./components/Window";
-import { useState } from "react";
+import { useRef, useState, type MouseEvent } from "react";
+import { useRouter } from "next/navigation";
+import { minimizeToAnchor, prefersReducedMotion } from "./lib/anchor";
 
 export default function HomeClient() {
+  const router = useRouter();
   const [overlayMinimized, setOverlayMinimized] = useState(false);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  // Minimize every window into the bottom middle, then open /projects.
+  // Modified clicks (new tab, etc.) keep the link's normal behavior.
+  const openProjects = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+      return;
+    }
+    e.preventDefault();
+    const windows = gridRef.current?.querySelectorAll<HTMLElement>(
+      ".win95-window"
+    );
+    if (!windows || prefersReducedMotion()) {
+      router.push("/projects");
+      return;
+    }
+    const animations = Array.from(windows, minimizeToAnchor);
+    Promise.all(animations.map((a) => a.finished)).then(() =>
+      router.push("/projects")
+    );
+  };
 
   return (
     <main className="relative w-full h-screen font-body bg-[#008080]">
@@ -34,7 +58,7 @@ export default function HomeClient() {
           className="w-full h-[95vh] overflow-y-auto p-3 md:w-[95vw] md:p-6 lg:p-8
       scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-5 md:min-h-full md:auto-rows-fr md:grid-flow-dense">
+          <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-5 md:min-h-full md:auto-rows-fr md:grid-flow-dense">
             {/* Me Card */}
             <Window
               title="About Me"
@@ -200,6 +224,7 @@ export default function HomeClient() {
             >
               <Link
                 href="/projects"
+                onClick={openProjects}
                 className="win95-sunken win95-focus relative block flex-1 aspect-video md:aspect-auto bg-[#00cc99]"
               >
                 <Image

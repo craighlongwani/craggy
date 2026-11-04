@@ -2,10 +2,11 @@
 "use client";
 import { motion } from "motion/react";
 import { ReactNode, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Template({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const handlePopState = () => {
@@ -35,6 +36,9 @@ export default function Template({ children }: { children: ReactNode }) {
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, [router]);
+
+  // /projects runs its own animation: windows restoring from the bottom middle
+  if (pathname === "/projects") return <>{children}</>;
 
   return (
     <>
