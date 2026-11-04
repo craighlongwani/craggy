@@ -10,7 +10,7 @@ export default function HomeClient() {
   const [overlayMinimized, setOverlayMinimized] = useState(false);
 
   return (
-    <main className="relative w-full h-screen font-win bg-[#008080]">
+    <main className="relative w-full h-screen font-system bg-[#008080]">
       {/* Minimize/Expand Button */}
       <button
         onClick={() => setOverlayMinimized((v) => !v)}

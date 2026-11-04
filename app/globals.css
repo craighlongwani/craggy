@@ -6,7 +6,7 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --text-tiny: 0.625rem;
-  --font-win: var(--font-w95), "MS Sans Serif", Tahoma, sans-serif;
+  --font-system: var(--font-chicago), Chicago, Charcoal, sans-serif;
   --font-code: var(--font-jetbrains), ui-monospace, monospace;
 }
 
