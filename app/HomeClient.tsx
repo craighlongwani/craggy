@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 import GithubCalendar from "./components/GithubCalendar";
-import Starfield from "./components/Starfield";
 import Window from "./components/Window";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "./hooks/useNavigate";
@@ -133,10 +132,7 @@ export default function HomeClient() {
   }, []);
 
   return (
-    <main className="relative w-full h-screen font-win">
-      {/* Background */}
-      <Starfield />
-
+    <main className="relative w-full h-screen font-win bg-[#dcdcdc]">
       {/* Minimize/Expand Button */}
       <button
         onClick={() => setOverlayMinimized((v) => !v)}
