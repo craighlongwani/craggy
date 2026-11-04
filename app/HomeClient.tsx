@@ -4,64 +4,8 @@ import Link from "next/link";
 import "./globals.css";
 import GithubCalendar from "./components/GithubCalendar";
 import Window from "./components/Window";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "./hooks/useNavigate";
-
-type TimelineEntry = {
-  date: string;
-  title: string;
-  detail: string;
-  href?: string;
-  upcoming?: boolean;
-};
-
-// Oldest first, matching the résumé.
-const timeline: TimelineEntry[] = [
-  {
-    date: "Sep 2024",
-    title: "Started BS Information Systems",
-    detail: "De La Salle-College of Saint Benilde",
-  },
-  {
-    date: "Oct 2024",
-    title: "Junior Barista",
-    detail: "Bodega Kafe, Parañaque",
-  },
-  {
-    date: "May 2025",
-    title: "Supplier & Inventory System",
-    detail: "Enterprise Programming course project",
-  },
-  {
-    date: "Feb 2026",
-    title: "WeatherWatch",
-    detail: "UI/UX Designer, WarFrames Hackathon at UP Los Baños",
-  },
-  {
-    date: "Mar 2026",
-    title: "VerifAI",
-    detail: "HackFest 2026 at Ateneo de Manila",
-    href: "/projects/verifai",
-  },
-  {
-    date: "May 2026",
-    title: "Revora",
-    detail: "Database Management course project",
-    href: "/projects/revora",
-  },
-  {
-    date: "Jul 2026",
-    title: "Barangay Management System",
-    detail: "Barangay 43, Pasay City",
-    href: "/projects/barangay",
-  },
-  {
-    date: "Dec 2027",
-    title: "Expected graduation",
-    detail: "BS Information Systems",
-    upcoming: true,
-  },
-];
 
 export default function HomeClient() {
   const navigate = useNavigate();
@@ -125,14 +69,8 @@ export default function HomeClient() {
     { id: 4, label: "Box 4" },
   ];
 
-  const timelineRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = timelineRef.current;
-    if (el) el.scrollLeft = el.scrollWidth;
-  }, []);
-
   return (
-    <main className="relative w-full h-screen font-win bg-[#dcdcdc]">
+    <main className="relative w-full h-screen font-win bg-[#008080]">
       {/* Minimize/Expand Button */}
       <button
         onClick={() => setOverlayMinimized((v) => !v)}
@@ -262,25 +200,6 @@ export default function HomeClient() {
               </div>
             </Window>
 
-            {/* Projects Card — spans 2 cols on md+ */}
-            <Window
-              title="Projects"
-              className="col-span-1 md:col-span-2 row-span-1"
-              bodyClassName="flex flex-col"
-            >
-              {/* 2 cols on mobile, 4 cols on desktop */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 flex-1">
-                {items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="win95-sunken win95-focus relative overflow-hidden bg-white aspect-square md:aspect-auto md:h-full flex flex-col"
-                  >
-                    {item.content}
-                  </div>
-                ))}
-              </div>
-            </Window>
-
             {/* Skills Card — col span 2, row span 2 */}
             <Window
               title="Skills"
@@ -333,6 +252,25 @@ export default function HomeClient() {
               </div>
             </Window>
 
+            {/* Projects Card — spans 2 cols on md+ */}
+            <Window
+              title="Projects"
+              className="col-span-1 md:col-span-2 row-span-1"
+              bodyClassName="flex flex-col"
+            >
+              {/* 2 cols on mobile, 4 cols on desktop */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 flex-1">
+                {items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="win95-sunken win95-focus relative overflow-hidden bg-white aspect-square md:aspect-auto md:h-full flex flex-col"
+                  >
+                    {item.content}
+                  </div>
+                ))}
+              </div>
+            </Window>
+
             {/* Contact Card — col span 1 */}
             <Window
               title="Contact Me"
@@ -373,59 +311,6 @@ export default function HomeClient() {
               <p className="text-xs text-[#404040] shrink-0">
                 Open to IS, database & full-stack internships
               </p>
-            </Window>
-
-            {/* Timeline Card — spans 2 cols on md+ */}
-            <Window
-              title="Timeline"
-              className="col-span-1 md:col-span-2 row-span-1"
-              bodyClassName="flex flex-col"
-            >
-              {/* Oldest to newest; opens scrolled to the newest entries */}
-              <div ref={timelineRef} className="overflow-x-auto flex-1 min-h-0 pb-2">
-                <ol
-                  className="relative flex min-w-max gap-5
-                    before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-[#808080]"
-                >
-                  {timeline.map((entry) => {
-                    const body = (
-                      <>
-                        <span
-                          className={`relative block w-[11px] h-[11px] ${
-                            entry.upcoming
-                              ? "border border-[#000080] bg-white"
-                              : "bg-[#000080]"
-                          }`}
-                        />
-                        <p className="mt-3 font-code text-[10px] uppercase tracking-widest text-[#404040]">
-                          {entry.date}
-                        </p>
-                        <p
-                          className={`mt-1 text-sm leading-snug ${
-                            entry.href ? "text-[#000080] group-hover:underline" : ""
-                          }`}
-                        >
-                          {entry.title}
-                        </p>
-                        <p className="mt-1 text-xs leading-snug text-[#404040]">
-                          {entry.detail}
-                        </p>
-                      </>
-                    );
-                    return (
-                      <li key={entry.title} className="w-36 md:w-40 shrink-0">
-                        {entry.href ? (
-                          <Link href={entry.href} className="group block">
-                            {body}
-                          </Link>
-                        ) : (
-                          body
-                        )}
-                      </li>
-                    );
-                  })}
-                </ol>
-              </div>
             </Window>
           </div>
         </div>
