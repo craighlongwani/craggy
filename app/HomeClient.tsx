@@ -70,6 +70,7 @@ export default function HomeClient() {
   const router = useRouter();
   const [overlayMinimized, setOverlayMinimized] = useState(false);
   const [openSkill, setOpenSkill] = useState<PropertiesItem | null>(null);
+  const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
 
   // Minimize every window into the taskbar's home icon, then open
   // /projects. Modified clicks (new tab, etc.) keep the link's normal behavior.
@@ -220,7 +221,7 @@ export default function HomeClient() {
             <Window
               title="Skills"
               className="col-span-1 md:col-span-2 row-span-2"
-              bodyClassName="flex flex-col"
+              bodyClassName="flex flex-col gap-1.5 md:gap-2"
             >
               {/* Each card opens its Properties dialog */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 flex-1">
@@ -229,8 +230,12 @@ export default function HomeClient() {
                     key={skill.title}
                     type="button"
                     onClick={() => setOpenSkill(skill)}
+                    onMouseEnter={() => setHoveredSkill(skill.title)}
+                    onMouseLeave={() => setHoveredSkill(null)}
+                    onFocus={() => setHoveredSkill(skill.title)}
+                    onBlur={() => setHoveredSkill(null)}
                     aria-haspopup="dialog"
-                    className="win95-raised win95-focus group relative min-h-28 md:min-h-0 cursor-pointer"
+                    className="win95-raised win95-focus pixel-hand group relative min-h-28 md:min-h-0"
                     style={{ background: skill.color }}
                   >
                     {/* Raised like a push button; pressing sinks the bevel
@@ -245,6 +250,13 @@ export default function HomeClient() {
                   </button>
                 ))}
               </div>
+
+              {/* Status bar: names the card under the pointer */}
+              <p className="win95-statusbar shrink-0 px-2 py-0.5 text-xs md:text-sm truncate">
+                {hoveredSkill
+                  ? `${hoveredSkill} — click for Properties`
+                  : "Click a skill to view its Properties"}
+              </p>
             </Window>
 
             {/* Projects Card — links to the full /projects page */}
