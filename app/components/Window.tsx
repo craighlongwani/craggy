@@ -6,15 +6,21 @@ export default function Window({
   title,
   className = "",
   bodyClassName = "",
+  project,
   children,
 }: {
   title: ReactNode;
   className?: string;
   bodyClassName?: string;
+  // Tags a project's window so it can expand into / collapse from its page
+  project?: string;
   children: ReactNode;
 }) {
   return (
-    <section className={`win95-window flex flex-col min-h-0 ${className}`}>
+    <section
+      data-project={project}
+      className={`win95-window flex flex-col min-h-0 ${className}`}
+    >
       <h2 className="win95-titlebar font-win flex items-center gap-1.5 text-sm md:text-base shrink-0">
         {title}
       </h2>

@@ -3,9 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 import GithubCalendar from "./components/GithubCalendar";
-import PropertiesDialog, {
-  type PropertiesItem,
-} from "./components/PropertiesDialog";
+import SkillsGrid from "./components/SkillsGrid";
+import type { Skill } from "./components/SkillWindow";
+
 import RestoreWindows from "./components/RestoreWindows";
 import Taskbar from "./components/Taskbar";
 import Window from "./components/Window";
@@ -14,14 +14,20 @@ import { useRouter } from "next/navigation";
 import { minimizeAndGo } from "./lib/anchor";
 
 // Each card shows its title art on a 90s web-safe color picked to contrast
-// with it; clicking opens a Properties dialog with the details.
-const skills: PropertiesItem[] = [
+// with it; clicking opens a window with the full write-up.
+const skills: Skill[] = [
   {
     title: "Full-Stack Development",
     image: "/assets/projects/FULLSTACKDEV.png",
     color: "#99ccff",
     description:
-      "Building complete web apps, from responsive interfaces to the APIs and servers behind them.",
+      "Building complete web apps end to end, from the screens people click through to the servers and APIs behind them.",
+    highlights: [
+      "Responsive interfaces that work on phones and desktops alike",
+      "Back-end APIs that validate input and hand the front end clean, predictable data",
+      "Picking up an existing codebase and shipping new features on top of it",
+      "Generating branded PDF documents and reports straight from app data",
+    ],
     usedIn: ["Bean-o", "Barangay Management System", "VerifAI", "Revora"],
   },
   {
@@ -29,7 +35,13 @@ const skills: PropertiesItem[] = [
     image: "/assets/projects/DBandSQL.png",
     color: "#ffff99",
     description:
-      "Designing normalized schemas and writing the queries and transactions that keep data consistent.",
+      "Modeling data so it stays correct, then writing the queries and rules that keep it that way.",
+    highlights: [
+      "Normalized schemas and ER diagrams, such as a 15-table design with a full address hierarchy",
+      "Multi-step writes wrapped in one transaction, so related records save together or not at all",
+      "Stored procedures and triggers that enforce business rules inside the database itself",
+      "Queries and functions that power live dashboards and approval queues",
+    ],
     usedIn: ["Revora", "Bean-o", "Barangay Management System"],
   },
   {
@@ -37,7 +49,13 @@ const skills: PropertiesItem[] = [
     image: "/assets/projects/SECandAC.png",
     color: "#ccffcc",
     description:
-      "Authentication, role-based permissions, and least-privilege access that keep user data safe.",
+      "Making sure every person and service can do exactly what it needs to, and nothing more.",
+    highlights: [
+      "Role-based accounts and admin-only pages, where users can't raise their own role",
+      "Least-privilege database logins with explicit deny rules and masked personal data",
+      "Hashed passwords, idle session timeouts, and audit logs that record who did what",
+      "Keeping secret keys on the server, never in the browser",
+    ],
     usedIn: ["Bean-o", "Revora", "Barangay Management System"],
   },
   {
@@ -45,7 +63,13 @@ const skills: PropertiesItem[] = [
     image: "/assets/projects/AIandAPI_Integration.png",
     color: "#ff66cc",
     description:
-      "Connecting apps to AI models and third-party APIs, and validating their output before users see it.",
+      "Putting AI models and outside APIs to work, without trusting their answers blindly.",
+    highlights: [
+      "A server-side proxy so AI keys never reach the user's browser",
+      "Checking every AI-suggested source against an authoritative database before showing it",
+      "Parallel API lookups, with a fallback search when no match turns up",
+      "A 100-point rubric that scores each source on recency and relevance",
+    ],
     usedIn: ["VerifAI"],
   },
   {
@@ -53,7 +77,13 @@ const skills: PropertiesItem[] = [
     image: "/assets/projects/TESTandDEVOPS.png",
     color: "#00cc99",
     description:
-      "Automated tests, containers, and CI pipelines that catch bugs early and make deploys repeatable.",
+      "Automated checks and repeatable builds, so changes ship with confidence instead of crossed fingers.",
+    highlights: [
+      "Automated tests that catch regressions before users ever see them",
+      "Containerized environments that run the same on every machine",
+      "CI pipelines that test and build every change automatically",
+      "Repeatable deploys that take the guesswork out of releasing",
+    ],
     usedIn: ["Bean-o", "This portfolio"],
   },
   {
@@ -61,7 +91,13 @@ const skills: PropertiesItem[] = [
     image: "/assets/projects/SYSandDE.png",
     color: "#ffcc66",
     description:
-      "Turning requirements into use cases, data models, and documentation before writing code.",
+      "Working out what a system should do before building it, and writing it down so the whole team agrees.",
+    highlights: [
+      "Requirements specifications and use cases that pin down the scope",
+      "Data flow and ER diagrams that map how information moves and where it lives",
+      "Multi-step workflows, like registration and approval, designed before any code",
+      "Technical documentation the rest of the team can build from",
+    ],
     usedIn: ["VerifAI", "Revora"],
   },
 ];
@@ -69,8 +105,6 @@ const skills: PropertiesItem[] = [
 export default function HomeClient() {
   const router = useRouter();
   const [overlayMinimized, setOverlayMinimized] = useState(false);
-  const [openSkill, setOpenSkill] = useState<PropertiesItem | null>(null);
-  const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
 
   // Minimize every window into the taskbar's home icon, then open
   // /projects. Modified clicks (new tab, etc.) keep the link's normal behavior.
@@ -114,7 +148,7 @@ export default function HomeClient() {
             {/* Me Card */}
             <Window
               title="About Me"
-              className="col-span-1 row-span-1"
+              className="col-span-1 row-span-1 max-md:-order-2"
               bodyClassName="flex flex-col justify-between"
             >
               <div>
@@ -223,40 +257,7 @@ export default function HomeClient() {
               className="col-span-1 md:col-span-2 row-span-2"
               bodyClassName="flex flex-col gap-1.5 md:gap-2"
             >
-              {/* Each card opens its Properties dialog */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 flex-1">
-                {skills.map((skill) => (
-                  <button
-                    key={skill.title}
-                    type="button"
-                    onClick={() => setOpenSkill(skill)}
-                    onMouseEnter={() => setHoveredSkill(skill.title)}
-                    onMouseLeave={() => setHoveredSkill(null)}
-                    onFocus={() => setHoveredSkill(skill.title)}
-                    onBlur={() => setHoveredSkill(null)}
-                    aria-haspopup="dialog"
-                    className="win95-raised win95-focus pixel-hand group relative min-h-28 md:min-h-0"
-                    style={{ background: skill.color }}
-                  >
-                    {/* Raised like a push button; pressing sinks the bevel
-                        and nudges the art down-right */}
-                    <Image
-                      src={skill.image}
-                      fill
-                      sizes="(min-width: 768px) 15vw, 50vw"
-                      alt={skill.title}
-                      className="object-contain p-2 group-active:translate-x-px group-active:translate-y-px"
-                    />
-                  </button>
-                ))}
-              </div>
-
-              {/* Status bar: names the card under the pointer */}
-              <p className="win95-statusbar shrink-0 px-2 py-0.5 text-xs md:text-sm truncate">
-                {hoveredSkill
-                  ? `${hoveredSkill} — click for Properties`
-                  : "Click a skill to view its Properties"}
-              </p>
+              <SkillsGrid skills={skills} />
             </Window>
 
             {/* Projects Card — links to the full /projects page */}
@@ -319,16 +320,47 @@ export default function HomeClient() {
                   </a>
                 ))}
               </div>
+            </Window>
 
-              <p className="text-xs text-[#404040] shrink-0">
-                Open to IS, database & full-stack internships
+            {/* Availability: what an employer needs to know first. Right
+                after About Me on phones; beside Contact Me on desktop. */}
+            <Window
+              title="Availability"
+              className="col-span-1 row-span-1 max-md:-order-1"
+              bodyClassName="flex flex-col gap-2"
+            >
+              <p className="flex items-center gap-2 text-lg leading-tight">
+                <span
+                  aria-hidden="true"
+                  className="win95-sunken inline-block w-3.5 h-3.5 shrink-0 bg-[#00c000]"
+                />
+                <span className="font-bold">Available now</span>
               </p>
+
+              <dl className="win95-sunken bg-white flex-1 grid grid-cols-[auto_1fr] content-center gap-x-3 gap-y-1.5 p-2.5 text-sm leading-snug">
+                {[
+                  ["Seeking", "IS, database & full-stack internships"],
+                  ["Setup", "Hybrid or remote"],
+                  ["Hours", "Flexible: full- or part-time"],
+                  ["Location", "Metro Manila"],
+                ].map(([label, value]) => (
+                  <div key={label} className="contents">
+                    <dt className="text-[#404040]">{label}:</dt>
+                    <dd>{value}</dd>
+                  </div>
+                ))}
+              </dl>
+
+              <a
+                href="mailto:jedlawrence.engbino@gmail.com?subject=Internship%20opportunity"
+                className="retro-button self-end shrink-0 px-4 py-1 text-sm"
+              >
+                Hire me
+              </a>
             </Window>
           </RestoreWindows>
         </div>
       </div>
-
-      <PropertiesDialog item={openSkill} onClose={() => setOpenSkill(null)} />
 
       <Taskbar current="home" />
     </main>

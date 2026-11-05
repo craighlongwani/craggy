@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
 // One color per contribution level (0 = none, 4 = most): GitHub's own
 // contribution-graph greens.
@@ -30,6 +30,11 @@ const githubTheme: ThemeInput = {
   dark: palette,
 }
 
+// Module-level so the calendar's props stay identical between renders
+const labels = {
+  totalCount: '{{count}} contributions in the last year',
+};
+
 const BLOCK_MARGIN = 4;
 const DEFAULT_BLOCK_SIZE = 12;
 const MIN_BLOCK_SIZE = 10;
@@ -40,7 +45,9 @@ const MAX_BLOCK_SIZE = 28;
 // seven rows reach the bottom, and the weeks that no longer fit scroll
 // horizontally. The parent must be positioned, since the calendar is laid
 // out absolutely so its size can't feed back into the grid row's height.
-export default function GithubCalendar({ fit = false }: { fit?: boolean }) {
+// Memoized: the calendar draws ~370 squares, so it should only re-render
+// when its own size changes, not whenever the home page does
+export default memo(function GithubCalendar({ fit = false }: { fit?: boolean }) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [blockSize, setBlockSize] = useState(DEFAULT_BLOCK_SIZE);
 
@@ -86,8 +93,15 @@ export default function GithubCalendar({ fit = false }: { fit?: boolean }) {
         const grid = 7 * current + 6 * BLOCK_MARGIN;
         const labels = calendar.offsetHeight - grid;
         const available = wrapper.clientHeight - labels;
-        const next = Math.floor((available - 6 * BLOCK_MARGIN) / 7);
-        return Math.min(MAX_BLOCK_SIZE, Math.max(MIN_BLOCK_SIZE, next));
+        const next = Math.min(
+          MAX_BLOCK_SIZE,
+          Math.max(MIN_BLOCK_SIZE, Math.floor((available - 6 * BLOCK_MARGIN) / 7)),
+        );
+        // Once the loaded calendar already fits, stop watching its DOM: every
+        // later change would only re-measure the same size. Window resizes
+        // still come through the ResizeObserver.
+        if (next === current) mutationObserver.disconnect();
+        return next;
       });
     };
 
@@ -110,10 +124,8 @@ export default function GithubCalendar({ fit = false }: { fit?: boolean }) {
         theme={githubTheme}
         blockSize={blockSize}
         blockMargin={BLOCK_MARGIN}
-        labels={{
-          totalCount: '{{count}} contributions in the last year',
-        }}
+        labels={labels}
       />
     </div>
   );
-}
+});

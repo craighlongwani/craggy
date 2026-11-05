@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import RestoreWindows from "../components/RestoreWindows";
 import Taskbar from "../components/Taskbar";
 import Window from "../components/Window";
 import { projects } from "./data";
+import ViewLink from "./ViewLink";
 
 export const metadata: Metadata = {
   title: "Projects · Jed Lawrence Engbino",
@@ -21,6 +21,7 @@ export default function Projects() {
 
       <div className="absolute inset-x-0 top-0 bottom-10 flex items-center justify-center">
         <div
+          data-bento
           className="w-full h-[95%] overflow-y-auto p-3 md:w-[95vw] md:p-6 lg:p-8
             scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
@@ -32,6 +33,7 @@ export default function Projects() {
             {projects.map((project) => (
               <Window
                 key={project.slug}
+                project={project.slug}
                 title={project.name}
                 className={project.span}
                 bodyClassName="flex flex-col gap-2"
@@ -58,13 +60,10 @@ export default function Projects() {
                       {project.summary}
                     </p>
                   </div>
-                  <Link
-                    href={`/projects/${project.slug}`}
-                    aria-label={`View ${project.name}`}
-                    className="retro-button shrink-0 px-4 py-1 text-sm"
-                  >
-                    View
-                  </Link>
+                  <ViewLink
+                    slug={project.slug}
+                    name={project.name}
+                  />
                 </div>
               </Window>
             ))}
