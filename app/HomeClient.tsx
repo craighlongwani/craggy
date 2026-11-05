@@ -3,166 +3,125 @@ import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 import GithubCalendar from "./components/GithubCalendar";
-import { motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
-import { Inter, Poppins } from "next/font/google";
-import { useNavigate } from "./hooks/useNavigate";
+import SkillsGrid from "./components/SkillsGrid";
+import type { Skill } from "./components/SkillWindow";
 
-const interFontBold = Inter({
-  subsets: ["latin"],
-  weight: "800",
-});
+import RestoreWindows from "./components/RestoreWindows";
+import Taskbar from "./components/Taskbar";
+import Window from "./components/Window";
+import { useState, type MouseEvent } from "react";
+import { useRouter } from "next/navigation";
+import { minimizeAndGo } from "./lib/anchor";
 
-const poppins = Poppins({
-  weight: "300",
-});
-
-type TimelineEntry = {
-  date: string;
-  title: string;
-  detail: string;
-  href?: string;
-  upcoming?: boolean;
-};
-
-// Oldest first, matching the résumé.
-const timeline: TimelineEntry[] = [
+// Each card shows its title art on a 90s web-safe color picked to contrast
+// with it; clicking opens a window with the full write-up.
+const skills: Skill[] = [
   {
-    date: "Sep 2024",
-    title: "Started BS Information Systems",
-    detail: "De La Salle-College of Saint Benilde",
+    title: "Full-Stack Development",
+    image: "/assets/projects/FULLSTACKDEV.png",
+    color: "#99ccff",
+    description:
+      "Building complete web apps end to end, from the screens people click through to the servers and APIs behind them.",
+    highlights: [
+      "Responsive interfaces that work on phones and desktops alike",
+      "Back-end APIs that validate input and hand the front end clean, predictable data",
+      "Picking up an existing codebase and shipping new features on top of it",
+      "Generating branded PDF documents and reports straight from app data",
+    ],
+    usedIn: ["Bean-o", "Barangay Management System", "VerifAI", "Revora"],
   },
   {
-    date: "Oct 2024",
-    title: "Junior Barista",
-    detail: "Bodega Kafe, Parañaque",
+    title: "Database Design & SQL",
+    image: "/assets/projects/DBandSQL.png",
+    color: "#ffff99",
+    description:
+      "Modeling data so it stays correct, then writing the queries and rules that keep it that way.",
+    highlights: [
+      "Normalized schemas and ER diagrams, such as a 15-table design with a full address hierarchy",
+      "Multi-step writes wrapped in one transaction, so related records save together or not at all",
+      "Stored procedures and triggers that enforce business rules inside the database itself",
+      "Queries and functions that power live dashboards and approval queues",
+    ],
+    usedIn: ["Revora", "Bean-o", "Barangay Management System"],
   },
   {
-    date: "May 2025",
-    title: "Supplier & Inventory System",
-    detail: "Enterprise Programming course project",
+    title: "Security & Access Control",
+    image: "/assets/projects/SECandAC.png",
+    color: "#ccffcc",
+    description:
+      "Making sure every person and service can do exactly what it needs to, and nothing more.",
+    highlights: [
+      "Role-based accounts and admin-only pages, where users can't raise their own role",
+      "Least-privilege database logins with explicit deny rules and masked personal data",
+      "Hashed passwords, idle session timeouts, and audit logs that record who did what",
+      "Keeping secret keys on the server, never in the browser",
+    ],
+    usedIn: ["Bean-o", "Revora", "Barangay Management System"],
   },
   {
-    date: "Feb 2026",
-    title: "WeatherWatch",
-    detail: "UI/UX Designer, WarFrames Hackathon at UP Los Baños",
+    title: "AI & API Integration",
+    image: "/assets/projects/AIandAPI_Integration.png",
+    color: "#ff66cc",
+    description:
+      "Putting AI models and outside APIs to work, without trusting their answers blindly.",
+    highlights: [
+      "A server-side proxy so AI keys never reach the user's browser",
+      "Checking every AI-suggested source against an authoritative database before showing it",
+      "Parallel API lookups, with a fallback search when no match turns up",
+      "A 100-point rubric that scores each source on recency and relevance",
+    ],
+    usedIn: ["VerifAI"],
   },
   {
-    date: "Mar 2026",
-    title: "VerifAI",
-    detail: "HackFest 2026 at Ateneo de Manila",
-    href: "/projects/verifai",
+    title: "Testing & DevOps",
+    image: "/assets/projects/TESTandDEVOPS.png",
+    color: "#00cc99",
+    description:
+      "Automated checks and repeatable builds, so changes ship with confidence instead of crossed fingers.",
+    highlights: [
+      "Automated tests that catch regressions before users ever see them",
+      "Containerized environments that run the same on every machine",
+      "CI pipelines that test and build every change automatically",
+      "Repeatable deploys that take the guesswork out of releasing",
+    ],
+    usedIn: ["Bean-o", "This portfolio"],
   },
   {
-    date: "May 2026",
-    title: "Revora",
-    detail: "Database Management course project",
-    href: "/projects/revora",
-  },
-  {
-    date: "Jul 2026",
-    title: "Barangay Management System",
-    detail: "Barangay 43, Pasay City",
-    href: "/projects/barangay",
-  },
-  {
-    date: "Dec 2027",
-    title: "Expected graduation",
-    detail: "BS Information Systems",
-    upcoming: true,
+    title: "Systems Analysis & Design",
+    image: "/assets/projects/SYSandDE.png",
+    color: "#ffcc66",
+    description:
+      "Working out what a system should do before building it, and writing it down so the whole team agrees.",
+    highlights: [
+      "Requirements specifications and use cases that pin down the scope",
+      "Data flow and ER diagrams that map how information moves and where it lives",
+      "Multi-step workflows, like registration and approval, designed before any code",
+      "Technical documentation the rest of the team can build from",
+    ],
+    usedIn: ["VerifAI", "Revora"],
   },
 ];
 
 export default function HomeClient() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [overlayMinimized, setOverlayMinimized] = useState(false);
 
-  const items = [
-    {
-      id: 1,
-      content: (
-        <div
-          onClick={() => navigate("/projects/verifai")}
-          className="cursor-pointer flex absolute inset-0 rounded-xl"
-        >
-          <div className="relative w-full flex-1">
-            <Image
-              src="/assets/projects/VerifAI/Logo.png"
-              fill
-              alt="VerifAI"
-              className="object-cover"
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      id: 2,
-      content: (
-        <div
-          onClick={() => navigate("/projects/revora")}
-          className="cursor-pointer flex absolute inset-0 rounded-xl"
-        >
-          <div className="relative w-full flex-1">
-            <Image
-              src="/assets/projects/Revora/logo.png"
-              fill
-              alt="Revora"
-              className="object-cover"
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      id: 3,
-      content: (
-        <div
-          onClick={() => navigate("/projects/barangay")}
-          className="cursor-pointer flex absolute inset-0 rounded-xl"
-        >
-          <div className="relative w-full flex-1">
-            <Image
-              src="/assets/projects/BMS/logo.png"
-              fill
-              alt="Barangay Management System"
-              className="object-cover"
-            />
-          </div>
-        </div>
-      ),
-    },
-    { id: 4, label: "Box 4" },
-  ];
-
-  const timelineRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = timelineRef.current;
-    if (el) el.scrollLeft = el.scrollWidth;
-  }, []);
+  // Minimize every window into the taskbar's home icon, then open
+  // /projects. Modified clicks (new tab, etc.) keep the link's normal behavior.
+  const openProjects = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+      return;
+    }
+    e.preventDefault();
+    minimizeAndGo("home", () => router.push("/projects"));
+  };
 
   return (
-    <main className="relative w-full h-screen">
-      {/* Background */}
-      {/* Background */}
-      <Image
-        src="/assets/Background.jpg"
-        fill
-        alt="Background Image"
-        style={{
-          objectFit: "cover",
-          objectPosition: "center",
-          transition: "filter 500ms ease-in-out",
-          filter: overlayMinimized
-            ? "blur(0px) brightness(0.8)"
-            : "blur(3px) brightness(0.2)",
-        }}
-      />
-
+    <main className="relative w-full h-screen font-body bg-[#008080]">
       {/* Minimize/Expand Button */}
       <button
         onClick={() => setOverlayMinimized((v) => !v)}
-        className="fixed top-4 right-4 z-[60] bg-black/60 text-white px-3 py-1.5 rounded-md hover:bg-black/80 transition-colors text-sm"
+        className="win95-raised win95-focus fixed top-4 right-4 z-[60] w-8 h-7 text-black text-base leading-none"
         aria-label={overlayMinimized ? "Expand" : "Minimize"}
       >
         {overlayMinimized ? "+" : "−"}
@@ -170,7 +129,7 @@ export default function HomeClient() {
 
       {/* Overlay */}
       <div
-        className={`fixed inset-0 flex items-center justify-center transition-all duration-500 ease-in-out
+        className={`fixed inset-x-0 top-0 bottom-10 flex items-center justify-center transition-all duration-500 ease-in-out
     ${
       overlayMinimized
         ? "opacity-0 pointer-events-none"
@@ -179,32 +138,30 @@ export default function HomeClient() {
         style={{ zIndex: 50 }}
       >
         <div
-          className="w-full h-[95vh] overflow-y-auto p-3 md:w-[95vw] md:p-6 lg:p-8
+          className="w-full h-[95%] overflow-y-auto p-3 md:w-[95vw] md:p-6 lg:p-8
       scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-5 md:min-h-full md:auto-rows-fr md:grid-flow-dense">
+          <RestoreWindows
+            icon="home"
+            className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-5 md:min-h-full md:auto-rows-fr md:grid-flow-dense"
+          >
             {/* Me Card */}
-            <motion.div
-              className="col-span-1 row-span-1 overflow-hidden
-                  bg-black/70 backdrop-blur-sm rounded-2xl p-4 md:p-5 lg:p-6 flex flex-col justify-between"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            <Window
+              title="About Me"
+              className="col-span-1 row-span-1 max-md:-order-2"
+              bodyClassName="flex flex-col justify-between"
             >
-              <div className={`text-base ${poppins.className}`}>
-                <h1
-                  className={`text-5xl md:text-6xl ${interFontBold.className}`}
-                >
-                  renzo
-                </h1>
-                <h2 className="opacity-50 text-sm md:text-base">
+              <div>
+                <h1 className="text-5xl md:text-6xl">renzo</h1>
+                <p className="font-code text-xs md:text-sm text-[#404040]">
                   Information Systems | Software Engineer
-                </h2>
+                </p>
 
                 {/* Education */}
-                <p className="mt-2 text-xs leading-snug">
+                <p className="mt-2 text-sm leading-snug">
                   BSIS, 3rd year · Dean&apos;s Lister
                 </p>
-                <p className="text-xs leading-snug opacity-50">
+                <p className="text-sm leading-snug text-[#404040]">
                   De La Salle-College of Saint Benilde
                 </p>
               </div>
@@ -261,162 +218,78 @@ export default function HomeClient() {
                   href="/Jed-Lawrence-Engbino-Resume.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`ml-auto rounded-full border border-white/30 px-3 py-1 text-xs
-                    hover:bg-white hover:text-black transition-colors ${interFontBold.className}`}
+                  className="win95-raised win95-focus ml-auto px-4 py-1 text-sm"
                 >
                   Résumé
                 </a>
               </div>
-            </motion.div>
+            </Window>
 
             {/* GitHub Card — spans 2 cols on md+ */}
-            <motion.div
-              className="col-span-1 md:col-span-2 row-span-1 overflow-hidden bg-black/70 backdrop-blur-sm rounded-2xl p-4 md:p-5 lg:p-6 flex flex-col"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            >
-              <div className="mb-2">
+            <Window
+              title={
                 <Link
                   href="https://github.com/renzoboyy"
                   target="_blank"
-                  className="items-center gap-3 inline-flex"
+                  className="inline-flex items-center gap-1.5 hover:underline"
                 >
                   <Image
                     src="/assets/icons/GitHub.png"
-                    width={28}
-                    height={28}
+                    width={16}
+                    height={16}
                     alt="GitHub Icon"
                   />
-                  <h2
-                    className={`text-2xl md:text-3xl ${interFontBold.className}`}
-                  >
-                    GitHub
-                  </h2>
+                  GitHub
                 </Link>
-              </div>
-
-              {/* Calendar scrolls horizontally on small screens */}
-              <div className="overflow-x-auto w-full">
-                <div className={`${poppins.className}`}>
-                  <GithubCalendar />
-                </div>
-              </div>
-            </motion.div>
-
-          
-            {/* Projects Card — spans 2 cols on md+ */}
-            <motion.div
-              className="col-span-1 md:col-span-2 row-span-1 overflow-hidden bg-black/70 backdrop-blur-sm rounded-2xl p-4 md:p-5 lg:p-6 flex flex-col"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              }
+              className="col-span-1 md:col-span-2 row-span-1"
+              bodyClassName="flex flex-col"
             >
-              <h2
-                className={`text-2xl md:text-3xl ${interFontBold.className} mb-2`}
-              >
-                Projects
-              </h2>
-
-              {/* 2 cols on mobile, 4 cols on desktop */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 flex-1">
-                {items.map((item) => (
-                  <motion.div
-                    key={item.id}
-                    className="relative overflow-hidden bg-black/80 backdrop-blur-sm rounded-xl aspect-square md:aspect-auto md:h-full flex flex-col"
-                    whileHover={{ scale: 1.02 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 300,
-                      damping: 20,
-                    }}
-                  >
-                    {item.content}
-                  </motion.div>
-                ))}
+              {/* Calendar fills the window on md+ and scrolls horizontally */}
+              <div className="win95-sunken bg-white p-3 overflow-x-auto w-full relative flex-1 min-h-0">
+                <GithubCalendar fit />
               </div>
-            </motion.div>
+            </Window>
 
             {/* Skills Card — col span 2, row span 2 */}
-            <motion.div
-              className="col-span-1 md:col-span-2 row-span-2 overflow-hidden bg-black/70 backdrop-blur-sm rounded-2xl p-4 md:p-5 lg:p-6 flex flex-col"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            <Window
+              title="Skills"
+              className="col-span-1 md:col-span-2 row-span-2"
+              bodyClassName="flex flex-col gap-1.5 md:gap-2"
             >
-              <h2
-                className={`text-2xl md:text-3xl ${interFontBold.className} mb-3`}
+              <SkillsGrid skills={skills} />
+            </Window>
+
+            {/* Projects Card — links to the full /projects page */}
+            <Window
+              title="Projects"
+              className="col-span-1 row-span-1"
+              bodyClassName="flex flex-col"
+            >
+              <Link
+                href="/projects"
+                onClick={openProjects}
+                className="win95-sunken win95-focus relative block flex-1 aspect-video md:aspect-auto bg-[#00cc99]"
               >
-                Skills
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 flex-1">
-                {[
-                  {
-                    title: "Web Development",
-                    description:
-                      "React, Next.js, Tailwind — building responsive, modern interfaces from scratch.",
-                  },
-                  {
-                    title: "Database Management",
-                    description:
-                      "SQL & NoSQL databases; schema design, queries, and basic normalization.",
-                  },
-                  {
-                    title: "Data Analysis",
-                    description:
-                      "Python (pandas, NumPy), Excel, and basic visualization with Matplotlib or Seaborn.",
-                  },
-                  {
-                    title: "Systems Analysis & Design",
-                    description:
-                      "Use-case modeling, ERDs, DFDs, and systems documentation.",
-                  },
-                  {
-                    title: "Version Control",
-                    description:
-                      "Git workflows — branching, pull requests, and collaborative development on GitHub.",
-                  },
-                  {
-                    title: "Business Process Modeling",
-                    description:
-                      "Mapping and optimizing workflows using BPMN and process flow diagrams.",
-                  },
-                ].map((skill, idx) => (
-                  <motion.div
-                    key={idx}
-                    className="relative overflow-hidden bg-black/80 rounded-xl p-4 flex flex-col justify-between"
-                    style={{ willChange: "transform" }}
-                    whileHover={{ scale: 1.04 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 300,
-                      damping: 20,
-                    }}
-                  >
-                    <h3
-                      className={`text-sm font-semibold text-white mb-2 ${interFontBold.className}`}
-                    >
-                      {skill.title}
-                    </h3>
-                    <p
-                      className={`text-xs text-white/50 leading-relaxed ${poppins.className}`}
-                    >
-                      {skill.description}
-                    </p>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
+                <Image
+                  src="/assets/ViewMyProjects.png"
+                  fill
+                  sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"
+                  alt="View my projects"
+                  className="object-contain p-3"
+                />
+                <span aria-hidden className="click-me-badge font-win">
+                  Click me!
+                </span>
+              </Link>
+            </Window>
 
             {/* Contact Card — col span 1 */}
-            <motion.div
-              className="col-span-1 row-span-1 min-h-0 overflow-hidden bg-black/70 backdrop-blur-sm rounded-2xl p-4 md:p-5 lg:p-6 flex flex-col gap-3"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            <Window
+              title="Contact Me"
+              className="col-span-1 row-span-1"
+              bodyClassName="flex flex-col gap-3 overflow-hidden"
             >
-              <h2
-                className={`text-2xl md:text-3xl ${interFontBold.className} shrink-0`}
-              >
-                Contact Me
-              </h2>
-
               <div className="flex flex-col gap-2 min-h-0 overflow-hidden flex-1">
                 {[
                   {
@@ -432,102 +305,64 @@ export default function HomeClient() {
                     href: "tel:+639459718300",
                   },
                 ].map((item, idx) => (
-                  <motion.a
+                  <a
                     key={idx}
                     href={item.href}
-                    className="flex items-center gap-3 bg-black/50 rounded-xl p-3 hover:bg-white/10 transition-colors group flex-1 min-h-0"
-                    whileHover={{ scale: 1.03 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 300,
-                      damping: 20,
-                    }}
+                    className="win95-sunken flex items-center gap-3 bg-white p-3 hover:bg-[#000080] hover:text-white group flex-1 min-h-0"
                   >
                     <span className="text-2xl shrink-0">{item.icon}</span>
                     <div className="min-w-0">
-                      <p
-                        className={`text-[10px] text-white/40 uppercase tracking-widest ${poppins.className}`}
-                      >
+                      <p className="text-xs text-[#606060] group-hover:text-white/80">
                         {item.label}
                       </p>
-                      <p
-                        className={`text-sm text-white/80 group-hover:text-white transition-colors truncate ${poppins.className}`}
-                      >
-                        {item.value}
-                      </p>
+                      <p className="font-code text-sm truncate">{item.value}</p>
                     </div>
-                  </motion.a>
+                  </a>
                 ))}
               </div>
+            </Window>
 
-              <p
-                className={`text-[10px] text-white/30 shrink-0 ${poppins.className}`}
-              >
-                Open to IS, database & full-stack internships
-              </p>
-            </motion.div>
-
-            {/* Timeline Card — spans 2 cols on md+ */}
-            <motion.div
-              className="col-span-1 md:col-span-2 row-span-1 min-h-0 overflow-hidden bg-black/70 backdrop-blur-sm rounded-2xl p-4 md:p-5 lg:p-6 flex flex-col"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            {/* Availability: what an employer needs to know first. Right
+                after About Me on phones; beside Contact Me on desktop. */}
+            <Window
+              title="Availability"
+              className="col-span-1 row-span-1 max-md:-order-1"
+              bodyClassName="flex flex-col gap-2"
             >
-              <h2
-                className={`text-2xl md:text-3xl ${interFontBold.className} mb-3 shrink-0`}
-              >
-                Timeline
-              </h2>
+              <p className="flex items-center gap-2 text-lg leading-tight">
+                <span
+                  aria-hidden="true"
+                  className="win95-sunken inline-block w-3.5 h-3.5 shrink-0 bg-[#00c000]"
+                />
+                <span className="font-bold">Available now</span>
+              </p>
 
-              {/* Oldest to newest; opens scrolled to the newest entries */}
-              <div ref={timelineRef} className="overflow-x-auto flex-1 min-h-0 pb-2">
-                <ol
-                  className={`relative flex min-w-max gap-5 ${poppins.className}
-                    before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-white/20`}
-                >
-                  {timeline.map((entry) => {
-                    const body = (
-                      <>
-                        <span
-                          className={`relative block w-[11px] h-[11px] rounded-full ${
-                            entry.upcoming
-                              ? "border border-white/60 bg-black"
-                              : "bg-white"
-                          }`}
-                        />
-                        <p className="mt-3 text-[10px] uppercase tracking-widest text-white/40">
-                          {entry.date}
-                        </p>
-                        <p
-                          className={`mt-1 text-sm leading-snug ${interFontBold.className} ${
-                            entry.href ? "group-hover:underline" : ""
-                          }`}
-                        >
-                          {entry.title}
-                        </p>
-                        <p className="mt-1 text-xs leading-snug text-white/50">
-                          {entry.detail}
-                        </p>
-                      </>
-                    );
-                    return (
-                      <li key={entry.title} className="w-36 md:w-40 shrink-0">
-                        {entry.href ? (
-                          <Link href={entry.href} className="group block">
-                            {body}
-                          </Link>
-                        ) : (
-                          body
-                        )}
-                      </li>
-                    );
-                  })}
-                </ol>
-              </div>
-            </motion.div>
-          </div>
+              <dl className="win95-sunken bg-white flex-1 grid grid-cols-[auto_1fr] content-center gap-x-3 gap-y-1.5 p-2.5 text-sm leading-snug">
+                {[
+                  ["Seeking", "IS, database & full-stack internships"],
+                  ["Setup", "Hybrid or remote"],
+                  ["Hours", "Flexible: full- or part-time"],
+                  ["Location", "Metro Manila"],
+                ].map(([label, value]) => (
+                  <div key={label} className="contents">
+                    <dt className="text-[#404040]">{label}:</dt>
+                    <dd>{value}</dd>
+                  </div>
+                ))}
+              </dl>
+
+              <a
+                href="mailto:jedlawrence.engbino@gmail.com?subject=Internship%20opportunity"
+                className="retro-button self-end shrink-0 px-4 py-1 text-sm"
+              >
+                Hire me
+              </a>
+            </Window>
+          </RestoreWindows>
         </div>
       </div>
+
+      <Taskbar current="home" />
     </main>
   );
 }

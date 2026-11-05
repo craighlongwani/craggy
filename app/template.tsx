@@ -1,11 +1,13 @@
 // app/template.tsx
 "use client";
 import { motion } from "motion/react";
-import { ReactNode, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { ReactNode, useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { arrivedFromExpand, arrivedFromMinimize } from "./lib/anchor";
 
 export default function Template({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const handlePopState = () => {
@@ -35,6 +37,21 @@ export default function Template({ children }: { children: ReactNode }) {
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, [router]);
+
+  // Pages with a taskbar run their own animation instead: windows restoring
+  // from their taskbar icon. /projects always does; home does when you
+  // arrive from another taskbar page; a project page does when its window
+  // just expanded out of /projects. Decided once per visit, so a later
+  // re-render can't swap the wrapper and remount the page.
+  const [ownAnimation] = useState(
+    () =>
+      pathname === "/projects" ||
+      (pathname === "/" && arrivedFromMinimize()) ||
+      (pathname.startsWith("/projects/") && arrivedFromExpand()),
+  );
+  if (ownAnimation) {
+    return <>{children}</>;
+  }
 
   return (
     <>

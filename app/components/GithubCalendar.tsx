@@ -1,11 +1,10 @@
 'use client';
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
-// One color per contribution level (0 = none, 4 = most). With only two
-// colors the library blends the middle levels, which left 1-commit days
-// nearly indistinguishable from empty ones.
+// One color per contribution level (0 = none, 4 = most): GitHub's own
+// contribution-graph greens.
 type ColorPalette = [string, string, string, string, string];
 
 interface ThemeInput {
@@ -14,11 +13,11 @@ interface ThemeInput {
 }
 
 const palette: ColorPalette = [
-  'hsl(215, 35%, 13%)',
-  '#6e1414',
-  '#8b0000',
-  '#b01818',
-  '#d42020',
+  '#ebedf0',
+  '#9be9a8',
+  '#40c463',
+  '#30a14e',
+  '#216e39',
 ];
 
 const GitHubCalendar = dynamic(
@@ -31,8 +30,26 @@ const githubTheme: ThemeInput = {
   dark: palette,
 }
 
-export default function GithubCalendar() {
+// Module-level so the calendar's props stay identical between renders
+const labels = {
+  totalCount: '{{count}} contributions in the last year',
+};
+
+const BLOCK_MARGIN = 4;
+const DEFAULT_BLOCK_SIZE = 12;
+const MIN_BLOCK_SIZE = 10;
+const MAX_BLOCK_SIZE = 28;
+
+// With `fit`, the calendar fills its parent's height (on md+ screens, where
+// the bento grid gives the window a fixed height): the squares grow until the
+// seven rows reach the bottom, and the weeks that no longer fit scroll
+// horizontally. The parent must be positioned, since the calendar is laid
+// out absolutely so its size can't feed back into the grid row's height.
+// Memoized: the calendar draws ~370 squares, so it should only re-render
+// when its own size changes, not whenever the home page does
+export default memo(function GithubCalendar({ fit = false }: { fit?: boolean }) {
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const [blockSize, setBlockSize] = useState(DEFAULT_BLOCK_SIZE);
 
   // The calendar is wider than its card and starts scrolled to the oldest
   // week, hiding recent activity. Once the data loads, jump to the newest.
@@ -55,17 +72,60 @@ export default function GithubCalendar() {
     });
     observer.observe(wrapper, { childList: true, subtree: true });
     return () => observer.disconnect();
-  }, []);
+  }, [blockSize]);
+
+  // Size the squares to the available height. The labels above and below
+  // the grid don't scale with the squares, so their height is measured from
+  // the rendered calendar and subtracted first.
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!fit || !wrapper) return;
+    const desktop = window.matchMedia('(min-width: 768px)');
+
+    const resize = () => {
+      if (!desktop.matches) {
+        setBlockSize(DEFAULT_BLOCK_SIZE);
+        return;
+      }
+      const calendar = wrapper.querySelector<HTMLElement>('.react-activity-calendar');
+      if (!calendar || !calendar.querySelector('rect[data-date]')) return;
+      setBlockSize((current) => {
+        const grid = 7 * current + 6 * BLOCK_MARGIN;
+        const labels = calendar.offsetHeight - grid;
+        const available = wrapper.clientHeight - labels;
+        const next = Math.min(
+          MAX_BLOCK_SIZE,
+          Math.max(MIN_BLOCK_SIZE, Math.floor((available - 6 * BLOCK_MARGIN) / 7)),
+        );
+        // Once the loaded calendar already fits, stop watching its DOM: every
+        // later change would only re-measure the same size. Window resizes
+        // still come through the ResizeObserver.
+        if (next === current) mutationObserver.disconnect();
+        return next;
+      });
+    };
+
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(wrapper);
+    const mutationObserver = new MutationObserver(resize);
+    mutationObserver.observe(wrapper, { childList: true, subtree: true });
+    desktop.addEventListener('change', resize);
+    return () => {
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
+      desktop.removeEventListener('change', resize);
+    };
+  }, [fit]);
 
   return (
-    <div ref={wrapperRef}>
+    <div ref={wrapperRef} className={fit ? 'md:absolute md:inset-3' : undefined}>
       <GitHubCalendar
         username="renzoboyy"
         theme={githubTheme}
-        labels={{
-          totalCount: '{{count}} contributions in the last year',
-        }}
+        blockSize={blockSize}
+        blockMargin={BLOCK_MARGIN}
+        labels={labels}
       />
     </div>
   );
-}
+});
