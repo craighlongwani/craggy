@@ -9,9 +9,10 @@ import type { Skill } from "./components/SkillWindow";
 import RestoreWindows from "./components/RestoreWindows";
 import Taskbar from "./components/Taskbar";
 import Window from "./components/Window";
-import { useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import { minimizeAndGo } from "./lib/anchor";
+import { hashId, scrollToWindow } from "./lib/windowScroll";
 
 // Each card shows its title art on a 90s web-safe color picked to contrast
 // with it; clicking opens a window with the full write-up.
@@ -106,6 +107,29 @@ export default function HomeClient() {
   const router = useRouter();
   const [overlayMinimized, setOverlayMinimized] = useState(false);
 
+  // Deep links such as /#skills (used by the Start menu) scroll the desktop's
+  // own scroll area, since the page itself doesn't scroll. Also runs on
+  // hashchange so jumping within the page doesn't reload it.
+  useEffect(() => {
+    const jump = () => {
+      const id = hashId();
+      if (!id) return;
+      const frame = requestAnimationFrame(() => scrollToWindow(id));
+      return () => cancelAnimationFrame(frame);
+    };
+
+    let cancel = jump();
+    const onHash = () => {
+      cancel?.();
+      cancel = jump();
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => {
+      cancel?.();
+      window.removeEventListener("hashchange", onHash);
+    };
+  }, []);
+
   // Minimize every window into the taskbar's home icon, then open
   // /projects. Modified clicks (new tab, etc.) keep the link's normal behavior.
   const openProjects = (e: MouseEvent<HTMLAnchorElement>) => {
@@ -147,6 +171,7 @@ export default function HomeClient() {
           >
             {/* Me Card */}
             <Window
+              id="about"
               title="About Me"
               className="col-span-1 row-span-1 max-md:-order-2"
               bodyClassName="flex flex-col justify-between"
@@ -227,6 +252,7 @@ export default function HomeClient() {
 
             {/* GitHub Card — spans 2 cols on md+ */}
             <Window
+              id="github"
               title={
                 <Link
                   href="https://github.com/renzoboyy"
@@ -253,6 +279,7 @@ export default function HomeClient() {
 
             {/* Skills Card — col span 2, row span 2 */}
             <Window
+              id="skills"
               title="Skills"
               className="col-span-1 md:col-span-2 row-span-2"
               bodyClassName="flex flex-col gap-1.5 md:gap-2"
@@ -262,6 +289,7 @@ export default function HomeClient() {
 
             {/* Projects Card — links to the full /projects page */}
             <Window
+              id="projects"
               title="Projects"
               className="col-span-1 row-span-1"
               bodyClassName="flex flex-col"
@@ -286,6 +314,7 @@ export default function HomeClient() {
 
             {/* Contact Card — col span 1 */}
             <Window
+              id="contact"
               title="Contact Me"
               className="col-span-1 row-span-1"
               bodyClassName="flex flex-col gap-3 overflow-hidden"
@@ -325,6 +354,7 @@ export default function HomeClient() {
             {/* Availability: what an employer needs to know first. Right
                 after About Me on phones; beside Contact Me on desktop. */}
             <Window
+              id="availability"
               title="Availability"
               className="col-span-1 row-span-1 max-md:-order-1"
               bodyClassName="flex flex-col gap-2"
