@@ -311,7 +311,7 @@ export default function HomeClient() {
               bodyClassName="flex flex-col"
             >
               {/* Calendar fills the window on md+ and scrolls horizontally */}
-              <div className="win95-sunken bg-white p-3 overflow-x-auto overflow-y-hidden w-full relative flex-1 min-h-0">
+              <div className="win95-sunken bg-white p-3 overflow-hidden w-full relative flex-1 min-h-0">
                 <GithubCalendar fit />
               </div>
             </Window>

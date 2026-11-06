@@ -37,7 +37,7 @@ const labels = {
 
 const BLOCK_MARGIN = 4;
 const DEFAULT_BLOCK_SIZE = 12;
-const MIN_BLOCK_SIZE = 10;
+const MIN_BLOCK_SIZE = 8;
 const MAX_BLOCK_SIZE = 28;
 
 // With `fit`, the calendar fills its parent's height (on md+ screens, where
