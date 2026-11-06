@@ -230,42 +230,6 @@ body {
 
 /* ── Start menu ───────────────────────────────────────────────────────── */
 
-/* Win95 menus appeared instantly; a stepped 120ms reveal keeps that feel
-   without springy modern motion. */
-.start-menu {
-  transform-origin: bottom left;
-  animation: start-menu-in 120ms steps(3, end);
-}
-
-@keyframes start-menu-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px) scaleY(0.94);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scaleY(1);
-  }
-}
-
-/* The vertical "Windows 95"-style strip down the left edge of the menu */
-.start-menu-banner {
-  width: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  padding: 6px 0;
-  background: #000080;
-  color: #c0c0c0;
-  font-family: var(--font-w95), "MS Sans Serif", Tahoma, sans-serif;
-  font-size: 10px;
-  font-weight: bold;
-  letter-spacing: 0.18em;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-}
-
 /* Briefly rings a window after the Start menu jumps to it */
 .window-target {
   outline: 3px solid #ffff00;
@@ -300,7 +264,6 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .start-menu,
   .shutdown-screen {
     animation: none;
   }

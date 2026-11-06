@@ -378,12 +378,8 @@ export default function StartMenu({ current }: { current: TaskbarIcon }) {
           role="dialog"
           aria-label="Start menu"
           onKeyDown={onMenuKeyDown}
-          className="start-menu win95-window fixed bottom-10 left-1 z-[80] flex max-h-[calc(100dvh-5rem)] w-[min(94vw,22rem)] p-[3px] text-black"
+          className="win95-window fixed bottom-10 left-1 z-[80] flex max-h-[calc(100dvh-5rem)] w-[min(94vw,22rem)] p-[3px] text-black"
         >
-          <div aria-hidden className="start-menu-banner shrink-0">
-            Renzo 95
-          </div>
-
           <div className="flex min-w-0 flex-1 flex-col">
             <div className="win95-sunken m-1 flex h-7 shrink-0 items-center gap-1 bg-white px-1 focus-within:outline focus-within:outline-1 focus-within:outline-dotted focus-within:outline-black">
               <PixelIcon
