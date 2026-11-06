@@ -282,14 +282,6 @@ export default function StartMenu({ current }: { current: TaskbarIcon }) {
         keywords: "email phone reach",
         run: () => goSection("contact"),
       },
-      {
-        id: "jump-availability",
-        label: "Availability",
-        group: "Jump to",
-        icon: "clock",
-        keywords: "hire internship status available",
-        run: () => goSection("availability"),
-      },
 
       ...projectLinks.map<Action>(({ slug, name }) => ({
         id: `project-${slug}`,
