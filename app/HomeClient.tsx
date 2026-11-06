@@ -179,26 +179,21 @@ export default function HomeClient() {
               <div className="flex min-w-0 flex-col justify-between">
                 <div>
                   <h1 className="text-2xl leading-[1.05] md:text-3xl lg:text-4xl">
-                    Jed Lawrence
-                    <span className="block whitespace-nowrap">
-                      &ldquo;renzo&rdquo; Engbino
-                    </span>
+                    Jed Lawrence Engbino
                   </h1>
                   <p className="mt-1 font-code text-xs text-[#404040] md:text-sm">
-                    Information Systems student · Full-stack &amp; database
-                    developer
+                    Full-stack &amp; Database
                   </p>
 
                   {/* Education */}
                   <p className="mt-2 text-xs leading-snug md:text-sm">
-                    BSIS, 3rd year · Dean&apos;s Lister
+                    Information Systems, 3rd year · Dean&apos;s Lister
                   </p>
                   <p className="text-xs leading-snug text-[#404040] md:text-sm">
                     De La Salle-College of Saint Benilde
                   </p>
                   <p className="mt-2 text-xs leading-snug md:text-sm">
-                    Seeking IS / software engineering internships · Metro
-                    Manila / remote
+                    @ Manila, Philippines | Jeddah, Kingdom of Saudi Arabia
                   </p>
                 </div>
 
@@ -316,7 +311,7 @@ export default function HomeClient() {
               bodyClassName="flex flex-col"
             >
               {/* Calendar fills the window on md+ and scrolls horizontally */}
-              <div className="win95-sunken bg-white p-3 overflow-x-auto w-full relative flex-1 min-h-0">
+              <div className="win95-sunken bg-white p-3 overflow-x-auto overflow-y-hidden w-full relative flex-1 min-h-0">
                 <GithubCalendar fit />
               </div>
             </Window>

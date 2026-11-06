@@ -92,7 +92,9 @@ export default memo(function GithubCalendar({ fit = false }: { fit?: boolean }) 
       setBlockSize((current) => {
         const grid = 7 * current + 6 * BLOCK_MARGIN;
         const labels = calendar.offsetHeight - grid;
-        const available = wrapper.clientHeight - labels;
+        // Leave a pixel of slack so sub-pixel rounding can't add a vertical
+        // scrollbar to the surrounding frame.
+        const available = wrapper.clientHeight - labels - 1;
         const next = Math.min(
           MAX_BLOCK_SIZE,
           Math.max(MIN_BLOCK_SIZE, Math.floor((available - 6 * BLOCK_MARGIN) / 7)),
@@ -118,7 +120,10 @@ export default memo(function GithubCalendar({ fit = false }: { fit?: boolean }) 
   }, [fit]);
 
   return (
-    <div ref={wrapperRef} className={fit ? 'md:absolute md:inset-3' : undefined}>
+    <div
+      ref={wrapperRef}
+      className={fit ? 'md:absolute md:inset-3 md:flex md:items-center' : undefined}
+    >
       <GitHubCalendar
         username="renzoboyy"
         theme={githubTheme}
