@@ -11,7 +11,11 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import PixelIcon, { icons, type IconName } from "./PixelIcon";
-import { minimizeAndGo, type TaskbarIcon } from "../lib/anchor";
+import {
+  markProjectOpening,
+  minimizeAndGo,
+  type TaskbarIcon,
+} from "../lib/anchor";
 import { scrollToWindow } from "../lib/windowScroll";
 import { projects } from "../projects/data";
 
@@ -200,7 +204,14 @@ export default function StartMenu({ current }: { current: TaskbarIcon }) {
 
     const goProject = (slug: string) => {
       closeMenu(true);
-      router.push(`/projects/${slug}`);
+      const href = `/projects/${slug}`;
+      if (pathname === href) return;
+      // Minimize the current page's windows, then let this project's window
+      // restore from the projects taskbar icon on the way in.
+      minimizeAndGo(current, () => {
+        markProjectOpening(slug);
+        router.push(href);
+      });
     };
 
     const openTab = (href: string) => {
