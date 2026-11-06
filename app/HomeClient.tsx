@@ -173,84 +173,128 @@ export default function HomeClient() {
             <Window
               id="about"
               title="About Me"
-              className="col-span-1 row-span-1 max-md:-order-2"
-              bodyClassName="flex flex-col justify-between"
+              className="col-span-1 md:col-span-2 row-span-1 max-md:-order-2"
+              bodyClassName="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] md:items-stretch"
             >
-              <div>
-                <h1 className="text-5xl md:text-6xl">renzo</h1>
-                <p className="font-code text-xs md:text-sm text-[#404040]">
-                  Information Systems | Software Engineer
-                </p>
+              <div className="flex min-w-0 flex-col justify-between">
+                <div>
+                  <h1 className="text-2xl leading-[1.05] md:text-3xl lg:text-4xl">
+                    Jed Lawrence
+                    <span className="block whitespace-nowrap">
+                      &ldquo;renzo&rdquo; Engbino
+                    </span>
+                  </h1>
+                  <p className="mt-1 font-code text-xs text-[#404040] md:text-sm">
+                    Information Systems student · Full-stack &amp; database
+                    developer
+                  </p>
 
-                {/* Education */}
-                <p className="mt-2 text-sm leading-snug">
-                  BSIS, 3rd year · Dean&apos;s Lister
-                </p>
-                <p className="text-sm leading-snug text-[#404040]">
-                  De La Salle-College of Saint Benilde
-                </p>
+                  {/* Education */}
+                  <p className="mt-2 text-xs leading-snug md:text-sm">
+                    BSIS, 3rd year · Dean&apos;s Lister
+                  </p>
+                  <p className="text-xs leading-snug text-[#404040] md:text-sm">
+                    De La Salle-College of Saint Benilde
+                  </p>
+                  <p className="mt-2 text-xs leading-snug md:text-sm">
+                    Seeking IS / software engineering internships · Metro
+                    Manila / remote
+                  </p>
+                </div>
+
+                {/* Socials + résumé */}
+                <div className="mt-3 flex flex-wrap items-center gap-2.5 md:gap-3">
+                  <Link
+                    href="https://www.linkedin.com/in/jed-lawrence-engbino-629997372/"
+                    target="_blank"
+                    aria-label="LinkedIn"
+                  >
+                    <Image
+                      src="/assets/icons/LinkedIn.png"
+                      width={24}
+                      height={24}
+                      alt=""
+                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6"
+                    />
+                  </Link>
+                  <Link
+                    href="https://github.com/renzoboyy"
+                    target="_blank"
+                    aria-label="GitHub"
+                  >
+                    <Image
+                      src="/assets/icons/GitHub.png"
+                      width={24}
+                      height={24}
+                      alt=""
+                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6"
+                    />
+                  </Link>
+                  <Link
+                    href="https://www.instagram.com/jlrebn/"
+                    target="_blank"
+                    aria-label="Instagram"
+                  >
+                    <Image
+                      src="/assets/icons/Instagram.png"
+                      width={24}
+                      height={24}
+                      alt=""
+                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6"
+                    />
+                  </Link>
+                  <Link
+                    href="https://discord.com/users/472141998565097472"
+                    target="_blank"
+                    aria-label="Discord"
+                  >
+                    <Image
+                      src="/assets/icons/Disc.png"
+                      width={24}
+                      height={24}
+                      alt=""
+                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6"
+                    />
+                  </Link>
+                  <Link
+                    href="https://www.facebook.com/jelo.binz/"
+                    target="_blank"
+                    aria-label="Facebook"
+                  >
+                    <Image
+                      src="/assets/icons/Facebook.png"
+                      width={24}
+                      height={24}
+                      alt=""
+                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6"
+                    />
+                  </Link>
+
+                  <a
+                    href="/Jed-Lawrence-Engbino-Resume.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="win95-raised win95-focus ml-auto px-3 py-0.5 text-xs md:px-4 md:py-1 md:text-sm"
+                  >
+                    Résumé
+                  </a>
+                </div>
               </div>
 
-              {/* Socials + résumé */}
-              <div className="flex flex-wrap items-center gap-3 mt-3">
-                <Link
-                  href="https://www.linkedin.com/in/jed-lawrence-engbino-629997372/"
-                  target="_blank"
-                >
-                  <Image
-                    src="/assets/icons/LinkedIn.png"
-                    width={24}
-                    height={24}
-                    alt="LinkedIn Icon"
-                    className="pointer-events-none"
-                  />
-                </Link>
-                <Link href="https://www.instagram.com/jlrebn/" target="_blank">
-                  <Image
-                    src="/assets/icons/Instagram.png"
-                    width={24}
-                    height={24}
-                    alt="Instagram Icon"
-                    className="pointer-events-none"
-                  />
-                </Link>
-                <Link
-                  href="https://discord.com/users/472141998565097472"
-                  target="_blank"
-                >
-                  <Image
-                    src="/assets/icons/Disc.png"
-                    width={24}
-                    height={24}
-                    alt="Discord Icon"
-                    className="pointer-events-none"
-                  />
-                </Link>
-                <Link
-                  href="https://www.facebook.com/jelo.binz/"
-                  target="_blank"
-                >
-                  <Image
-                    src="/assets/icons/Facebook.png"
-                    width={24}
-                    height={24}
-                    alt="Facebook Icon"
-                    className="pointer-events-none"
-                  />
-                </Link>
-
-                <a
-                  href="/Jed-Lawrence-Engbino-Resume.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="win95-raised win95-focus ml-auto px-4 py-1 text-sm"
-                >
-                  Résumé
-                </a>
+              {/* Portrait */}
+              <div className="win95-sunken relative min-h-56 overflow-hidden bg-white md:min-h-0">
+                <Image
+                  src="/assets/me.png"
+                  alt="Portrait of Jed Lawrence Engbino"
+                  fill
+                  priority
+                  sizes="(min-width: 768px) 25vw, 100vw"
+                  className="object-cover object-[55%_35%]"
+                />
               </div>
             </Window>
 
-            {/* GitHub Card — spans 2 cols on md+ */}
+            {/* GitHub Card */}
             <Window
               id="github"
               title={
@@ -268,7 +312,7 @@ export default function HomeClient() {
                   GitHub
                 </Link>
               }
-              className="col-span-1 md:col-span-2 row-span-1"
+              className="col-span-1 row-span-1"
               bodyClassName="flex flex-col"
             >
               {/* Calendar fills the window on md+ and scrolls horizontally */}
@@ -277,11 +321,11 @@ export default function HomeClient() {
               </div>
             </Window>
 
-            {/* Skills Card — col span 2, row span 2 */}
+            {/* Skills Card — col span 2 */}
             <Window
               id="skills"
               title="Skills"
-              className="col-span-1 md:col-span-2 row-span-2"
+              className="col-span-1 md:col-span-2 row-span-1"
               bodyClassName="flex flex-col gap-1.5 md:gap-2"
             >
               <SkillsGrid skills={skills} />
