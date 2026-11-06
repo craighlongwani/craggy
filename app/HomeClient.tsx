@@ -321,11 +321,11 @@ export default function HomeClient() {
               </div>
             </Window>
 
-            {/* Skills Card — col span 2 */}
+            {/* Skills Card — col span 2, row span 2 */}
             <Window
               id="skills"
               title="Skills"
-              className="col-span-1 md:col-span-2 row-span-1"
+              className="col-span-1 md:col-span-2 row-span-2"
               bodyClassName="flex flex-col gap-1.5 md:gap-2"
             >
               <SkillsGrid skills={skills} />
