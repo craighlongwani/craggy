@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 // 16×16 pixel art shared by the taskbar and the Start menu. Each icon is one
 // string per row, one character per pixel, and "." is transparent.
 
@@ -282,7 +284,17 @@ export const icons = {
 
 export type IconName = keyof typeof icons;
 
-export default function PixelIcon({
+function pixelPath(rows: string[], color: string) {
+  let d = "";
+  rows.forEach((row, y) => {
+    for (let x = 0; x < row.length; x += 1) {
+      if (row[x] === color) d += `M${x} ${y}h1v1h-1z`;
+    }
+  });
+  return d;
+}
+
+function PixelIcon({
   rows,
   size = 24,
   className = "",
@@ -291,6 +303,15 @@ export default function PixelIcon({
   size?: number;
   className?: string;
 }) {
+  // One path per color instead of one <rect> per pixel: a 16×16 icon drops
+  // from ~100 SVG nodes to a handful, so the menu stays cheap to paint.
+  const colors = new Set<string>();
+  for (const row of rows) {
+    for (const c of row) {
+      if (c !== ".") colors.add(c);
+    }
+  }
+
   return (
     <svg
       viewBox="0 0 16 16"
@@ -300,20 +321,11 @@ export default function PixelIcon({
       aria-hidden
       className={className}
     >
-      {rows.flatMap((row, y) =>
-        Array.from(row, (c, x) =>
-          c === "." ? null : (
-            <rect
-              key={`${x}-${y}`}
-              x={x}
-              y={y}
-              width={1}
-              height={1}
-              fill={pixelColors[c]}
-            />
-          )
-        )
-      )}
+      {Array.from(colors, (c) => (
+        <path key={c} d={pixelPath(rows, c)} fill={pixelColors[c]} />
+      ))}
     </svg>
   );
 }
+
+export default memo(PixelIcon);

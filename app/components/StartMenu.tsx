@@ -1,5 +1,6 @@
 "use client";
 import {
+  memo,
   useCallback,
   useEffect,
   useId,
@@ -51,6 +52,44 @@ function matches(haystack: string, needle: string) {
   return false;
 }
 
+// One result row. Memoized so hovering only re-renders the two rows whose
+// selected state changed instead of the whole list, keeping the pixel icons
+// untouched while the highlight moves.
+const StartMenuItem = memo(function StartMenuItem({
+  action,
+  index,
+  active,
+  optionId,
+  onHover,
+  onSelect,
+}: {
+  action: Action;
+  index: number;
+  active: boolean;
+  optionId: string;
+  onHover: (index: number) => void;
+  onSelect: (action: Action) => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="option"
+      id={optionId}
+      data-index={index}
+      aria-selected={active}
+      tabIndex={-1}
+      onPointerEnter={() => onHover(index)}
+      onClick={() => onSelect(action)}
+      className={`flex w-full items-center gap-2 px-2 py-1.5 text-left font-win text-sm ${
+        active ? "bg-[#000080] text-white" : "text-black"
+      }`}
+    >
+      <PixelIcon rows={icons[action.icon]} size={20} className="shrink-0" />
+      <span className="min-w-0 flex-1 truncate">{action.label}</span>
+    </button>
+  );
+});
+
 // The Win95 Start button, plus a searchable Start menu standing in for a
 // command palette: every page, section, project and link is a result you can
 // arrow through and open with Enter. Ctrl/Cmd+K toggles it from anywhere.
@@ -65,7 +104,6 @@ export default function StartMenu({ current }: { current: TaskbarIcon }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const restartRef = useRef<HTMLButtonElement>(null);
-  const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const menuId = `start-menu-${uid}`;
@@ -82,6 +120,15 @@ export default function StartMenu({ current }: { current: TaskbarIcon }) {
     setQuery("");
     setActive(0);
     setOpen(true);
+  }, []);
+
+  // Stable handlers keep the memoized rows from re-rendering on every hover
+  const handleHover = useCallback((index: number) => {
+    setActive((current) => (current === index ? current : index));
+  }, []);
+
+  const handleSelect = useCallback((action: Action) => {
+    action.run();
   }, []);
 
   // Ctrl/Cmd+K opens and closes the menu from anywhere on the desktop
@@ -318,12 +365,6 @@ export default function StartMenu({ current }: { current: TaskbarIcon }) {
   // briefly point the active descendant at a row that no longer exists
   const activeIndex = visible.length ? Math.min(active, visible.length - 1) : 0;
 
-  // Arrow keys scroll the highlighted row into view inside the menu
-  useEffect(() => {
-    if (!open) return;
-    optionRefs.current[activeIndex]?.scrollIntoView({ block: "nearest" });
-  }, [activeIndex, open]);
-
   const onMenuKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Escape") {
       e.preventDefault();
@@ -332,18 +373,28 @@ export default function StartMenu({ current }: { current: TaskbarIcon }) {
     }
     if (visible.length === 0) return;
 
+    // Scroll only for keyboard moves. Hovering already means the row is
+    // visible, and scrolling on hover can move another row under the cursor,
+    // firing pointerenter again and making the highlight stutter.
+    const select = (next: number) => {
+      setActive(next);
+      e.currentTarget
+        .querySelector<HTMLElement>(`[data-index="${next}"]`)
+        ?.scrollIntoView({ block: "nearest" });
+    };
+
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setActive((activeIndex + 1) % visible.length);
+      select((activeIndex + 1) % visible.length);
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setActive((activeIndex - 1 + visible.length) % visible.length);
+      select((activeIndex - 1 + visible.length) % visible.length);
     } else if (e.key === "Home") {
       e.preventDefault();
-      setActive(0);
+      select(0);
     } else if (e.key === "End") {
       e.preventDefault();
-      setActive(visible.length - 1);
+      select(visible.length - 1);
     } else if (e.key === "Enter") {
       e.preventDefault();
       visible[activeIndex]?.run();
@@ -394,6 +445,8 @@ export default function StartMenu({ current }: { current: TaskbarIcon }) {
                 onChange={(e) => {
                   setQuery(e.target.value);
                   setActive(0);
+                  const list = document.getElementById(listId);
+                  if (list) list.scrollTop = 0;
                 }}
                 placeholder="Search..."
                 aria-label="Search the Start menu"
@@ -436,34 +489,15 @@ export default function StartMenu({ current }: { current: TaskbarIcon }) {
                       {group.name}
                     </p>
                     {group.items.map(({ action, index }) => (
-                      <button
+                      <StartMenuItem
                         key={action.id}
-                        ref={(el) => {
-                          optionRefs.current[index] = el;
-                        }}
-                        type="button"
-                        role="option"
-                        id={`${listId}-option-${index}`}
-                        aria-selected={index === activeIndex}
-                        tabIndex={-1}
-                        title={action.label}
-                        onPointerEnter={() => setActive(index)}
-                        onClick={action.run}
-                        className={`flex w-full items-center gap-2 px-2 py-1.5 text-left font-win text-sm ${
-                          index === activeIndex
-                            ? "bg-[#000080] text-white"
-                            : "text-black"
-                        }`}
-                      >
-                        <PixelIcon
-                          rows={icons[action.icon]}
-                          size={20}
-                          className="shrink-0"
-                        />
-                        <span className="min-w-0 flex-1 truncate">
-                          {action.label}
-                        </span>
-                      </button>
+                        action={action}
+                        index={index}
+                        active={index === activeIndex}
+                        optionId={`${listId}-option-${index}`}
+                        onHover={handleHover}
+                        onSelect={handleSelect}
+                      />
                     ))}
                   </div>
                 ))
