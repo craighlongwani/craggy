@@ -9,9 +9,11 @@ import type { Skill } from "./components/SkillWindow";
 import RestoreWindows from "./components/RestoreWindows";
 import Taskbar from "./components/Taskbar";
 import Window from "./components/Window";
-import { useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
-import { minimizeAndGo } from "./lib/anchor";
+import { markProjectOpening, minimizeAndGo } from "./lib/anchor";
+import { projects } from "./projects/data";
+import { hashId, scrollToWindow } from "./lib/windowScroll";
 
 // Each card shows its title art on a 90s web-safe color picked to contrast
 // with it; clicking opens a window with the full write-up.
@@ -106,6 +108,29 @@ export default function HomeClient() {
   const router = useRouter();
   const [overlayMinimized, setOverlayMinimized] = useState(false);
 
+  // Deep links such as /#skills (used by the Start menu) scroll the desktop's
+  // own scroll area, since the page itself doesn't scroll. Also runs on
+  // hashchange so jumping within the page doesn't reload it.
+  useEffect(() => {
+    const jump = () => {
+      const id = hashId();
+      if (!id) return;
+      const frame = requestAnimationFrame(() => scrollToWindow(id));
+      return () => cancelAnimationFrame(frame);
+    };
+
+    let cancel = jump();
+    const onHash = () => {
+      cancel?.();
+      cancel = jump();
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => {
+      cancel?.();
+      window.removeEventListener("hashchange", onHash);
+    };
+  }, []);
+
   // Minimize every window into the taskbar's home icon, then open
   // /projects. Modified clicks (new tab, etc.) keep the link's normal behavior.
   const openProjects = (e: MouseEvent<HTMLAnchorElement>) => {
@@ -114,6 +139,19 @@ export default function HomeClient() {
     }
     e.preventDefault();
     minimizeAndGo("home", () => router.push("/projects"));
+  };
+
+  // Same movement for a single project, following the Start menu's jump: the
+  // project page restores its window from the projects taskbar icon.
+  const openFeatured = (slug: string) => (e: MouseEvent<HTMLAnchorElement>) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+      return;
+    }
+    e.preventDefault();
+    minimizeAndGo("home", () => {
+      markProjectOpening(slug);
+      router.push(`/projects/${slug}`);
+    });
   };
 
   return (
@@ -147,86 +185,131 @@ export default function HomeClient() {
           >
             {/* Me Card */}
             <Window
+              id="about"
               title="About Me"
-              className="col-span-1 row-span-1 max-md:-order-2"
-              bodyClassName="flex flex-col justify-between"
+              className="col-span-1 md:col-span-2 row-span-1 max-md:-order-2"
+              bodyClassName="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] md:items-stretch"
             >
-              <div>
-                <h1 className="text-5xl md:text-6xl">renzo</h1>
-                <p className="font-code text-xs md:text-sm text-[#404040]">
-                  Information Systems | Software Engineer
-                </p>
+              <div className="flex min-w-0 flex-col justify-between">
+                <div>
+                  <h1 className="text-2xl leading-[1.05] md:text-3xl lg:text-4xl">
+                    Jed Lawrence Engbino
+                  </h1>
+                  <p className="mt-1 font-code text-xs text-[#404040] md:text-sm">
+                    Full-stack &amp; Database
+                  </p>
 
-                {/* Education */}
-                <p className="mt-2 text-sm leading-snug">
-                  BSIS, 3rd year · Dean&apos;s Lister
-                </p>
-                <p className="text-sm leading-snug text-[#404040]">
-                  De La Salle-College of Saint Benilde
-                </p>
+                  {/* Education */}
+                  <p className="mt-2 text-xs leading-snug md:text-sm">
+                    Information Systems, 3rd year · Dean&apos;s Lister
+                  </p>
+                  <p className="text-xs leading-snug text-[#404040] md:text-sm">
+                    De La Salle-College of Saint Benilde
+                  </p>
+                  <p className="mt-2 text-xs leading-snug md:text-sm">
+                    @ Manila, Philippines | Jeddah, Kingdom of Saudi Arabia
+                  </p>
+                  <p className="mt-2 text-xs leading-snug md:text-sm">
+                    Seeking IS / software engineering internships · Metro
+                    Manila / remote
+                  </p>
+                </div>
+
+                {/* Socials + résumé */}
+                <div className="mt-3 flex flex-wrap items-center gap-2.5 md:gap-3">
+                  <Link
+                    href="https://www.linkedin.com/in/jed-lawrence-engbino-629997372/"
+                    target="_blank"
+                    aria-label="LinkedIn"
+                  >
+                    <Image
+                      src="/assets/icons/LinkedIn.png"
+                      width={24}
+                      height={24}
+                      alt=""
+                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6"
+                    />
+                  </Link>
+                  <Link
+                    href="https://github.com/renzoboyy"
+                    target="_blank"
+                    aria-label="GitHub"
+                  >
+                    <Image
+                      src="/assets/icons/GitHub.png"
+                      width={24}
+                      height={24}
+                      alt=""
+                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6"
+                    />
+                  </Link>
+                  <Link
+                    href="https://www.instagram.com/jlrebn/"
+                    target="_blank"
+                    aria-label="Instagram"
+                  >
+                    <Image
+                      src="/assets/icons/Instagram.png"
+                      width={24}
+                      height={24}
+                      alt=""
+                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6"
+                    />
+                  </Link>
+                  <Link
+                    href="https://discord.com/users/472141998565097472"
+                    target="_blank"
+                    aria-label="Discord"
+                  >
+                    <Image
+                      src="/assets/icons/Disc.png"
+                      width={24}
+                      height={24}
+                      alt=""
+                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6"
+                    />
+                  </Link>
+                  <Link
+                    href="https://www.facebook.com/jelo.binz/"
+                    target="_blank"
+                    aria-label="Facebook"
+                  >
+                    <Image
+                      src="/assets/icons/Facebook.png"
+                      width={24}
+                      height={24}
+                      alt=""
+                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6"
+                    />
+                  </Link>
+
+                  <a
+                    href="/Jed-Lawrence-Engbino-Resume.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="win95-raised win95-focus ml-auto px-3 py-0.5 text-xs md:px-4 md:py-1 md:text-sm"
+                  >
+                    Résumé
+                  </a>
+                </div>
               </div>
 
-              {/* Socials + résumé */}
-              <div className="flex flex-wrap items-center gap-3 mt-3">
-                <Link
-                  href="https://www.linkedin.com/in/jed-lawrence-engbino-629997372/"
-                  target="_blank"
-                >
-                  <Image
-                    src="/assets/icons/LinkedIn.png"
-                    width={24}
-                    height={24}
-                    alt="LinkedIn Icon"
-                    className="pointer-events-none"
-                  />
-                </Link>
-                <Link href="https://www.instagram.com/jlrebn/" target="_blank">
-                  <Image
-                    src="/assets/icons/Instagram.png"
-                    width={24}
-                    height={24}
-                    alt="Instagram Icon"
-                    className="pointer-events-none"
-                  />
-                </Link>
-                <Link
-                  href="https://discord.com/users/472141998565097472"
-                  target="_blank"
-                >
-                  <Image
-                    src="/assets/icons/Disc.png"
-                    width={24}
-                    height={24}
-                    alt="Discord Icon"
-                    className="pointer-events-none"
-                  />
-                </Link>
-                <Link
-                  href="https://www.facebook.com/jelo.binz/"
-                  target="_blank"
-                >
-                  <Image
-                    src="/assets/icons/Facebook.png"
-                    width={24}
-                    height={24}
-                    alt="Facebook Icon"
-                    className="pointer-events-none"
-                  />
-                </Link>
-
-                <a
-                  href="/Jed-Lawrence-Engbino-Resume.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="win95-raised win95-focus ml-auto px-4 py-1 text-sm"
-                >
-                  Résumé
-                </a>
+              {/* Portrait */}
+              <div className="win95-sunken relative min-h-56 overflow-hidden bg-white md:min-h-0">
+                <Image
+                  src="/assets/me.png"
+                  alt="Portrait of Jed Lawrence Engbino"
+                  fill
+                  priority
+                  sizes="(min-width: 768px) 25vw, 100vw"
+                  className="object-cover object-[55%_35%]"
+                />
               </div>
             </Window>
 
-            {/* GitHub Card — spans 2 cols on md+ */}
+            {/* GitHub Card */}
             <Window
+              id="github"
               title={
                 <Link
                   href="https://github.com/renzoboyy"
@@ -242,17 +325,18 @@ export default function HomeClient() {
                   GitHub
                 </Link>
               }
-              className="col-span-1 md:col-span-2 row-span-1"
+              className="col-span-1 row-span-1"
               bodyClassName="flex flex-col"
             >
               {/* Calendar fills the window on md+ and scrolls horizontally */}
-              <div className="win95-sunken bg-white p-3 overflow-x-auto w-full relative flex-1 min-h-0">
+              <div className="win95-sunken bg-white p-3 overflow-hidden w-full relative flex-1 min-h-0">
                 <GithubCalendar fit />
               </div>
             </Window>
 
             {/* Skills Card — col span 2, row span 2 */}
             <Window
+              id="skills"
               title="Skills"
               className="col-span-1 md:col-span-2 row-span-2"
               bodyClassName="flex flex-col gap-1.5 md:gap-2"
@@ -260,32 +344,51 @@ export default function HomeClient() {
               <SkillsGrid skills={skills} />
             </Window>
 
-            {/* Projects Card — links to the full /projects page */}
+            {/* Featured Work — one clickable row per project; the footer opens
+                the full /projects page (rows follow data.ts automatically) */}
             <Window
-              title="Projects"
+              id="projects"
+              title="Featured Work"
               className="col-span-1 row-span-1"
-              bodyClassName="flex flex-col"
+              bodyClassName="flex flex-col gap-2 min-h-0"
             >
+              <div className="flex flex-col gap-2 flex-1 min-h-0">
+                {projects.map((p) => (
+                  <Link
+                    key={p.slug}
+                    href={`/projects/${p.slug}`}
+                    onClick={openFeatured(p.slug)}
+                    className="win95-sunken group flex flex-1 min-h-0 items-center gap-3 bg-white p-2.5 hover:bg-[#000080] hover:text-white"
+                  >
+                    <Image
+                      src={p.logo}
+                      alt=""
+                      width={32}
+                      height={32}
+                      className="h-8 w-8 shrink-0 object-contain"
+                    />
+                    <span className="block min-w-0">
+                      <span className="block text-sm font-bold">{p.name}</span>
+                      <span className="block truncate font-code text-xs text-[#404040] group-hover:text-white/80">
+                        {p.summary}
+                      </span>
+                    </span>
+                  </Link>
+                ))}
+              </div>
+
               <Link
                 href="/projects"
                 onClick={openProjects}
-                className="win95-sunken win95-focus relative block flex-1 aspect-video md:aspect-auto bg-[#00cc99]"
+                className="retro-button shrink-0 self-center px-4 py-1 text-sm"
               >
-                <Image
-                  src="/assets/ViewMyProjects.png"
-                  fill
-                  sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"
-                  alt="View my projects"
-                  className="object-contain p-3"
-                />
-                <span aria-hidden className="click-me-badge font-win">
-                  Click me!
-                </span>
+                All projects →
               </Link>
             </Window>
 
             {/* Contact Card — col span 1 */}
             <Window
+              id="contact"
               title="Contact Me"
               className="col-span-1 row-span-1"
               bodyClassName="flex flex-col gap-3 overflow-hidden"
@@ -301,7 +404,7 @@ export default function HomeClient() {
                   {
                     icon: "📱",
                     label: "Phone",
-                    value: "+63 945 971 8300",
+                    value: "+63 949 825 3671",
                     href: "tel:+639459718300",
                   },
                 ].map((item, idx) => (
@@ -320,43 +423,6 @@ export default function HomeClient() {
                   </a>
                 ))}
               </div>
-            </Window>
-
-            {/* Availability: what an employer needs to know first. Right
-                after About Me on phones; beside Contact Me on desktop. */}
-            <Window
-              title="Availability"
-              className="col-span-1 row-span-1 max-md:-order-1"
-              bodyClassName="flex flex-col gap-2"
-            >
-              <p className="flex items-center gap-2 text-lg leading-tight">
-                <span
-                  aria-hidden="true"
-                  className="win95-sunken inline-block w-3.5 h-3.5 shrink-0 bg-[#00c000]"
-                />
-                <span className="font-bold">Available now</span>
-              </p>
-
-              <dl className="win95-sunken bg-white flex-1 grid grid-cols-[auto_1fr] content-center gap-x-3 gap-y-1.5 p-2.5 text-sm leading-snug">
-                {[
-                  ["Seeking", "IS, database & full-stack internships"],
-                  ["Setup", "Hybrid or remote"],
-                  ["Hours", "Flexible: full- or part-time"],
-                  ["Location", "Metro Manila"],
-                ].map(([label, value]) => (
-                  <div key={label} className="contents">
-                    <dt className="text-[#404040]">{label}:</dt>
-                    <dd>{value}</dd>
-                  </div>
-                ))}
-              </dl>
-
-              <a
-                href="mailto:jedlawrence.engbino@gmail.com?subject=Internship%20opportunity"
-                className="retro-button self-end shrink-0 px-4 py-1 text-sm"
-              >
-                Hire me
-              </a>
             </Window>
           </RestoreWindows>
         </div>

@@ -202,6 +202,35 @@ export function expandAndGo(selected: HTMLElement, go: () => void) {
   ghostTimers.add(safety);
 }
 
+// ── Opening a project from the Start menu ────────────────────────────────
+// The Start menu minimizes the current page's windows into its taskbar icon
+// first, then the chosen project page grows its single window back out of the
+// projects icon. This is separate from View's expand-and-go transition above,
+// where the selected window grows straight into the project page.
+
+let startMenuProject: { slug: string; at: number; readAt?: number } | null =
+  null;
+
+// The project that should restore its window on arrival. Still readable for a
+// moment after the first read, because React in dev mounts the page's effects
+// twice; after that a later visit won't replay it.
+export function arrivedFromStartMenu(slug: string) {
+  const p = startMenuProject;
+  if (!p || p.slug !== slug) return false;
+  const now = performance.now();
+  if (now - p.at > 10000) return false;
+  p.readAt ??= now;
+  if (now - p.readAt > 500) {
+    startMenuProject = null;
+    return false;
+  }
+  return true;
+}
+
+export function markProjectOpening(slug: string) {
+  startMenuProject = { slug, at: performance.now() };
+}
+
 // ── Closing a project ────────────────────────────────────────────────────
 // The reverse: the project page's contents fade out, /projects loads with
 // that window still expanded, it shrinks back into its grid slot, and then

@@ -7,6 +7,7 @@ export default function Window({
   className = "",
   bodyClassName = "",
   project,
+  id,
   children,
 }: {
   title: ReactNode;
@@ -14,10 +15,14 @@ export default function Window({
   bodyClassName?: string;
   // Tags a project's window so it can expand into / collapse from its page
   project?: string;
+  // Anchor used by the Start menu and #hash URLs to jump to this window
+  id?: string;
   children: ReactNode;
 }) {
   return (
     <section
+      id={id}
+      data-window={id}
       data-project={project}
       className={`win95-window flex flex-col min-h-0 ${className}`}
     >

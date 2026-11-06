@@ -99,6 +99,16 @@ body {
     inset 2px 2px #808080;
 }
 
+/* Held-down control, e.g. the Start button while its menu is open */
+.win95-pressed {
+  background: #c0c0c0;
+  box-shadow:
+    inset -1px -1px #fff,
+    inset 1px 1px #0a0a0a,
+    inset -2px -2px #dfdfdf,
+    inset 2px 2px #808080;
+}
+
 /* Skill window: a Win95 window in the top layer, with no dimmed backdrop
    (Win95 windows just sat on top of the desktop) */
 .skill-window::backdrop {
@@ -214,6 +224,50 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .retro-button::before {
+    animation: none;
+  }
+}
+
+/* ── Start menu ───────────────────────────────────────────────────────── */
+
+/* Briefly rings a window after the Start menu jumps to it */
+.window-target {
+  outline: 3px solid #ffff00;
+  outline-offset: 2px;
+  animation: window-target-flash 1.6s steps(1, end);
+}
+
+@keyframes window-target-flash {
+  0%,
+  55% {
+    outline-color: #ffff00;
+  }
+  100% {
+    outline-color: transparent;
+  }
+}
+
+/* The classic orange "safe to turn off" screen */
+.shutdown-screen {
+  background: #ffa500;
+  color: #000;
+  animation: shutdown-in 160ms steps(2, end);
+}
+
+@keyframes shutdown-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shutdown-screen {
+    animation: none;
+  }
+  .window-target {
     animation: none;
   }
 }
