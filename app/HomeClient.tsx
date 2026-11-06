@@ -11,7 +11,8 @@ import Taskbar from "./components/Taskbar";
 import Window from "./components/Window";
 import { useEffect, useState, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
-import { minimizeAndGo } from "./lib/anchor";
+import { markProjectOpening, minimizeAndGo } from "./lib/anchor";
+import { projects } from "./projects/data";
 import { hashId, scrollToWindow } from "./lib/windowScroll";
 
 // Each card shows its title art on a 90s web-safe color picked to contrast
@@ -140,6 +141,19 @@ export default function HomeClient() {
     minimizeAndGo("home", () => router.push("/projects"));
   };
 
+  // Same movement for a single project, following the Start menu's jump: the
+  // project page restores its window from the projects taskbar icon.
+  const openFeatured = (slug: string) => (e: MouseEvent<HTMLAnchorElement>) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+      return;
+    }
+    e.preventDefault();
+    minimizeAndGo("home", () => {
+      markProjectOpening(slug);
+      router.push(`/projects/${slug}`);
+    });
+  };
+
   return (
     <main className="relative w-full h-screen font-body bg-[#008080]">
       {/* Minimize/Expand Button */}
@@ -194,6 +208,10 @@ export default function HomeClient() {
                   </p>
                   <p className="mt-2 text-xs leading-snug md:text-sm">
                     @ Manila, Philippines | Jeddah, Kingdom of Saudi Arabia
+                  </p>
+                  <p className="mt-2 text-xs leading-snug md:text-sm">
+                    Seeking IS / software engineering internships · Metro
+                    Manila / remote
                   </p>
                 </div>
 
@@ -326,28 +344,45 @@ export default function HomeClient() {
               <SkillsGrid skills={skills} />
             </Window>
 
-            {/* Projects Card — links to the full /projects page */}
+            {/* Featured Work — one clickable row per project; the footer opens
+                the full /projects page (rows follow data.ts automatically) */}
             <Window
               id="projects"
-              title="Projects"
+              title="Featured Work"
               className="col-span-1 row-span-1"
-              bodyClassName="flex flex-col"
+              bodyClassName="flex flex-col gap-2 min-h-0"
             >
+              <div className="flex flex-col gap-2 flex-1 min-h-0">
+                {projects.map((p) => (
+                  <Link
+                    key={p.slug}
+                    href={`/projects/${p.slug}`}
+                    onClick={openFeatured(p.slug)}
+                    className="win95-sunken group flex flex-1 min-h-0 items-center gap-3 bg-white p-2.5 hover:bg-[#000080] hover:text-white"
+                  >
+                    <Image
+                      src={p.logo}
+                      alt=""
+                      width={32}
+                      height={32}
+                      className="h-8 w-8 shrink-0 object-contain"
+                    />
+                    <span className="block min-w-0">
+                      <span className="block text-sm font-bold">{p.name}</span>
+                      <span className="block truncate font-code text-xs text-[#404040] group-hover:text-white/80">
+                        {p.summary}
+                      </span>
+                    </span>
+                  </Link>
+                ))}
+              </div>
+
               <Link
                 href="/projects"
                 onClick={openProjects}
-                className="win95-sunken win95-focus relative block flex-1 aspect-video md:aspect-auto bg-[#00cc99]"
+                className="retro-button shrink-0 self-center px-4 py-1 text-sm"
               >
-                <Image
-                  src="/assets/ViewMyProjects.png"
-                  fill
-                  sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"
-                  alt="View my projects"
-                  className="object-contain p-3"
-                />
-                <span aria-hidden className="click-me-badge font-win">
-                  Click me!
-                </span>
+                All projects →
               </Link>
             </Window>
 
@@ -369,7 +404,7 @@ export default function HomeClient() {
                   {
                     icon: "📱",
                     label: "Phone",
-                    value: "+63 945 971 8300",
+                    value: "+63 949 825 3671",
                     href: "tel:+639459718300",
                   },
                 ].map((item, idx) => (
@@ -388,44 +423,6 @@ export default function HomeClient() {
                   </a>
                 ))}
               </div>
-            </Window>
-
-            {/* Availability: what an employer needs to know first. Right
-                after About Me on phones; beside Contact Me on desktop. */}
-            <Window
-              id="availability"
-              title="Availability"
-              className="col-span-1 row-span-1 max-md:-order-1"
-              bodyClassName="flex flex-col gap-2"
-            >
-              <p className="flex items-center gap-2 text-lg leading-tight">
-                <span
-                  aria-hidden="true"
-                  className="win95-sunken inline-block w-3.5 h-3.5 shrink-0 bg-[#00c000]"
-                />
-                <span className="font-bold">Available now</span>
-              </p>
-
-              <dl className="win95-sunken bg-white flex-1 grid grid-cols-[auto_1fr] content-center gap-x-3 gap-y-1.5 p-2.5 text-sm leading-snug">
-                {[
-                  ["Seeking", "IS, database & full-stack internships"],
-                  ["Setup", "Hybrid or remote"],
-                  ["Hours", "Flexible: full- or part-time"],
-                  ["Location", "Metro Manila"],
-                ].map(([label, value]) => (
-                  <div key={label} className="contents">
-                    <dt className="text-[#404040]">{label}:</dt>
-                    <dd>{value}</dd>
-                  </div>
-                ))}
-              </dl>
-
-              <a
-                href="mailto:jedlawrence.engbino@gmail.com?subject=Internship%20opportunity"
-                className="retro-button self-end shrink-0 px-4 py-1 text-sm"
-              >
-                Hire me
-              </a>
             </Window>
           </RestoreWindows>
         </div>
