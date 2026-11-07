@@ -26,9 +26,16 @@ function windowWidth(card: HTMLElement | null) {
 }
 
 // Pop the window up in the middle of the screen, with focus on OK (the
-// scrolling text would take it otherwise)
-function openWindow(dialog: HTMLDialogElement, card: HTMLElement | null) {
-  dialog.style.width = `${windowWidth(card)}px`;
+// scrolling text would take it otherwise). A fixed `width` beats sizing from
+// the card, for callers whose opener isn't a card.
+function openWindow(
+  dialog: HTMLDialogElement,
+  card: HTMLElement | null,
+  width?: number,
+) {
+  dialog.style.width = `${
+    width ? Math.min(width, window.innerWidth - 32) : windowWidth(card)
+  }px`;
   dialog.showModal();
   dialog
     .querySelector<HTMLElement>("[data-ok]")
@@ -42,13 +49,17 @@ function openWindow(dialog: HTMLDialogElement, card: HTMLElement | null) {
 export default function SkillWindow({
   skill,
   origin,
+  width,
   open,
   onClose,
 }: {
   // The last skill opened; it stays rendered while closed, so reopening
   // doesn't rebuild the window
   skill: Skill | null;
+  // The card that opened it, which sets the window's width
   origin: HTMLElement | null;
+  // Pixel width to use instead of sizing from `origin`
+  width?: number;
   open: boolean;
   onClose: () => void;
 }) {
@@ -57,8 +68,8 @@ export default function SkillWindow({
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog || !skill || !open || dialog.open) return;
-    openWindow(dialog, origin);
-  }, [skill, origin, open]);
+    openWindow(dialog, origin, width);
+  }, [skill, origin, width, open]);
 
   const close = () => ref.current?.close();
 

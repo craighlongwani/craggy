@@ -3,20 +3,21 @@ import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 import GithubCalendar from "./components/GithubCalendar";
-import SkillsGrid from "./components/SkillsGrid";
-import type { Skill } from "./components/SkillWindow";
-
 import RestoreWindows from "./components/RestoreWindows";
-import Taskbar from "./components/Taskbar";
+import type { Skill } from "./components/SkillWindow";
 import Window from "./components/Window";
-import { useEffect, useState, type MouseEvent } from "react";
+import Sidebar from "./components/linux/Sidebar";
+import SkillsList from "./components/linux/SkillsList";
+import Uptime from "./components/linux/Uptime";
+import { links } from "./components/linux/links";
+import { useEffect, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import { markProjectOpening, minimizeAndGo } from "./lib/anchor";
 import { projects } from "./projects/data";
 import { hashId, scrollToWindow } from "./lib/windowScroll";
 
-// Each card shows its title art on a 90s web-safe color picked to contrast
-// with it; clicking opens a window with the full write-up.
+// Each skill is a row in the Skills window; clicking one opens a window with
+// the full write-up and its title art.
 const skills: Skill[] = [
   {
     title: "Full-Stack Development",
@@ -104,11 +105,22 @@ const skills: Skill[] = [
   },
 ];
 
+// neofetch-style grays, darkest to brightest
+const swatches = [
+  "#0b0b0b",
+  "#262626",
+  "#404040",
+  "#5a5a5a",
+  "#7d7d7d",
+  "#a0a0a0",
+  "#c8c8c8",
+  "#f0f0f0",
+];
+
 export default function HomeClient() {
   const router = useRouter();
-  const [overlayMinimized, setOverlayMinimized] = useState(false);
 
-  // Deep links such as /#skills (used by the Start menu) scroll the desktop's
+  // Deep links such as /#skills (used by the Start menu) scroll the page's
   // own scroll area, since the page itself doesn't scroll. Also runs on
   // hashchange so jumping within the page doesn't reload it.
   useEffect(() => {
@@ -131,7 +143,7 @@ export default function HomeClient() {
     };
   }, []);
 
-  // Minimize every window into the taskbar's home icon, then open
+  // Minimize every window into the sidebar's home entry, then open
   // /projects. Modified clicks (new tab, etc.) keep the link's normal behavior.
   const openProjects = (e: MouseEvent<HTMLAnchorElement>) => {
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
@@ -141,8 +153,8 @@ export default function HomeClient() {
     minimizeAndGo("home", () => router.push("/projects"));
   };
 
-  // Same movement for a single project, following the Start menu's jump: the
-  // project page restores its window from the projects taskbar icon.
+  // Same movement for a single project: its page restores from the projects
+  // entry.
   const openFeatured = (slug: string) => (e: MouseEvent<HTMLAnchorElement>) => {
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
       return;
@@ -155,159 +167,107 @@ export default function HomeClient() {
   };
 
   return (
-    <main className="relative w-full h-screen font-body bg-[#008080]">
-      {/* Minimize/Expand Button */}
-      <button
-        onClick={() => setOverlayMinimized((v) => !v)}
-        className="win95-raised win95-focus fixed top-4 right-4 z-[60] w-8 h-7 text-black text-base leading-none"
-        aria-label={overlayMinimized ? "Expand" : "Minimize"}
-      >
-        {overlayMinimized ? "+" : "−"}
-      </button>
+    <main data-skin="linux" className="relative h-dvh w-full overflow-hidden">
+      <Sidebar current="home" />
 
-      {/* Overlay */}
-      <div
-        className={`fixed inset-x-0 top-0 bottom-10 flex items-center justify-center transition-all duration-500 ease-in-out
-    ${
-      overlayMinimized
-        ? "opacity-0 pointer-events-none"
-        : "opacity-100 pointer-events-auto"
-    }`}
-        style={{ zIndex: 50 }}
-      >
-        <div
-          className="w-full h-[95%] overflow-y-auto p-3 md:w-[95vw] md:p-6 lg:p-8 short:md:p-4 shorter:md:p-3
-      scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-        >
+      {/* Below 1024px the windows stack and this area scrolls; from there up
+          they tile the screen exactly, 4 columns by 3 rows */}
+      <div className="h-full overflow-y-auto pt-10 xl:pl-52 xl:pt-0">
+        <div className="p-3 md:p-4 lg:h-full xl:p-5">
           <RestoreWindows
             icon="home"
-            className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-5 short:md:gap-3 md:h-full md:auto-rows-fr md:grid-flow-dense"
+            className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:h-full lg:grid-cols-4 lg:grid-rows-3 lg:gap-4"
           >
-            {/* Me Card */}
+            {/* About: laid out like neofetch's output */}
             <Window
               id="about"
-              title="About Me"
-              className="col-span-1 md:col-span-2 row-span-1 max-md:-order-2"
-              bodyClassName="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)] xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] md:items-stretch md:overflow-hidden"
+              title="README.md"
+              className="md:col-span-2 lg:row-span-2"
+              bodyClassName="flex flex-col gap-3 overflow-hidden"
             >
-              <div className="flex min-w-0 flex-col justify-between">
-                <div>
-                  <h1 className="text-2xl leading-[1.05] md:text-3xl lg:text-4xl short:lg:text-3xl shorter:md:text-2xl shorter:lg:text-2xl">
-                    Jed Lawrence Engbino
-                  </h1>
-                  <p className="mt-1 font-code text-xs text-[#404040] md:text-sm">
-                    Full-stack &amp; Database
-                  </p>
+              <p className="lx-dim">
+                <span aria-hidden="true">$ </span>neofetch
+              </p>
 
-                  {/* Education */}
-                  <p className="mt-2 short:mt-1 shorter:mt-0.5 text-xs leading-snug md:text-sm shorter:md:text-xs">
-                    Information Systems, 3rd year · Dean&apos;s Lister
-                  </p>
-                  <p className="text-xs leading-snug text-[#404040] md:text-sm shorter:md:text-xs">
-                    De La Salle-College of Saint Benilde
-                  </p>
-                  <p className="mt-2 short:mt-1 shorter:mt-0.5 text-xs leading-snug md:text-sm shorter:md:text-xs">
-                    @ Manila, Philippines | Jeddah, Kingdom of Saudi Arabia
-                  </p>
-                  <p className="mt-2 short:mt-1 shorter:mt-0.5 text-xs leading-snug md:text-sm shorter:md:text-xs">
-                    Seeking IS / software engineering internships · Metro
-                    Manila / remote
-                  </p>
+              <div className="@container flex min-h-0 flex-1 flex-col">
+                <div className="grid min-h-0 flex-1 gap-4 @md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+                  <div className="lx-portrait aspect-[4/3] @md:aspect-auto @md:min-h-0">
+                    <Image
+                      src="/assets/me.png"
+                      alt="Portrait of Jed Lawrence Engbino"
+                      fill
+                      priority
+                      sizes="(min-width: 1024px) 25vw, 100vw"
+                      className="object-cover object-[55%_35%]"
+                    />
+                  </div>
+
+                  <div className="flex min-w-0 flex-col gap-3">
+                    <div>
+                      <h1 className="text-xl font-bold leading-tight tracking-tight @lg:text-2xl">
+                        Jed Lawrence Engbino
+                      </h1>
+                      <hr className="lx-rule mt-2" />
+                    </div>
+
+                    <dl className="grid grid-cols-[4.25rem_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-[12px] @lg:text-[13px]">
+                      <dt className="lx-dim">role</dt>
+                      <dd>Full-stack &amp; Database</dd>
+                      <dt className="lx-dim">school</dt>
+                      <dd>De La Salle-College of Saint Benilde</dd>
+                      <dt className="lx-dim">study</dt>
+                      <dd>Information Systems, 3rd year · Dean&apos;s Lister</dd>
+                      <dt className="lx-dim">uptime</dt>
+                      <dd>
+                        <Uptime />
+                      </dd>
+                      <dt className="lx-dim">based</dt>
+                      <dd>Manila, Philippines | Jeddah, Kingdom of Saudi Arabia</dd>
+                      <dt className="lx-dim">seeking</dt>
+                      <dd>
+                        IS / software engineering internships · Metro Manila /
+                        remote
+                      </dd>
+                    </dl>
+
+                    <div aria-hidden="true" className="flex">
+                      {swatches.map((color) => (
+                        <span
+                          key={color}
+                          className="h-3 w-5"
+                          style={{ background: color }}
+                        />
+                      ))}
+                    </div>
+
+                    {/* The top bar and sidebar list these from 1024px up */}
+                    <ul className="mt-auto flex flex-wrap gap-x-3 gap-y-1 lg:hidden">
+                      {links.map((link) => (
+                        <li key={link.label}>
+                          <a
+                            href={link.href}
+                            {...(link.external
+                              ? { target: "_blank", rel: "noopener noreferrer" }
+                              : {})}
+                            className="lx-link"
+                          >
+                            {link.label}
+                            {link.external && (
+                              <span aria-hidden="true" className="lx-dim">
+                                {" "}
+                                ↗
+                              </span>
+                            )}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-
-                {/* Socials + résumé */}
-                <div className="mt-3 short:mt-2 shorter:mt-1.5 flex flex-wrap items-center gap-2.5 md:gap-3">
-                  <Link
-                    href="https://www.linkedin.com/in/jed-lawrence-engbino-629997372/"
-                    target="_blank"
-                    aria-label="LinkedIn"
-                  >
-                    <Image
-                      src="/assets/icons/LinkedIn.png"
-                      width={24}
-                      height={24}
-                      alt=""
-                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6 short:md:h-5 short:md:w-5"
-                    />
-                  </Link>
-                  <Link
-                    href="https://github.com/renzoboyy"
-                    target="_blank"
-                    aria-label="GitHub"
-                  >
-                    <Image
-                      src="/assets/icons/GitHub.png"
-                      width={24}
-                      height={24}
-                      alt=""
-                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6 short:md:h-5 short:md:w-5"
-                    />
-                  </Link>
-                  <Link
-                    href="https://www.instagram.com/jlrebn/"
-                    target="_blank"
-                    aria-label="Instagram"
-                  >
-                    <Image
-                      src="/assets/icons/Instagram.png"
-                      width={24}
-                      height={24}
-                      alt=""
-                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6 short:md:h-5 short:md:w-5"
-                    />
-                  </Link>
-                  <Link
-                    href="https://discord.com/users/472141998565097472"
-                    target="_blank"
-                    aria-label="Discord"
-                  >
-                    <Image
-                      src="/assets/icons/Disc.png"
-                      width={24}
-                      height={24}
-                      alt=""
-                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6 short:md:h-5 short:md:w-5"
-                    />
-                  </Link>
-                  <Link
-                    href="https://www.facebook.com/jelo.binz/"
-                    target="_blank"
-                    aria-label="Facebook"
-                  >
-                    <Image
-                      src="/assets/icons/Facebook.png"
-                      width={24}
-                      height={24}
-                      alt=""
-                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6 short:md:h-5 short:md:w-5"
-                    />
-                  </Link>
-
-                  <a
-                    href="/Jed-Lawrence-Engbino-Resume.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="win95-raised win95-focus ml-auto px-3 py-0.5 text-xs md:px-4 md:py-1 md:text-sm"
-                  >
-                    Résumé
-                  </a>
-                </div>
-              </div>
-
-              {/* Portrait */}
-              <div className="win95-sunken relative min-h-56 overflow-hidden bg-white md:min-h-0">
-                <Image
-                  src="/assets/me.png"
-                  alt="Portrait of Jed Lawrence Engbino"
-                  fill
-                  priority
-                  sizes="(min-width: 768px) 25vw, 100vw"
-                  className="object-cover object-[55%_35%]"
-                />
               </div>
             </Window>
 
-            {/* GitHub Card */}
+            {/* GitHub: the contribution calendar, scaled to the window */}
             <Window
               id="github"
               title={
@@ -318,117 +278,111 @@ export default function HomeClient() {
                 >
                   <Image
                     src="/assets/icons/GitHub.png"
-                    width={16}
-                    height={16}
-                    alt="GitHub Icon"
+                    width={14}
+                    height={14}
+                    alt=""
+                    className="h-3.5 w-3.5"
                   />
-                  GitHub
+                  github.com/renzoboyy
                 </Link>
               }
-              className="col-span-1 row-span-1"
-              bodyClassName="flex flex-col"
+              className="md:col-span-2"
+              bodyClassName="flex flex-col gap-3 overflow-hidden"
             >
-              {/* Calendar fills the window on md+ and scrolls horizontally */}
-              <div className="win95-sunken bg-white p-3 overflow-hidden w-full relative flex-1 min-h-0">
-                <GithubCalendar fit />
+              <p className="lx-dim">
+                <span aria-hidden="true">$ </span>git log --since=&quot;1 year
+                ago&quot;
+              </p>
+              <div className="flex min-h-0 flex-1 items-center">
+                <GithubCalendar />
               </div>
             </Window>
 
-            {/* Skills Card — col span 2, row span 2 */}
+            {/* Skills: a compact list, each row opens its write-up */}
             <Window
               id="skills"
-              title="Skills"
-              className="col-span-1 md:col-span-2 row-span-2"
-              bodyClassName="flex flex-col gap-1.5 md:gap-2"
+              title="~/skills"
+              className="md:col-span-2"
+              bodyClassName="flex flex-col gap-2 overflow-hidden"
             >
-              <SkillsGrid skills={skills} />
+              <SkillsList skills={skills} />
             </Window>
 
-            {/* Featured Work — one clickable row per project; the footer opens
-                the full /projects page (rows follow data.ts automatically) */}
+            {/* Featured work: one row per project (they follow data.ts), plus
+                the link to the full /projects page */}
             <Window
               id="projects"
-              title="Featured Work"
-              className="col-span-1 row-span-1"
-              bodyClassName="flex flex-col gap-2 short:gap-1.5 min-h-0 overflow-hidden"
+              title="~/projects"
+              className="lg:col-span-3"
+              bodyClassName="flex flex-col gap-2 overflow-hidden"
             >
-              <div className="flex flex-col gap-2 short:gap-1.5 flex-1 min-h-0">
+              <p className="lx-dim">
+                <span aria-hidden="true">$ </span>ls ~/projects
+              </p>
+              <ul className="@container flex min-h-0 flex-1 flex-col gap-1.5">
                 {projects.map((p) => (
-                  <Link
-                    key={p.slug}
-                    href={`/projects/${p.slug}`}
-                    onClick={openFeatured(p.slug)}
-                    className="win95-sunken group flex flex-1 min-h-0 items-center gap-3 bg-white p-2.5 short:p-1.5 hover:bg-[#000080] hover:text-white"
-                  >
-                    <Image
-                      src={p.logo}
-                      alt=""
-                      width={32}
-                      height={32}
-                      className="h-8 w-8 short:h-6 short:w-6 shrink-0 object-contain"
-                    />
-                    <span className="block min-w-0">
-                      <span className="block text-sm font-bold">{p.name}</span>
-                      <span className="block truncate font-code text-xs text-[#404040] group-hover:text-white/80">
+                  <li key={p.slug} className="min-h-0 flex-1">
+                    <Link
+                      href={`/projects/${p.slug}`}
+                      onClick={openFeatured(p.slug)}
+                      className="lx-row lx-box flex h-full flex-col justify-center gap-0 @lg:flex-row @lg:items-baseline @lg:justify-start @lg:gap-3"
+                    >
+                      <span className="shrink-0 font-bold">
+                        <span aria-hidden="true" className="lx-dim">
+                          ▸{" "}
+                        </span>
+                        {p.name}
+                      </span>
+                      <span className="lx-dim min-w-0 truncate text-[12px]">
                         {p.summary}
                       </span>
-                    </span>
-                  </Link>
+                    </Link>
+                  </li>
                 ))}
-              </div>
-
+              </ul>
               <Link
                 href="/projects"
                 onClick={openProjects}
-                className="retro-button shrink-0 self-center px-4 py-1 short:py-0.5 text-sm"
+                className="lx-link self-start"
               >
-                All projects →
+                all projects →
               </Link>
             </Window>
 
-            {/* Contact Card — col span 1 */}
+            {/* Contact */}
             <Window
               id="contact"
-              title="Contact Me"
-              className="col-span-1 row-span-1"
-              bodyClassName="flex flex-col gap-3 overflow-hidden"
+              title="contact.txt"
+              bodyClassName="flex flex-col gap-2 overflow-hidden"
             >
-              <div className="flex flex-col gap-2 min-h-0 overflow-hidden flex-1">
-                {[
-                  {
-                    icon: "✉️",
-                    label: "Email",
-                    value: "jedlawrence.engbino@gmail.com",
-                    href: "mailto:jedlawrence.engbino@gmail.com",
-                  },
-                  {
-                    icon: "📱",
-                    label: "Phone",
-                    value: "+63 949 825 3671",
-                    href: "tel:+639459718300",
-                  },
-                ].map((item, idx) => (
-                  <a
-                    key={idx}
-                    href={item.href}
-                    className="win95-sunken flex items-center gap-3 bg-white p-3 hover:bg-[#000080] hover:text-white group flex-1 min-h-0"
-                  >
-                    <span className="text-2xl shrink-0">{item.icon}</span>
-                    <div className="min-w-0">
-                      <p className="text-xs text-[#606060] group-hover:text-white/80">
-                        {item.label}
-                      </p>
-                      <p className="font-code text-sm truncate">{item.value}</p>
-                    </div>
-                  </a>
-                ))}
-              </div>
+              <p className="lx-dim">
+                <span aria-hidden="true">$ </span>cat contact.txt
+              </p>
+              <dl className="flex flex-col gap-3 text-[12px]">
+                <div className="min-w-0">
+                  <dt className="lx-dim">email</dt>
+                  <dd className="break-all">
+                    <a
+                      href="mailto:jedlawrence.engbino@gmail.com"
+                      className="lx-link"
+                    >
+                      jedlawrence.engbino@gmail.com
+                    </a>
+                  </dd>
+                </div>
+                <div className="min-w-0">
+                  <dt className="lx-dim">phone</dt>
+                  <dd className="truncate">
+                    <a href="tel:+639459718300" className="lx-link">
+                      +63 949 825 3671
+                    </a>
+                  </dd>
+                </div>
+              </dl>
             </Window>
           </RestoreWindows>
         </div>
       </div>
-
-      <Taskbar current="home" />
     </main>
   );
 }

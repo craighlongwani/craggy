@@ -276,3 +276,345 @@ body {
     animation: none;
   }
 }
+
+/* ── Linux monochrome skin ───────────────────────────────────────────────
+   A flat black-and-white tiling-window-manager look. It's scoped to a
+   [data-skin="linux"] wrapper (the home page), so every other page keeps the
+   Win95 styling above. Inside the wrapper the shared Window and SkillWindow
+   components keep their markup and class names; this block restyles them.
+   Unlayered CSS beats Tailwind's layered utilities, so these rules win over
+   classes like p-1.5 or font-win on the same elements. */
+
+/* Match the page behind it, so overscroll never flashes white */
+body:has([data-skin="linux"]) {
+  background: #0b0b0b;
+}
+
+[data-skin="linux"] {
+  --lx-bg: #0b0b0b;
+  --lx-surface: #111111;
+  --lx-raised: #1a1a1a;
+  --lx-line: #2d2d2d;
+  --lx-fg: #e8e8e8;
+  --lx-dim: #9a9a9a;
+  --lx-faint: #5f5f5f;
+  background: var(--lx-bg);
+  color: var(--lx-fg);
+  font-family:
+    var(--font-jetbrains), ui-monospace, "SFMono-Regular", Menlo, Consolas,
+    monospace;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+@media (min-width: 1536px) {
+  [data-skin="linux"] {
+    font-size: 14px;
+  }
+}
+
+[data-skin="linux"] * {
+  scrollbar-color: var(--lx-faint) transparent;
+}
+
+[data-skin="linux"] ::selection {
+  background: var(--lx-fg);
+  color: var(--lx-bg);
+}
+
+/* Everything inherits the mono font, including the Win95-era font classes */
+[data-skin="linux"] .font-win,
+[data-skin="linux"] .font-body {
+  font-family: inherit;
+}
+
+[data-skin="linux"] .lx-dim {
+  color: var(--lx-dim);
+}
+
+[data-skin="linux"] .lx-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Windows: 1px frames that light up under the pointer or focus, like a
+   tiling WM with focus-follows-mouse ── */
+
+[data-skin="linux"] .win95-window {
+  background: var(--lx-surface);
+  color: var(--lx-fg);
+  padding: 0;
+  border: 1px solid var(--lx-line);
+  box-shadow: none;
+  transition: border-color 120ms;
+}
+
+/* Keyboard focus lights a window up too (but not the focus a mouse click
+   leaves behind, so a window doesn't stay lit after you click away) */
+[data-skin="linux"] .win95-window:has(:focus-visible) {
+  border-color: var(--lx-fg);
+}
+
+@media (hover: hover) {
+  [data-skin="linux"] .win95-window:hover {
+    border-color: var(--lx-fg);
+  }
+  [data-skin="linux"] .win95-window:hover > .win95-titlebar {
+    color: var(--lx-fg);
+    border-bottom-color: var(--lx-fg);
+  }
+}
+
+[data-skin="linux"] .win95-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2rem;
+  padding: 0 0.75rem;
+  background: transparent;
+  color: var(--lx-dim);
+  border-bottom: 1px solid var(--lx-line);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  transition:
+    color 120ms,
+    border-color 120ms;
+}
+
+[data-skin="linux"] .win95-window:has(:focus-visible) > .win95-titlebar {
+  color: var(--lx-fg);
+  border-bottom-color: var(--lx-fg);
+}
+
+[data-skin="linux"] .win95-titlebar + div {
+  padding: 0.875rem;
+}
+
+/* Rows and links: hover inverts them, like a selected line in a terminal */
+
+[data-skin="linux"] .lx-box {
+  border: 1px solid var(--lx-line);
+}
+
+[data-skin="linux"] .lx-row {
+  width: 100%;
+  padding: 0.25rem 0.625rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+[data-skin="linux"] .lx-row:hover,
+[data-skin="linux"] .lx-row:focus-visible {
+  background: var(--lx-fg);
+  border-color: var(--lx-fg);
+  color: var(--lx-bg);
+  outline: none;
+}
+
+[data-skin="linux"] .lx-row:hover .lx-dim,
+[data-skin="linux"] .lx-row:focus-visible .lx-dim {
+  color: #4a4a4a;
+}
+
+[data-skin="linux"] .lx-link {
+  text-decoration: underline;
+  text-decoration-color: var(--lx-faint);
+  text-underline-offset: 3px;
+}
+
+[data-skin="linux"] .lx-link:hover,
+[data-skin="linux"] .lx-link:focus-visible {
+  background: var(--lx-fg);
+  color: var(--lx-bg);
+  outline: none;
+  text-decoration-color: transparent;
+}
+
+[data-skin="linux"] .lx-rule {
+  border: 0;
+  border-top: 1px solid var(--lx-line);
+}
+
+/* ── Navigation (sidebar from 1280px, top bar below) ── */
+
+[data-skin="linux"] .lx-nav {
+  background: var(--lx-bg);
+  border-color: var(--lx-line);
+}
+
+[data-skin="linux"] .lx-nav-item {
+  display: block;
+  padding: 0.125rem 0.5rem;
+  color: var(--lx-dim);
+}
+
+[data-skin="linux"] .lx-nav-item:hover,
+[data-skin="linux"] .lx-nav-item:focus-visible {
+  color: var(--lx-fg);
+  outline: none;
+  background: var(--lx-raised);
+}
+
+[data-skin="linux"] .lx-nav-item[aria-current="page"] {
+  background: var(--lx-fg);
+  color: var(--lx-bg);
+}
+
+/* Blinking block cursor after the prompt */
+[data-skin="linux"] .lx-cursor {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.1em;
+  vertical-align: text-bottom;
+  background: var(--lx-fg);
+  animation: lx-blink 1.1s steps(1, end) infinite;
+}
+
+@keyframes lx-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ── Portrait: grayscale with a halftone dot screen over it ── */
+
+[data-skin="linux"] .lx-portrait {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--lx-line);
+  background: #000;
+}
+
+[data-skin="linux"] .lx-portrait img {
+  filter: grayscale(1) contrast(1.15) brightness(0.95);
+}
+
+[data-skin="linux"] .lx-portrait::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle at center,
+    rgb(0 0 0 / 0.55) 0 28%,
+    transparent 32%
+  );
+  background-size: 3px 3px;
+  mix-blend-mode: multiply;
+}
+
+/* ── GitHub calendar: the library draws an SVG with a viewBox and sets an
+   inline max-content width on its root, so a stylesheet override
+   (!important, to beat that inline style) is the only way to make the
+   calendar fill the window. ── */
+
+[data-skin="linux"] .lx-calendar .react-activity-calendar {
+  width: 100% !important;
+}
+
+[data-skin="linux"] .lx-calendar .react-activity-calendar__calendar {
+  width: 100%;
+  height: auto;
+}
+
+[data-skin="linux"] .lx-calendar .react-activity-calendar__footer {
+  font-size: 12px;
+}
+
+/* ── Pop-up windows (a skill's write-up): a focused window over a dimmed
+   screen, with the title bar inverted ── */
+
+[data-skin="linux"] .skill-window {
+  border-color: var(--lx-fg);
+}
+
+[data-skin="linux"] .skill-window::backdrop {
+  background: rgb(0 0 0 / 0.7);
+}
+
+/* Repeated for :hover and keyboard focus so the general window rules above
+   (which light the title text up) can't turn it light-on-light */
+[data-skin="linux"] .skill-window.win95-window > .win95-titlebar,
+[data-skin="linux"] .skill-window.win95-window:hover > .win95-titlebar,
+[data-skin="linux"] .skill-window.win95-window:has(:focus-visible) > .win95-titlebar {
+  background: var(--lx-fg);
+  color: var(--lx-bg);
+  border-bottom-color: var(--lx-fg);
+}
+
+[data-skin="linux"] .win95-raised {
+  background: transparent;
+  color: inherit;
+  border: 1px solid currentColor;
+  box-shadow: none;
+}
+
+[data-skin="linux"] .win95-raised:hover {
+  background: var(--lx-fg);
+  color: var(--lx-bg);
+}
+
+[data-skin="linux"] .skill-window .win95-titlebar .win95-raised:hover {
+  background: var(--lx-bg);
+  color: var(--lx-fg);
+}
+
+[data-skin="linux"] .win95-sunken {
+  background: transparent;
+  border: 1px solid var(--lx-line);
+  box-shadow: none;
+}
+
+/* The skill's art sits on an inline pastel color; swap it for a gray panel
+   and take the color out of the image */
+[data-skin="linux"] .win95-sunken[style] {
+  background: var(--lx-raised) !important;
+}
+
+[data-skin="linux"] .skill-window img {
+  filter: grayscale(1);
+}
+
+[data-skin="linux"] .win95-etched {
+  border: 0;
+  border-top: 1px solid var(--lx-line);
+}
+
+[data-skin="linux"] .skill-window .text-\[\#404040\] {
+  color: var(--lx-dim);
+}
+
+[data-skin="linux"] .win95-focus:hover {
+  outline: none;
+}
+
+[data-skin="linux"] .win95-focus:focus-visible {
+  outline: 1px solid var(--lx-fg);
+  outline-offset: 2px;
+}
+
+/* Briefly rings a window after a #hash jump lands on it */
+[data-skin="linux"] .window-target {
+  outline: 2px solid var(--lx-fg);
+  outline-offset: 2px;
+  animation: lx-target-flash 1.6s steps(1, end);
+}
+
+@keyframes lx-target-flash {
+  0%,
+  55% {
+    outline-color: var(--lx-fg);
+  }
+  100% {
+    outline-color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-skin="linux"] .lx-cursor,
+  [data-skin="linux"] .window-target {
+    animation: none;
+  }
+}
