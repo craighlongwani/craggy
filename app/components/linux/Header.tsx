@@ -5,6 +5,8 @@ import type { MouseEvent } from "react";
 import { curtainAndGo, type Page } from "../../lib/curtain";
 import Clock from "./Clock";
 import LinksMenu from "./LinksMenu";
+import PaletteToggle from "./PaletteToggle";
+import ThemeToggle from "./ThemeToggle";
 
 // The pages, numbered like tiling-WM workspaces
 const workspaces: { icon: Page; label: string; href: string }[] = [
@@ -57,7 +59,11 @@ export default function Header({ current }: { current: Page }) {
         <LinksMenu />
       </nav>
 
-      <Clock className="lx-dim ml-auto hidden sm:block" />
+      <div className="ml-auto flex items-center gap-2 md:gap-3">
+        <PaletteToggle />
+        <ThemeToggle />
+        <Clock className="lx-dim hidden sm:block" />
+      </div>
     </header>
   );
 }

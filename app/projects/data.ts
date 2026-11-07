@@ -9,6 +9,8 @@ export type Project = {
   // logo's own edge color
   logoBackground: string;
   event: string;
+  // Short context shown beside the project on the home page
+  badge: string;
   // One-line pitch; the page title is "<name>: <summary>"
   summary: string;
   // Bento grid spans on /projects
@@ -35,6 +37,7 @@ export const projects: Project[] = [
     logo: "/assets/projects/VerifAI/Logo.png",
     logoBackground: "#061947",
     event: "HackFest GDG Loyola 2026 · Ateneo De Manila University · March 2026",
+    badge: "HackFest GDG Loyola 2026",
     summary: "AI-Powered Source Verification for Student Research Papers",
     span: "col-span-1 md:col-span-2 md:row-span-2",
     role: "Lead Developer · Backend & AI Integration",
@@ -90,6 +93,7 @@ export const projects: Project[] = [
     logo: "/assets/projects/Revora/logo.png",
     logoBackground: "linear-gradient(135deg, #2f9362, #164f37)",
     event: "Database Management Course Project · May to August 2026",
+    badge: "Database Management course project",
     summary: "Verified Onboarding for a Circular Material Exchange",
     span: "col-span-1 lg:col-span-2",
     role: "Lead Developer · Database & Backend",
@@ -147,6 +151,7 @@ export const projects: Project[] = [
     logo: "/assets/projects/BMS/logo.png",
     logoBackground: "#fff",
     event: "Barangay 43, Pasay City · May to August 2026",
+    badge: "Barangay 43, Pasay City",
     summary: "Digital Records and Services for a Local Government Unit",
     span: "col-span-1 lg:col-span-2",
     role: "Backend Developer · Documents, Households & Security",

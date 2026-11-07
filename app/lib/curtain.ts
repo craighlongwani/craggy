@@ -10,7 +10,7 @@ export type Page = "home" | "projects";
 
 // One window's whole sequence: cursor fades in, the drag, then the fade out
 const FADE_MS = 110;
-const DRAG_MS = 280;
+const DRAG_MS = 420;
 export const OPEN_MS = FADE_MS + DRAG_MS + FADE_MS;
 export const CLOSE_MS = 180;
 const CLOSE_EASE = "cubic-bezier(0.4, 0, 0.6, 1)";
@@ -18,7 +18,7 @@ const CLOSE_EASE = "cubic-bezier(0.4, 0, 0.6, 1)";
 export const OPEN_STAGGER_MS = 120;
 
 const DRAG_EASE = "cubic-bezier(0.45, 0, 0.25, 1)";
-const OUTLINE = "#e8e8e8";
+const OUTLINE = "var(--lx-fg)";
 
 export function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -38,7 +38,7 @@ function dragOverlay(el: HTMLElement) {
   layer.popover = "manual";
   layer.style.cssText = `position:fixed;inset:auto;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;margin:0;padding:0;border:0;overflow:visible;background:transparent;pointer-events:none;z-index:90;`;
   const outline = document.createElement("div");
-  outline.style.cssText = `position:absolute;left:0;top:0;box-sizing:border-box;border:1px solid ${OUTLINE};background:rgba(232,232,232,0.05);`;
+  outline.style.cssText = `position:absolute;left:0;top:0;box-sizing:border-box;border:1px solid ${OUTLINE};background:color-mix(in srgb, var(--lx-fg) 5%, transparent);`;
   const cursor = document.createElement("div");
   // A classic arrow: its tip is the element's top-left corner
   cursor.style.cssText = "position:absolute;left:0;top:0;width:14px;height:20px;";

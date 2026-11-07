@@ -25,8 +25,7 @@ export async function generateMetadata({
 }
 
 // A project's write-up inside its window, in the site's monochrome Linux
-// look: flat panels, dim secondary text, and the demo video in grayscale
-// until you point at it
+// look: flat panels, dim secondary text, and the demo video in full color
 export default async function ProjectPage({
   params,
 }: {
@@ -50,7 +49,7 @@ export default async function ProjectPage({
       {/* Role */}
       <p className="lx-dim text-center text-sm">{project.role}</p>
 
-      {/* Demo video, framed; grayscale until you point at it */}
+      {/* Demo video, framed */}
       <div className="lx-box mt-5 bg-black p-[2px]">
         <video
           src={project.video.src}
@@ -59,7 +58,7 @@ export default async function ProjectPage({
           loop
           playsInline
           aria-label={project.video.label}
-          className="block h-auto w-full grayscale transition-[filter] duration-300 hover:grayscale-0"
+          className="block h-auto w-full"
         />
       </div>
 

@@ -43,8 +43,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <head>
         <meta name="darkreader-lock" />
+        {/* Applies the saved theme before first paint, so light mode never
+            flashes dark */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{var d=document.documentElement;if(localStorage.getItem("theme")==="light")d.dataset.theme="light";if(localStorage.getItem("palette")==="mono")d.dataset.palette="mono"}catch(e){}',
+          }}
+        />
       </head>
-      {/* The monochrome Linux skin (globals.css) covers every page */}
+      {/* The Linux skin (globals.css) covers every page */}
       <body data-skin="linux">{children}</body>
     </html>
   );

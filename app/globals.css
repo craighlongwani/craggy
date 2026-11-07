@@ -289,17 +289,24 @@ body {
 /* The skin sits on <body>, so it covers every page (and overscroll never
    flashes white) */
 body[data-skin="linux"] {
-  background: #0b0b0b;
+  background: var(--lx-bg);
 }
 
 [data-skin="linux"] {
-  --lx-bg: #0b0b0b;
-  --lx-surface: #111111;
-  --lx-raised: #1a1a1a;
-  --lx-line: #5a5a5a;
-  --lx-fg: #e8e8e8;
-  --lx-dim: #9a9a9a;
-  --lx-faint: #5f5f5f;
+  --lx-bg: #1d2021;
+  --lx-surface: #282828;
+  --lx-raised: #32302f;
+  --lx-line: #665c54;
+  --lx-fg: #d4be98;
+  --lx-dim: #a89984;
+  --lx-faint: #7c6f64;
+  --lx-inv-dim: #504945;
+  /* GitHub calendar: contribution levels 0 (none) to 4 (most) */
+  --lx-cal-0: #32302f;
+  --lx-cal-1: #697a3e;
+  --lx-cal-2: #8a9a4a;
+  --lx-cal-3: #a9b665;
+  --lx-cal-4: #c5d17f; /* dim text on an inverted (selected) row */
   background: var(--lx-bg);
   color: var(--lx-fg);
   font-family:
@@ -307,6 +314,94 @@ body[data-skin="linux"] {
     monospace;
   font-size: 13px;
   line-height: 1.55;
+}
+
+/* Two independent choices, both set on <html> (theme.ts): the mode (dark by
+   default, data-theme="light") and the palette (gruvbox by default,
+   data-palette="mono"). Gruvbox dark is the base block above; the rest are
+   listed in increasing specificity so a later one wins. The data-pv selectors
+   are for the theme-switch copy of the page, which previews the combination
+   being switched to while <html> still has the old one; they're deliberately
+   more specific than any real selector. */
+[data-skin="linux"][data-skin="linux"][data-skin="linux"][data-pv="gruv-dark"] {
+  --lx-bg: #1d2021;
+  --lx-surface: #282828;
+  --lx-raised: #32302f;
+  --lx-line: #665c54;
+  --lx-fg: #d4be98;
+  --lx-dim: #a89984;
+  --lx-faint: #7c6f64;
+  --lx-inv-dim: #504945;
+  --lx-cal-0: #32302f;
+  --lx-cal-1: #697a3e;
+  --lx-cal-2: #8a9a4a;
+  --lx-cal-3: #a9b665;
+  --lx-cal-4: #c5d17f;
+}
+
+html[data-theme="light"] [data-skin="linux"],
+[data-skin="linux"][data-skin="linux"][data-skin="linux"][data-pv="gruv-light"] {
+  --lx-bg: #fbf1c7;
+  --lx-surface: #f4e8be;
+  --lx-raised: #eee0b7;
+  --lx-line: #a89984;
+  --lx-fg: #654735;
+  --lx-dim: #7c6f64;
+  --lx-faint: #a89984;
+  --lx-inv-dim: #e5d5ad;
+  --lx-cal-0: #eee0b7;
+  --lx-cal-1: #c9c47f;
+  --lx-cal-2: #a2a84f;
+  --lx-cal-3: #6c782e;
+  --lx-cal-4: #4a5a1f;
+}
+
+html[data-palette="mono"] [data-skin="linux"],
+[data-skin="linux"][data-skin="linux"][data-skin="linux"][data-pv="mono-dark"] {
+  --lx-bg: #0b0b0b;
+  --lx-surface: #111111;
+  --lx-raised: #1a1a1a;
+  --lx-line: #2d2d2d;
+  --lx-fg: #e8e8e8;
+  --lx-dim: #9a9a9a;
+  --lx-faint: #5f5f5f;
+  --lx-inv-dim: #4a4a4a;
+  --lx-cal-0: #1f1f1f;
+  --lx-cal-1: #434343;
+  --lx-cal-2: #7a7a7a;
+  --lx-cal-3: #b4b4b4;
+  --lx-cal-4: #f2f2f2;
+}
+
+html[data-palette="mono"][data-theme="light"] [data-skin="linux"],
+[data-skin="linux"][data-skin="linux"][data-skin="linux"][data-pv="mono-light"] {
+  --lx-bg: #ffffff;
+  --lx-surface: #ffffff;
+  --lx-raised: #f0f0f0;
+  --lx-line: #000000;
+  --lx-fg: #000000;
+  --lx-dim: #4d4d4d;
+  --lx-faint: #8a8a8a;
+  --lx-inv-dim: #b3b3b3;
+  --lx-cal-0: #ebebeb;
+  --lx-cal-1: #b4b4b4;
+  --lx-cal-2: #7a7a7a;
+  --lx-cal-3: #434343;
+  --lx-cal-4: #000000;
+}
+
+/* neofetch's color blocks stay gruvbox colors, but go gray in mono */
+html[data-palette="mono"] [data-skin="linux"] .lx-ramp,
+[data-skin="linux"][data-pv^="mono"] .lx-ramp {
+  filter: grayscale(1);
+}
+
+[data-skin="linux"][data-skin="linux"][data-pv^="gruv"] .lx-ramp {
+  filter: none;
+}
+
+html[data-theme="light"] [data-skin="linux"] .skill-window::backdrop {
+  background: rgb(101 71 53 / 0.5);
 }
 
 @media (min-width: 1536px) {
@@ -336,7 +431,7 @@ body[data-skin="linux"] {
 
 /* The "$ command" lines above a window's content: dropped on short screens,
    where the content needs the room more */
-@media (min-width: 768px) and (max-height: 800px) {
+@media (min-width: 768px) and (max-height: 920px) {
   [data-skin="linux"] .lx-prompt {
     display: none;
   }
@@ -456,7 +551,7 @@ body[data-skin="linux"] {
 
 [data-skin="linux"] .lx-row:hover .lx-dim,
 [data-skin="linux"] .lx-row:focus-visible .lx-dim {
-  color: #4a4a4a;
+  color: var(--lx-inv-dim);
 }
 
 [data-skin="linux"] .lx-link {
@@ -534,7 +629,7 @@ body[data-skin="linux"] {
 
 [data-skin="linux"] .lx-menu-item:hover .lx-dim,
 [data-skin="linux"] .lx-menu-item:focus-visible .lx-dim {
-  color: #4a4a4a;
+  color: var(--lx-inv-dim);
 }
 
 /* Blinking block cursor after the prompt */
@@ -553,17 +648,13 @@ body[data-skin="linux"] {
   }
 }
 
-/* ── Portrait: grayscale with a halftone dot screen over it ── */
+/* ── Portrait: a halftone dot screen over the photo (only here) ── */
 
 [data-skin="linux"] .lx-portrait {
   position: relative;
   overflow: hidden;
   border: 1px solid var(--lx-line);
   background: #000;
-}
-
-[data-skin="linux"] .lx-portrait img {
-  filter: grayscale(1) contrast(1.15) brightness(0.95);
 }
 
 [data-skin="linux"] .lx-portrait::after {
@@ -580,14 +671,16 @@ body[data-skin="linux"] {
   mix-blend-mode: multiply;
 }
 
-/* ── GitHub calendar, scaled to fill its box. The library draws an SVG with
-   a viewBox, so the stylesheet can stretch it; its root sets an inline
-   max-content width and its scroll container an inline overflow, which is
-   why those two overrides need !important. Below 1024px the calendar takes
-   the box's width and its natural height. From 1024px the box has a fixed
-   height, so the calendar is pinned to all four corners of it and the SVG
-   fills whatever the footer leaves: the whole year always shows, and it
-   follows the box as the window resizes. ── */
+/* ── GitHub calendar. The library draws an SVG with a viewBox; its root sets
+   an inline max-content width and its scroll container an inline overflow,
+   which is why some overrides need !important. Below 1024px the calendar
+   takes the box's width and its natural height. From 1024px the box has a
+   fixed height, and the calendar is pinned to its top and bottom: the SVG is
+   as tall as the footer leaves room for and its width follows. When that is
+   wider than the box it scrolls sideways; GithubCalendar.tsx starts the
+   scroll at the right edge, so the cropped part is the oldest weeks (the
+   left). The scrollbar is hidden so it leaves no gap; the wheel scrolls it
+   sideways (see GithubCalendar.tsx). ── */
 
 [data-skin="linux"] .lx-calendar .react-activity-calendar {
   width: 100% !important;
@@ -610,6 +703,8 @@ body[data-skin="linux"] {
   [data-skin="linux"] .lx-calendar {
     position: absolute;
     inset: 0.75rem;
+    /* Its layout and painting depend on nothing outside the box */
+    contain: layout paint;
   }
 
   [data-skin="linux"] .lx-calendar .react-activity-calendar {
@@ -619,10 +714,50 @@ body[data-skin="linux"] {
   [data-skin="linux"] .lx-calendar .react-activity-calendar__scroll-container {
     flex: 1 1 0;
     min-height: 0;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    /* No scrollbar and no padding, so the SVG touches the top and bottom of
+       its box; scroll with the wheel, a trackpad swipe or touch */
+    scrollbar-width: none;
+    padding-top: 0 !important;
+    position: relative;
   }
 
+  /* Taken out of the flow and given a pixel size by GithubCalendar.tsx, so
+     the scroll container's height comes from the box alone and the SVG can't
+     feed back into it. Left-aligned when wider than the box (it scrolls),
+     centered when narrower. */
   [data-skin="linux"] .lx-calendar .react-activity-calendar__calendar {
-    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-inline: auto;
+    height: var(--lx-cal-h, 100%);
+    width: var(--lx-cal-w, auto);
+    max-width: none;
+  }
+
+  /* The Skills list shrinks its entries to the height it is given: when a
+     full entry (name, proof, project) doesn't fit, the project line goes;
+     when even that doesn't, the proof drops to one line */
+  [data-skin="linux"] .lx-skills {
+    container-type: size;
+  }
+}
+
+@container (max-height: 189px) {
+  [data-skin="linux"] .lx-skill-used {
+    display: none;
+  }
+}
+
+@container (max-height: 144px) {
+  [data-skin="linux"] .lx-skill-proof {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 }
 
@@ -670,14 +805,9 @@ body[data-skin="linux"] {
   box-shadow: none;
 }
 
-/* The skill's art sits on an inline pastel color; swap it for a gray panel
-   and take the color out of the image */
+/* The skill's art sits on an inline pastel color; swap it for a theme panel */
 [data-skin="linux"] .win95-sunken[style] {
   background: var(--lx-raised) !important;
-}
-
-[data-skin="linux"] .skill-window img {
-  filter: grayscale(1);
 }
 
 [data-skin="linux"] .win95-etched {
@@ -713,6 +843,14 @@ body[data-skin="linux"] {
   100% {
     outline-color: transparent;
   }
+}
+
+/* The theme must come only from the drag: no element colors fading on their
+   own while it runs */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

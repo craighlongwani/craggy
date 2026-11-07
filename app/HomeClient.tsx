@@ -4,111 +4,26 @@ import Link from "next/link";
 import "./globals.css";
 import GithubCalendar from "./components/GithubCalendar";
 import OpenWindows from "./components/OpenWindows";
-import type { Skill } from "./components/SkillWindow";
 import Window from "./components/Window";
 import Header from "./components/linux/Header";
 import ResumeButton from "./components/linux/ResumeButton";
-import SkillsList from "./components/linux/SkillsList";
+import SkillsLoop from "./components/linux/SkillsLoop";
 import Uptime from "./components/linux/Uptime";
 import { stack } from "./components/linux/stack";
-import { Fragment, useEffect, type MouseEvent } from "react";
+import { useEffect, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import { curtainAndGo, markProjectOpening } from "./lib/curtain";
 import { projects } from "./projects/data";
 import { hashId, scrollToWindow } from "./lib/windowScroll";
 
-// Each skill is a row in the Skills window; clicking one opens a window with
-// the full write-up and its title art.
-const skills: Skill[] = [
-  {
-    title: "Full-Stack Development",
-    image: "/assets/projects/FULLSTACKDEV.png",
-    color: "#99ccff",
-    description:
-      "Building complete web apps end to end, from the screens people click through to the servers and APIs behind them.",
-    highlights: [
-      "Responsive interfaces that work on phones and desktops alike",
-      "Back-end APIs that validate input and hand the front end clean, predictable data",
-      "Picking up an existing codebase and shipping new features on top of it",
-      "Generating branded PDF documents and reports straight from app data",
-    ],
-    usedIn: ["Barangay Management System", "VerifAI", "Revora"],
-  },
-  {
-    title: "Database Design & SQL",
-    image: "/assets/projects/DBandSQL.png",
-    color: "#ffff99",
-    description:
-      "Modeling data so it stays correct, then writing the queries and rules that keep it that way.",
-    highlights: [
-      "Normalized schemas and ER diagrams, such as a 14-table design with a full address hierarchy",
-      "Multi-step writes wrapped in one transaction, so related records save together or not at all",
-      "Stored procedures and triggers that enforce business rules inside the database itself",
-      "Queries and functions that power live dashboards and approval queues",
-    ],
-    usedIn: ["Revora", "Barangay Management System"],
-  },
-  {
-    title: "Security & Access Control",
-    image: "/assets/projects/SECandAC.png",
-    color: "#ccffcc",
-    description:
-      "Making sure every person and service can do exactly what it needs to, and nothing more.",
-    highlights: [
-      "Role-based accounts and admin-only pages, where users can't raise their own role",
-      "Least-privilege database logins with explicit deny rules and masked personal data",
-      "Hashed passwords, idle session timeouts, and audit logs that record who did what",
-      "Keeping secret keys on the server, never in the browser",
-    ],
-    usedIn: ["Revora", "Barangay Management System"],
-  },
-  {
-    title: "AI & API Integration",
-    image: "/assets/projects/AIandAPI_Integration.png",
-    color: "#ff66cc",
-    description:
-      "Putting AI models and outside APIs to work, without trusting their answers blindly.",
-    highlights: [
-      "A server-side proxy so AI keys never reach the user's browser",
-      "Checking every AI-suggested source against an authoritative database before showing it",
-      "Parallel API lookups, with a fallback search when no match turns up",
-      "A 100-point rubric that scores each source on recency and relevance",
-    ],
-    usedIn: ["VerifAI"],
-  },
-  {
-    title: "Testing & DevOps",
-    image: "/assets/projects/TESTandDEVOPS.png",
-    color: "#00cc99",
-    description:
-      "Automated checks and repeatable builds, so changes ship with confidence instead of crossed fingers.",
-    highlights: [
-      "Automated tests that catch regressions before users ever see them",
-      "Containerized environments that run the same on every machine",
-      "CI pipelines that test and build every change automatically",
-      "Repeatable deploys that take the guesswork out of releasing",
-    ],
-    usedIn: ["This portfolio"],
-  },
-  {
-    title: "Systems Analysis & Design",
-    image: "/assets/projects/SYSandDE.png",
-    color: "#ffcc66",
-    description:
-      "Working out what a system should do before building it, and writing it down so the whole team agrees.",
-    highlights: [
-      "Requirements specifications and use cases that pin down the scope",
-      "Data flow and ER diagrams that map how information moves and where it lives",
-      "Multi-step workflows, like registration and approval, designed before any code",
-      "Technical documentation the rest of the team can build from",
-    ],
-    usedIn: ["VerifAI", "Revora"],
-  },
+// neofetch's color blocks in the Gruvbox Material palette: the soft colors,
+// then the deeper ones, shown as two rows of eight
+const ramp = [
+  "#45403d", "#ea6962", "#e78a4e", "#d8a657",
+  "#a9b665", "#89b482", "#7daea3", "#d3869b",
+  "#928374", "#c14a4a", "#c35e0a", "#b47109",
+  "#6c782e", "#4c7a5d", "#45707a", "#945e80",
 ];
-
-// neofetch's color blocks, in grays: 16 steps from dark to light, shown as
-// two rows of eight
-const ramp = Array.from({ length: 16 }, (_, i) => `hsl(0 0% ${6 + i * 6}%)`);
 
 export default function HomeClient() {
   const router = useRouter();
@@ -163,19 +78,19 @@ export default function HomeClient() {
       <Header current="home" />
 
       {/* From 1024px the windows tile the screen exactly: 4 columns by 3 rows.
-          About is 2x2; GitHub, Skills and Projects are 2x1; Contact is 1x1.
-          Below that they stack (two columns from 768px) and this area
-          scrolls. */}
+          About is 2x2; Projects and Skills are 2x1 on the right; GitHub is 2x1
+          and Contact 1x1 along the bottom. Below that they stack (two columns
+          from 768px) and this area scrolls. */}
       <div className="h-full overflow-y-auto pb-10">
         <div className="p-3 md:p-4 lg:h-full">
           <OpenWindows
             className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:h-full lg:grid-cols-4 lg:grid-rows-3 lg:gap-4"
           >
-            {/* About: neofetch's output (portrait, facts and a gray gradient),
-                then a short bio and the tech stack. The neofetch part keeps
-                its size; the bio and stack scroll inside the window when they
-                don't fit. The prompts and the decoration only show where
-                there's room for them. */}
+            {/* About: neofetch's output (portrait, facts and a color
+                gradient), then a short bio and the tech stack as chips. The neofetch
+                part keeps its size; the bio and stack scroll inside the
+                window only when they don't fit. The prompts and the
+                decoration only show where there's room for them. */}
             <Window
               id="about"
               title="README.md"
@@ -238,8 +153,8 @@ export default function HomeClient() {
                       </dd>
                     </dl>
 
-                    {/* neofetch's color blocks, in grays: one ramp over two rows */}
-                    <div aria-hidden="true" className="mt-auto pt-1 shorter:hidden">
+                    {/* neofetch's color blocks, in the gruvbox palette, over two rows */}
+                    <div aria-hidden="true" className="lx-ramp mt-auto pt-1 shorter:hidden">
                       <div className="flex">
                         {ramp.slice(0, 8).map((color) => (
                           <span
@@ -273,34 +188,82 @@ export default function HomeClient() {
                   </p>
                   <p className="text-[12px] leading-[1.6]">
                     Information Systems student building database-driven web
-                    systems end to end, from requirements and ER design to the
-                    APIs and screens on top. Led Revora, a verified-onboarding
-                    system that keeps its business rules and security inside SQL
-                    Server: a normalized 14-table schema, all-or-nothing
-                    registration transactions, triggers for password hashing and
-                    audit logs, and least-privilege logins with masked personal
-                    data. Led the backend and AI integration for VerifAI, a
-                    hackathon prototype that checks every AI-suggested source
-                    against CrossRef before showing it, and built certificate
-                    PDFs, household rules and access controls for a Pasay City
-                    barangay&apos;s management system. Writes things down as it goes:
-                    requirements specifications, data flow diagrams, and
-                    technical documentation the rest of a team can build from.
+                    systems end to end. Led Revora, a verified-onboarding system
+                    with its rules and security inside SQL Server, and the
+                    backend and AI integration for VerifAI.
                   </p>
 
-                  <p className="lx-dim lx-prompt mb-1.5 mt-3">
+                  <p className="lx-dim lx-prompt mb-1 mt-2">
                     <span aria-hidden="true">$ </span>cat stack.txt
                   </p>
-                  <dl className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-x-3 gap-y-1 text-[12px] leading-[1.45]">
-                    {stack.map(({ label, items }) => (
-                      <Fragment key={label}>
-                        <dt className="lx-dim">{label}</dt>
-                        <dd>{items.join(" · ")}</dd>
-                      </Fragment>
+                  <ul className="flex flex-wrap gap-1.5">
+                    {stack.map((tool) => (
+                      <li
+                        key={tool}
+                        className="lx-box px-2 py-0.5 text-[12px] leading-[1.4]"
+                      >
+                        {tool}
+                      </li>
                     ))}
-                  </dl>
+                  </ul>
                 </div>
               </div>
+            </Window>
+
+            {/* Projects: one row per project (they follow data.ts), plus the
+                link to the full /projects page */}
+            <Window
+              id="projects"
+              title="~/projects"
+              className="md:col-span-2"
+              bodyClassName="flex flex-col gap-2 overflow-hidden"
+            >
+              <p className="lx-dim lx-prompt">
+                <span aria-hidden="true">$ </span>ls ~/projects
+              </p>
+              <ul className="@container flex min-h-0 flex-1 flex-col gap-1.5">
+                {projects.map((p) => (
+                  <li key={p.slug} className="min-h-0 flex-1">
+                    <Link
+                      href={`/projects/${p.slug}`}
+                      onClick={openFeatured(p.slug)}
+                      className="lx-row lx-box flex h-full flex-col justify-center"
+                    >
+                      <span className="flex min-w-0 items-baseline gap-2">
+                        <span className="block min-w-0 truncate font-bold">
+                          <span aria-hidden="true" className="lx-dim">
+                            ▸{" "}
+                          </span>
+                          {p.name}
+                        </span>
+                        <span className="lx-box ml-auto hidden shrink-0 whitespace-nowrap px-2 text-[11px] leading-[1.5] @md:block">
+                          {p.badge}
+                        </span>
+                      </span>
+                      <span className="lx-dim block min-w-0 max-w-full truncate text-[12px]">
+                        {p.summary}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/projects"
+                onClick={openProjects}
+                className="lx-link self-start"
+              >
+                all projects →
+              </Link>
+            </Window>
+
+            {/* Skills: a for loop over the skills, each with its proof */}
+            <Window
+              id="skills"
+              title="~/skills"
+              className="md:col-span-2"
+              bodyClassName="flex flex-col gap-2 overflow-hidden"
+            >
+              <SkillsLoop />
             </Window>
 
             {/* GitHub: the whole year when it fits the window at a readable
@@ -335,61 +298,11 @@ export default function HomeClient() {
               </div>
             </Window>
 
-            {/* Skills: a list, each cell opens its write-up */}
-            <Window
-              id="skills"
-              title="~/skills"
-              className="md:col-span-2"
-              bodyClassName="flex flex-col gap-2 overflow-hidden"
-            >
-              <SkillsList skills={skills} />
-            </Window>
-
-            {/* Projects: one row per project (they follow data.ts), plus the
-                link to the full /projects page */}
-            <Window
-              id="projects"
-              title="~/projects"
-              className="lg:col-span-2"
-              bodyClassName="flex flex-col gap-2 overflow-hidden"
-            >
-              <p className="lx-dim lx-prompt">
-                <span aria-hidden="true">$ </span>ls ~/projects
-              </p>
-              <ul className="@container flex min-h-0 flex-1 flex-col gap-1.5">
-                {projects.map((p) => (
-                  <li key={p.slug} className="min-h-0 flex-1">
-                    <Link
-                      href={`/projects/${p.slug}`}
-                      onClick={openFeatured(p.slug)}
-                      className="lx-row lx-box flex h-full flex-col justify-center @lg:flex-row @lg:items-baseline @lg:justify-start @lg:gap-3"
-                    >
-                      <span className="block max-w-full shrink-0 truncate font-bold">
-                        <span aria-hidden="true" className="lx-dim">
-                          ▸{" "}
-                        </span>
-                        {p.name}
-                      </span>
-                      <span className="lx-dim block min-w-0 max-w-full truncate text-[12px]">
-                        {p.summary}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/projects"
-                onClick={openProjects}
-                className="lx-link self-start"
-              >
-                all projects →
-              </Link>
-            </Window>
-
             {/* Contact */}
             <Window
               id="contact"
               title="contact.txt"
+              className="md:col-span-2 lg:col-span-1"
               bodyClassName="flex flex-col gap-2 overflow-hidden"
             >
               <p className="lx-dim lx-prompt">
