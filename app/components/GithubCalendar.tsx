@@ -39,16 +39,20 @@ const labels = {
 };
 const style = { color: 'var(--lx-dim)' };
 
-const BLOCK_MARGIN = 4;
+const BLOCK_MARGIN = 3;
 const DEFAULT_BLOCK_SIZE = 12;
-const MIN_BLOCK_SIZE = 8;
+const MIN_BLOCK_SIZE = 6;
 const MAX_BLOCK_SIZE = 28;
 
-// With `fit`, the calendar fills its parent's height (on md+ screens, where
-// the bento grid gives the window a fixed height): the squares grow until the
-// seven rows reach the bottom, and the weeks that no longer fit scroll
-// horizontally. The parent must be positioned, since the calendar is laid
-// out absolutely so its size can't feed back into the grid row's height.
+// From this width the bento grid gives every window a fixed height
+const TILED = '(min-width: 1024px)';
+
+// With `fit`, the squares are sized to the window. They grow until the whole
+// year spans its width, as long as that keeps them at least MIN_BLOCK_SIZE
+// (otherwise only the latest weeks show, scrolled to the end). Where the
+// window has a fixed height, they are also kept short enough for all seven
+// rows. There the calendar is laid out absolutely, so its size can't feed
+// back into the grid row's height; the parent must be positioned.
 // Memoized: the calendar draws ~370 squares, so it should only re-render
 // when its own size changes, not whenever the home page does
 export default memo(function GithubCalendar({ fit = false }: { fit?: boolean }) {
@@ -78,31 +82,36 @@ export default memo(function GithubCalendar({ fit = false }: { fit?: boolean }) 
     return () => observer.disconnect();
   }, [blockSize]);
 
-  // Size the squares to the available height. The labels above and below
-  // the grid don't scale with the squares, so their height is measured from
-  // the rendered calendar and subtracted first.
   useEffect(() => {
     const wrapper = wrapperRef.current;
     if (!fit || !wrapper) return;
-    const desktop = window.matchMedia('(min-width: 768px)');
+    const tiled = window.matchMedia(TILED);
 
     const resize = () => {
-      if (!desktop.matches) {
-        setBlockSize(DEFAULT_BLOCK_SIZE);
-        return;
-      }
       const calendar = wrapper.querySelector<HTMLElement>('.react-activity-calendar');
-      if (!calendar || !calendar.querySelector('rect[data-date]')) return;
+      if (!calendar) return;
+      const days = calendar.querySelectorAll('rect[data-date]').length;
+      if (!days) return;
+      const weeks = Math.ceil(days / 7);
+
       setBlockSize((current) => {
-        const grid = 7 * current + 6 * BLOCK_MARGIN;
-        const labels = calendar.offsetHeight - grid;
-        // Leave a pixel of slack so sub-pixel rounding can't add a vertical
-        // scrollbar to the surrounding frame.
-        const available = wrapper.clientHeight - labels - 1;
-        const next = Math.min(
-          MAX_BLOCK_SIZE,
-          Math.max(MIN_BLOCK_SIZE, Math.floor((available - 6 * BLOCK_MARGIN) / 7)),
-        );
+        // Widest square that still fits every week across
+        let next =
+          Math.floor((wrapper.clientWidth + BLOCK_MARGIN) / weeks) - BLOCK_MARGIN;
+        if (tiled.matches) {
+          // The labels above and below the grid don't scale with the squares,
+          // so their height is measured from the rendered calendar and
+          // subtracted first. A pixel of slack keeps sub-pixel rounding from
+          // adding a vertical scrollbar to the surrounding frame.
+          const grid = 7 * current + 6 * BLOCK_MARGIN;
+          const labels = calendar.offsetHeight - grid;
+          const available = wrapper.clientHeight - labels - 1;
+          next = Math.min(
+            next,
+            Math.floor((available - 6 * BLOCK_MARGIN) / 7),
+          );
+        }
+        next = Math.min(MAX_BLOCK_SIZE, Math.max(MIN_BLOCK_SIZE, next));
         // Once the loaded calendar already fits, stop watching its DOM: every
         // later change would only re-measure the same size. Window resizes
         // still come through the ResizeObserver.
@@ -115,18 +124,18 @@ export default memo(function GithubCalendar({ fit = false }: { fit?: boolean }) 
     resizeObserver.observe(wrapper);
     const mutationObserver = new MutationObserver(resize);
     mutationObserver.observe(wrapper, { childList: true, subtree: true });
-    desktop.addEventListener('change', resize);
+    tiled.addEventListener('change', resize);
     return () => {
       resizeObserver.disconnect();
       mutationObserver.disconnect();
-      desktop.removeEventListener('change', resize);
+      tiled.removeEventListener('change', resize);
     };
   }, [fit]);
 
   return (
     <div
       ref={wrapperRef}
-      className={fit ? 'md:absolute md:inset-3 md:flex md:items-center' : undefined}
+      className={fit ? 'lg:absolute lg:inset-3 lg:flex lg:items-center' : undefined}
     >
       <GitHubCalendar
         username="renzoboyy"

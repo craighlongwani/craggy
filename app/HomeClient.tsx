@@ -157,29 +157,30 @@ export default function HomeClient() {
     <main data-skin="linux" className="relative h-dvh w-full overflow-hidden">
       <Header current="home" />
 
-      {/* The windows keep the Win95 home page's arrangement: 3 columns from
-          768px up and 4 from 1024px, in three rows that split the screen
-          height. Below 768px they stack and this area scrolls. */}
+      {/* From 1024px the windows tile the screen exactly: 4 columns by 3 rows.
+          About is 2x2; GitHub, Skills and Projects are 2x1; Contact is 1x1.
+          Below that they stack (two columns from 768px) and this area
+          scrolls. */}
       <div className="h-full overflow-y-auto pt-10">
-        <div className="p-3 md:h-full md:p-4">
+        <div className="p-3 md:p-4 lg:h-full">
           <RestoreWindows
             icon="home"
-            className="grid grid-cols-1 gap-3 md:h-full md:auto-rows-fr md:grid-flow-dense md:grid-cols-3 lg:grid-cols-4 lg:gap-4"
+            className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:h-full lg:grid-cols-4 lg:grid-rows-3 lg:gap-4"
           >
-            {/* About: laid out like neofetch's output. Its prompt only shows
-                on phones and very tall screens, where there's room for it. */}
+            {/* About: neofetch's output (portrait and facts), then a short bio.
+                The prompts only show where there's room for them. */}
             <Window
               id="about"
               title="README.md"
-              className="md:col-span-2"
+              className="md:col-span-2 lg:row-span-2"
               bodyClassName="flex flex-col gap-2 overflow-hidden"
             >
-              <p className="lx-dim md:hidden md:tall:block">
+              <p className="lx-dim lx-prompt">
                 <span aria-hidden="true">$ </span>neofetch
               </p>
 
-              <div className="@container flex min-h-0 flex-1 flex-col">
-                <div className="grid min-h-0 flex-1 gap-3 @md:grid-cols-[minmax(0,3fr)_minmax(0,8fr)] shorter:@md:grid-cols-[minmax(0,2fr)_minmax(0,7fr)]">
+              <div className="@container flex min-h-0 flex-1 flex-col gap-3 shorter:gap-2">
+                <div className="grid gap-3 @md:grid-cols-[minmax(0,2fr)_minmax(0,5fr)]">
                   <div className="lx-portrait aspect-[4/3] @md:aspect-auto @md:min-h-0">
                     <Image
                       src="/assets/me.png"
@@ -206,13 +207,10 @@ export default function HomeClient() {
                       <dd>De La Salle-College of Saint Benilde</dd>
                       <dt className="lx-dim">study</dt>
                       <dd>Information Systems, 3rd year · Dean&apos;s Lister</dd>
-                      {/* Dropped on short screens to keep the rest in view */}
-                      <div className="contents shorter:hidden">
-                        <dt className="lx-dim">uptime</dt>
-                        <dd>
-                          <Uptime />
-                        </dd>
-                      </div>
+                      <dt className="lx-dim">uptime</dt>
+                      <dd>
+                        <Uptime />
+                      </dd>
                       <dt className="lx-dim">based</dt>
                       <dd>Manila, Philippines | Jeddah, Kingdom of Saudi Arabia</dd>
                       <dt className="lx-dim">seeking</dt>
@@ -223,11 +221,39 @@ export default function HomeClient() {
                     </dl>
                   </div>
                 </div>
+
+                <div className="min-h-0 flex-1">
+                  <p className="lx-dim lx-prompt mb-1.5">
+                    <span aria-hidden="true">$ </span>cat about.txt
+                  </p>
+                  <p className="text-[12px] leading-[1.6] shorter:text-[11px] shorter:leading-[1.5]">
+                    Information Systems student building database-driven web
+                    systems end to end, from requirements and ER design to the
+                    APIs and screens on top. Led Revora, a verified-onboarding
+                    system that keeps its business rules and security inside SQL
+                    Server: a normalized 15-table schema, all-or-nothing
+                    registration transactions, triggers for password hashing and
+                    audit logs, and least-privilege logins with masked personal
+                    data. Led the backend and AI integration for VerifAI, a
+                    hackathon prototype that checks every AI-suggested source
+                    against CrossRef before showing it, and built certificate
+                    PDFs, household rules and access controls for a Pasay City
+                    barangay&apos;s management system. Currently building Bean-o,
+                    a recipe-costing and inventory app for small cafés, backed
+                    by automated tests and CI.{" "}
+                    {/* Dropped on short screens, where the bio has to fit */}
+                    <span className="shorter:hidden">
+                      Writes things down as it goes: requirements
+                      specifications, data flow diagrams, and technical
+                      documentation the rest of a team can build from.
+                    </span>
+                  </p>
+                </div>
               </div>
             </Window>
 
-            {/* GitHub: the calendar's squares are sized to fill the window's
-                height, showing the latest weeks */}
+            {/* GitHub: the whole year when it fits the window at a readable
+                size, otherwise the latest weeks */}
             <Window
               id="github"
               title={
@@ -246,6 +272,7 @@ export default function HomeClient() {
                   github.com/renzoboyy
                 </Link>
               }
+              className="md:col-span-2"
               bodyClassName="flex flex-col gap-2 overflow-hidden"
             >
               <p className="lx-dim lx-prompt">
@@ -261,37 +288,38 @@ export default function HomeClient() {
             <Window
               id="skills"
               title="~/skills"
-              className="md:col-span-2 md:row-span-2"
+              className="md:col-span-2"
               bodyClassName="flex flex-col gap-2 overflow-hidden"
             >
               <SkillsList skills={skills} />
             </Window>
 
-            {/* Featured work: one row per project (they follow data.ts), plus
-                the link to the full /projects page */}
+            {/* Projects: one row per project (they follow data.ts), plus the
+                link to the full /projects page */}
             <Window
               id="projects"
               title="~/projects"
+              className="lg:col-span-2"
               bodyClassName="flex flex-col gap-2 overflow-hidden"
             >
               <p className="lx-dim lx-prompt">
                 <span aria-hidden="true">$ </span>ls ~/projects
               </p>
-              <ul className="flex min-h-0 flex-1 flex-col gap-1.5">
+              <ul className="@container flex min-h-0 flex-1 flex-col gap-1.5">
                 {projects.map((p) => (
                   <li key={p.slug} className="min-h-0 flex-1">
                     <Link
                       href={`/projects/${p.slug}`}
                       onClick={openFeatured(p.slug)}
-                      className="lx-row lx-box flex h-full flex-col justify-center"
+                      className="lx-row lx-box flex h-full flex-col justify-center @lg:flex-row @lg:items-baseline @lg:justify-start @lg:gap-3"
                     >
-                      <span className="block max-w-full truncate font-bold">
+                      <span className="block max-w-full shrink-0 truncate font-bold">
                         <span aria-hidden="true" className="lx-dim">
                           ▸{" "}
                         </span>
                         {p.name}
                       </span>
-                      <span className="lx-dim block max-w-full truncate text-[12px]">
+                      <span className="lx-dim block min-w-0 max-w-full truncate text-[12px]">
                         {p.summary}
                       </span>
                     </Link>

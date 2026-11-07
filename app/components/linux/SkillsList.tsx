@@ -28,7 +28,7 @@ export default function SkillsList({ skills }: { skills: Skill[] }) {
               type="button"
               onClick={() => setShown({ skill, open: true })}
               aria-haspopup="dialog"
-              className="lx-row lx-box flex h-full flex-col items-start justify-center gap-0.5 overflow-hidden"
+              className="lx-row lx-box flex h-full flex-col items-start justify-center overflow-hidden"
             >
               <span className="block max-w-full truncate text-[12px] font-bold">
                 <span aria-hidden="true" className="lx-dim">
@@ -36,11 +36,8 @@ export default function SkillsList({ skills }: { skills: Skill[] }) {
                 </span>
                 {skill.title}
               </span>
-              <span className="lx-dim line-clamp-3 text-[12px] leading-snug">
+              <span className="lx-dim block max-w-full truncate text-[12px]">
                 {skill.description}
-              </span>
-              <span className="lx-dim block max-w-full truncate text-[11px]">
-                used in {skill.usedIn.join(", ")}
               </span>
             </button>
           </li>
