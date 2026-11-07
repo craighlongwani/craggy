@@ -13,11 +13,14 @@ export const stack: { label: string; items: string[] }[] = [
   {
     label: "back end",
     items: [
-      "ASP.NET Core",
+      "ASP.NET Core MVC",
       "Node.js/Express",
       "Flask",
       "Django REST Framework",
       "Entity Framework Core",
+      "AutoMapper",
+      "repository pattern",
+      "dependency injection",
     ],
   },
   {
@@ -30,6 +33,8 @@ export const stack: { label: string; items: string[] }[] = [
       "triggers",
       "views",
       "indexes",
+      "relational design",
+      "code-first migrations",
     ],
   },
   {
@@ -45,7 +50,13 @@ export const stack: { label: string; items: string[] }[] = [
   },
   {
     label: "ai & apis",
-    items: ["Gemini API", "CrossRef API", "REST APIs", "server-side proxies"],
+    items: [
+      "Gemini API",
+      "CrossRef API",
+      "REST APIs",
+      "LLM integration",
+      "server-side proxies",
+    ],
   },
   {
     label: "testing",

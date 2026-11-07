@@ -55,7 +55,7 @@ export default function LinksMenu() {
       {open && (
         <ul
           id={panelId}
-          className="lx-menu absolute right-3 top-full z-10 mt-1 w-44 md:left-0 md:right-auto"
+          className="lx-menu absolute bottom-full right-3 z-10 mb-3 w-44 md:left-0 md:right-auto"
         >
           {links.map((link) => (
             <li key={link.label}>

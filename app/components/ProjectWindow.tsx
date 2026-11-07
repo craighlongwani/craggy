@@ -80,7 +80,7 @@ export default function ProjectWindow({
           (projectWindowRect reads them) */}
       <div
         data-bento
-        className="h-full overflow-y-auto p-3 pt-[3.25rem] md:p-4 md:pt-14"
+        className="h-full overflow-y-auto p-3 pb-[3.25rem] md:p-4 md:pb-14"
       >
         <section
           ref={windowRef}

@@ -296,7 +296,7 @@ body[data-skin="linux"] {
   --lx-bg: #0b0b0b;
   --lx-surface: #111111;
   --lx-raised: #1a1a1a;
-  --lx-line: #2d2d2d;
+  --lx-line: #5a5a5a;
   --lx-fg: #e8e8e8;
   --lx-dim: #9a9a9a;
   --lx-faint: #5f5f5f;
@@ -478,7 +478,7 @@ body[data-skin="linux"] {
   border-top: 1px solid var(--lx-line);
 }
 
-/* ── Header bar ── */
+/* ── Footer bar (the Header component) ── */
 
 [data-skin="linux"] .lx-nav {
   background: var(--lx-bg);

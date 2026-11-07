@@ -19,7 +19,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 const siteTitle = "Jed Lawrence Engbino · Information Systems";
 const siteDescription =
-  "Portfolio of Jed Lawrence Engbino, an Information Systems student at De La Salle-College of Saint Benilde building database-driven systems, from SQL Server back ends to full-stack web apps.";
+  "Portfolio of Jed Lawrence Engbino, an Information Systems student at De La Salle – College of Saint Benilde building database-driven systems, from SQL Server back ends to full-stack web apps.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://renzo-dev.vercel.app"),

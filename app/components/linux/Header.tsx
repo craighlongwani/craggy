@@ -33,7 +33,7 @@ export default function Header({ current }: { current: Page }) {
   };
 
   return (
-    <header className="lx-nav fixed inset-x-0 top-0 z-[70] flex h-10 items-center gap-2 border-b px-3 md:gap-3">
+    <header className="lx-nav fixed inset-x-0 bottom-0 z-[70] flex h-10 items-center gap-2 border-t px-3 md:gap-3">
       <p className="whitespace-nowrap font-bold">
         jed@renzo:~<span aria-hidden="true">$</span>{" "}
         <span aria-hidden="true" className="lx-cursor" />

@@ -1,29 +1,77 @@
-// Page transitions. Leaving a page closes its windows like a vertical
-// curtain: each window's top and bottom edges slide in until they meet along
-// the middle. The next page's windows open the same way, one after another.
+// Page transitions. A window opens the way you'd draw it on a desktop: a
+// mouse cursor fades in at the window's top-left corner and drags a white
+// outline out to the bottom-right, then the cursor fades away and the
+// window's contents appear. Closing is a different, quicker move: each
+// window squishes shut like a vertical curtain.
 // Opening a project from /projects is the one exception: the chosen window
 // grows into the project page while all the others close.
 
 export type Page = "home" | "projects";
 
-export const CLOSE_MS = 250;
-export const OPEN_MS = 250;
-export const OPEN_STAGGER_MS = 50;
+// One window's whole sequence: cursor fades in, the drag, then the fade out
+const FADE_MS = 110;
+const DRAG_MS = 280;
+export const OPEN_MS = FADE_MS + DRAG_MS + FADE_MS;
+export const CLOSE_MS = 180;
+const CLOSE_EASE = "cubic-bezier(0.4, 0, 0.6, 1)";
+// Wait between one window starting to open and the next
+export const OPEN_STAGGER_MS = 120;
 
-// clip-path insets: fully shown, and shut to a line across the middle
-const SHOWN = "inset(0% 0 0% 0)";
-const SHUT = "inset(50% 0 50% 0)";
+const DRAG_EASE = "cubic-bezier(0.45, 0, 0.25, 1)";
+const OUTLINE = "#e8e8e8";
 
 export function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-export function closeCurtain(el: HTMLElement) {
-  return el.animate([{ clipPath: SHOWN }, { clipPath: SHUT }], {
-    duration: CLOSE_MS,
-    easing: "ease-in",
-    fill: "forwards",
-  });
+// The cursor and the outline are temporary overlays above the page, placed
+// over the window's slot. They're removed once the sequence ends or the
+// window's animation is cancelled.
+function dragOverlay(el: HTMLElement) {
+  const r = el.getBoundingClientRect();
+  // A hidden window (the skill dialog while closed) has nothing to draw
+  if (r.width === 0 || r.height === 0) return null;
+  const layer = document.createElement("div");
+  layer.setAttribute("aria-hidden", "true");
+  // A popover puts the overlay in the top layer, so it also shows above a
+  // pop-up <dialog> (the resume window) and its dimmed backdrop
+  layer.popover = "manual";
+  layer.style.cssText = `position:fixed;inset:auto;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;margin:0;padding:0;border:0;overflow:visible;background:transparent;pointer-events:none;z-index:90;`;
+  const outline = document.createElement("div");
+  outline.style.cssText = `position:absolute;left:0;top:0;box-sizing:border-box;border:1px solid ${OUTLINE};background:rgba(232,232,232,0.05);`;
+  const cursor = document.createElement("div");
+  // A classic arrow: its tip is the element's top-left corner
+  cursor.style.cssText = "position:absolute;left:0;top:0;width:14px;height:20px;";
+  cursor.innerHTML =
+    '<svg width="14" height="20" viewBox="0 0 14 20" style="display:block;overflow:visible"><path d="M0 0v16l4-4 3 7 2.5-1-3-7H13z" fill="#fff" stroke="#000" stroke-width="1" stroke-linejoin="round"/></svg>';
+  layer.append(outline, cursor);
+  document.body.append(layer);
+  try {
+    layer.showPopover();
+  } catch {
+    // Without the Popover API the overlay just sits in the normal layer
+  }
+  return { layer, outline, cursor, w: r.width, h: r.height };
+}
+
+// Plays the overlay in step with the window's own animation `main`, and
+// cleans it up when that ends or is cancelled
+function followWith(
+  main: Animation,
+  layer: HTMLElement,
+  extra: Animation[],
+  total: number,
+  delay: number,
+) {
+  const remove = () => {
+    layer.remove();
+    extra.forEach((a) => a.cancel());
+  };
+  main.addEventListener("finish", remove);
+  main.addEventListener("cancel", remove);
+  // Animations stall when the browser stops drawing frames (e.g. a hidden
+  // tab), so don't leave the overlay behind
+  setTimeout(remove, delay + total + 600);
 }
 
 export function openCurtain(
@@ -32,13 +80,54 @@ export function openCurtain(
   // Extra wait before the staggered opening begins
   after = 0,
 ) {
-  // Backwards fill keeps the window shut until its turn comes
-  return el.animate([{ clipPath: SHUT }, { clipPath: SHOWN }], {
-    duration: OPEN_MS,
-    delay: after + index * OPEN_STAGGER_MS,
-    easing: "ease-out",
-    fill: "backwards",
-  });
+  const delay = after + index * OPEN_STAGGER_MS;
+  const overlay = dragOverlay(el);
+  const main = el.animate(
+    [{ opacity: 0 }, { opacity: 0, offset: (FADE_MS + DRAG_MS) / OPEN_MS }, { opacity: 1 }],
+    { duration: OPEN_MS, delay, fill: "backwards" },
+  );
+  if (!overlay) return main;
+  const { layer, outline, cursor, w, h } = overlay;
+  const t0 = FADE_MS / OPEN_MS;
+  const t1 = (FADE_MS + DRAG_MS) / OPEN_MS;
+  const timing = { duration: OPEN_MS, delay, fill: "both" as const };
+
+  // The outline and cursor sit at the corner, drag out, then fade away
+  const outlineAnim = outline.animate(
+    [
+      { width: "0px", height: "0px", opacity: 0 },
+      { width: "0px", height: "0px", opacity: 1, offset: t0, easing: DRAG_EASE },
+      { width: `${w}px`, height: `${h}px`, opacity: 1, offset: t1 },
+      { width: `${w}px`, height: `${h}px`, opacity: 0 },
+    ],
+    timing,
+  );
+  const cursorAnim = cursor.animate(
+    [
+      { transform: "translate(0px,0px)", opacity: 0 },
+      { transform: "translate(0px,0px)", opacity: 1, offset: t0, easing: DRAG_EASE },
+      { transform: `translate(${w}px,${h}px)`, opacity: 1, offset: t1 },
+      { transform: `translate(${w}px,${h}px)`, opacity: 0 },
+    ],
+    timing,
+  );
+  followWith(main, layer, [outlineAnim, cursorAnim], OPEN_MS, delay);
+  return main;
+}
+
+// Closing is a vertical curtain: the window squishes toward its middle line,
+// contents and all, and fades over the thin end so the last sliver never
+// shows squashed text.
+export function closeCurtain(el: HTMLElement) {
+  const origin = "50% 50%";
+  return el.animate(
+    [
+      { transform: "scaleY(1)", opacity: 1, transformOrigin: origin },
+      { opacity: 1, offset: 0.4 },
+      { transform: "scaleY(0)", opacity: 0, transformOrigin: origin },
+    ],
+    { duration: CLOSE_MS, easing: CLOSE_EASE, fill: "forwards" },
+  );
 }
 
 // Set when a page closes its windows on the way out, so the next page opens
@@ -73,7 +162,7 @@ export function curtainAndGo(go: () => void) {
     leave();
   };
   Promise.all(animations.map((a) => a.finished)).then(leaveOnce);
-  setTimeout(leaveOnce, CLOSE_MS + 100);
+  setTimeout(leaveOnce, CLOSE_MS + 80);
 }
 
 // ── Opening a project ────────────────────────────────────────────────────
@@ -198,7 +287,7 @@ export function expandAndGo(selected: HTMLElement, go: () => void) {
     leave();
   };
   Promise.all(animations.map((a) => a.finished)).then(leaveOnce);
-  setTimeout(leaveOnce, EXPAND_MS + 100);
+  setTimeout(leaveOnce, Math.max(EXPAND_MS, CLOSE_MS) + 100);
   const safety = setTimeout(() => {
     ghost.remove();
     ghostTimers.delete(safety);

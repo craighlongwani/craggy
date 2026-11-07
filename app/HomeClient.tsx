@@ -7,6 +7,7 @@ import OpenWindows from "./components/OpenWindows";
 import type { Skill } from "./components/SkillWindow";
 import Window from "./components/Window";
 import Header from "./components/linux/Header";
+import ResumeButton from "./components/linux/ResumeButton";
 import SkillsList from "./components/linux/SkillsList";
 import Uptime from "./components/linux/Uptime";
 import { stack } from "./components/linux/stack";
@@ -31,7 +32,7 @@ const skills: Skill[] = [
       "Picking up an existing codebase and shipping new features on top of it",
       "Generating branded PDF documents and reports straight from app data",
     ],
-    usedIn: ["Bean-o", "Barangay Management System", "VerifAI", "Revora"],
+    usedIn: ["Barangay Management System", "VerifAI", "Revora"],
   },
   {
     title: "Database Design & SQL",
@@ -40,12 +41,12 @@ const skills: Skill[] = [
     description:
       "Modeling data so it stays correct, then writing the queries and rules that keep it that way.",
     highlights: [
-      "Normalized schemas and ER diagrams, such as a 15-table design with a full address hierarchy",
+      "Normalized schemas and ER diagrams, such as a 14-table design with a full address hierarchy",
       "Multi-step writes wrapped in one transaction, so related records save together or not at all",
       "Stored procedures and triggers that enforce business rules inside the database itself",
       "Queries and functions that power live dashboards and approval queues",
     ],
-    usedIn: ["Revora", "Bean-o", "Barangay Management System"],
+    usedIn: ["Revora", "Barangay Management System"],
   },
   {
     title: "Security & Access Control",
@@ -59,7 +60,7 @@ const skills: Skill[] = [
       "Hashed passwords, idle session timeouts, and audit logs that record who did what",
       "Keeping secret keys on the server, never in the browser",
     ],
-    usedIn: ["Bean-o", "Revora", "Barangay Management System"],
+    usedIn: ["Revora", "Barangay Management System"],
   },
   {
     title: "AI & API Integration",
@@ -87,7 +88,7 @@ const skills: Skill[] = [
       "CI pipelines that test and build every change automatically",
       "Repeatable deploys that take the guesswork out of releasing",
     ],
-    usedIn: ["Bean-o", "This portfolio"],
+    usedIn: ["This portfolio"],
   },
   {
     title: "Systems Analysis & Design",
@@ -165,7 +166,7 @@ export default function HomeClient() {
           About is 2x2; GitHub, Skills and Projects are 2x1; Contact is 1x1.
           Below that they stack (two columns from 768px) and this area
           scrolls. */}
-      <div className="h-full overflow-y-auto pt-10">
+      <div className="h-full overflow-y-auto pb-10">
         <div className="p-3 md:p-4 lg:h-full">
           <OpenWindows
             className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:h-full lg:grid-cols-4 lg:grid-rows-3 lg:gap-4"
@@ -206,9 +207,12 @@ export default function HomeClient() {
                       >
                         jed@renzo
                       </p>
-                      <h1 className="text-lg font-bold leading-tight tracking-tight @lg:text-xl shorter:text-base shorter:@lg:text-base">
-                        Jed Lawrence Engbino
-                      </h1>
+                      <div className="flex items-center justify-between gap-2">
+                        <h1 className="text-lg font-bold leading-tight tracking-tight @lg:text-xl shorter:text-base shorter:@lg:text-base">
+                          Jed Lawrence Engbino
+                        </h1>
+                        <ResumeButton />
+                      </div>
                       <hr className="lx-rule mt-1.5 shorter:mt-1" />
                     </div>
 
@@ -216,7 +220,7 @@ export default function HomeClient() {
                       <dt className="lx-dim">role</dt>
                       <dd>Full-stack &amp; Database</dd>
                       <dt className="lx-dim">school</dt>
-                      <dd>De La Salle-College of Saint Benilde</dd>
+                      <dd>De La Salle – College of Saint Benilde</dd>
                       <dt className="lx-dim">study</dt>
                       <dd>Information Systems, 3rd year · Dean&apos;s Lister</dd>
                       <dt className="lx-dim">uptime</dt>
@@ -224,7 +228,9 @@ export default function HomeClient() {
                         <Uptime />
                       </dd>
                       <dt className="lx-dim">based</dt>
-                      <dd>Manila, Philippines | Jeddah, Kingdom of Saudi Arabia</dd>
+                      <dd>Manila, Philippines | Jeddah, Saudi Arabia</dd>
+                      <dt className="lx-dim">speaks</dt>
+                      <dd>English, Tagalog</dd>
                       <dt className="lx-dim">seeking</dt>
                       <dd>
                         IS / software engineering internships · Metro Manila /
@@ -270,16 +276,14 @@ export default function HomeClient() {
                     systems end to end, from requirements and ER design to the
                     APIs and screens on top. Led Revora, a verified-onboarding
                     system that keeps its business rules and security inside SQL
-                    Server: a normalized 15-table schema, all-or-nothing
+                    Server: a normalized 14-table schema, all-or-nothing
                     registration transactions, triggers for password hashing and
                     audit logs, and least-privilege logins with masked personal
                     data. Led the backend and AI integration for VerifAI, a
                     hackathon prototype that checks every AI-suggested source
                     against CrossRef before showing it, and built certificate
                     PDFs, household rules and access controls for a Pasay City
-                    barangay&apos;s management system. Currently building Bean-o,
-                    a recipe-costing and inventory app for small cafés, backed
-                    by automated tests and CI. Writes things down as it goes:
+                    barangay&apos;s management system. Writes things down as it goes:
                     requirements specifications, data flow diagrams, and
                     technical documentation the rest of a team can build from.
                   </p>
@@ -406,7 +410,7 @@ export default function HomeClient() {
                 <div className="min-w-0">
                   <dt className="lx-dim">phone</dt>
                   <dd className="truncate">
-                    <a href="tel:+639459718300" className="lx-link">
+                    <a href="tel:+639498253671" className="lx-link">
                       +63 949 825 3671
                     </a>
                   </dd>
