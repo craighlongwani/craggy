@@ -280,7 +280,7 @@ export default function HomeClient() {
                 ago&quot;
               </p>
               <div className="lx-box relative min-h-0 w-full flex-1 overflow-hidden p-3">
-                <GithubCalendar fit />
+                <GithubCalendar />
               </div>
             </Window>
 

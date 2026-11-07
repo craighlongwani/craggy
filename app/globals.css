@@ -558,6 +558,52 @@ body:has([data-skin="linux"]) {
   mix-blend-mode: multiply;
 }
 
+/* ── GitHub calendar, scaled to fill its box. The library draws an SVG with
+   a viewBox, so the stylesheet can stretch it; its root sets an inline
+   max-content width and its scroll container an inline overflow, which is
+   why those two overrides need !important. Below 1024px the calendar takes
+   the box's width and its natural height. From 1024px the box has a fixed
+   height, so the calendar is pinned to all four corners of it and the SVG
+   fills whatever the footer leaves: the whole year always shows, and it
+   follows the box as the window resizes. ── */
+
+[data-skin="linux"] .lx-calendar .react-activity-calendar {
+  width: 100% !important;
+}
+
+[data-skin="linux"] .lx-calendar .react-activity-calendar__scroll-container {
+  overflow: hidden !important;
+}
+
+[data-skin="linux"] .lx-calendar .react-activity-calendar__calendar {
+  width: 100%;
+  height: auto;
+}
+
+[data-skin="linux"] .lx-calendar .react-activity-calendar__footer {
+  font-size: 12px;
+}
+
+@media (min-width: 1024px) {
+  [data-skin="linux"] .lx-calendar {
+    position: absolute;
+    inset: 0.75rem;
+  }
+
+  [data-skin="linux"] .lx-calendar .react-activity-calendar {
+    height: 100% !important;
+  }
+
+  [data-skin="linux"] .lx-calendar .react-activity-calendar__scroll-container {
+    flex: 1 1 0;
+    min-height: 0;
+  }
+
+  [data-skin="linux"] .lx-calendar .react-activity-calendar__calendar {
+    height: 100%;
+  }
+}
+
 /* ── Pop-up windows (a skill's write-up): a focused window over a dimmed
    screen, with the title bar inverted ── */
 
