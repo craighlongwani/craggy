@@ -6,10 +6,9 @@ import GithubCalendar from "./components/GithubCalendar";
 import RestoreWindows from "./components/RestoreWindows";
 import type { Skill } from "./components/SkillWindow";
 import Window from "./components/Window";
-import Sidebar from "./components/linux/Sidebar";
+import Header from "./components/linux/Header";
 import SkillsList from "./components/linux/SkillsList";
 import Uptime from "./components/linux/Uptime";
-import { links } from "./components/linux/links";
 import { useEffect, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import { markProjectOpening, minimizeAndGo } from "./lib/anchor";
@@ -105,18 +104,6 @@ const skills: Skill[] = [
   },
 ];
 
-// neofetch-style grays, darkest to brightest
-const swatches = [
-  "#0b0b0b",
-  "#262626",
-  "#404040",
-  "#5a5a5a",
-  "#7d7d7d",
-  "#a0a0a0",
-  "#c8c8c8",
-  "#f0f0f0",
-];
-
 export default function HomeClient() {
   const router = useRouter();
 
@@ -143,7 +130,7 @@ export default function HomeClient() {
     };
   }, []);
 
-  // Minimize every window into the sidebar's home entry, then open
+  // Minimize every window into the header's [1] home button, then open
   // /projects. Modified clicks (new tab, etc.) keep the link's normal behavior.
   const openProjects = (e: MouseEvent<HTMLAnchorElement>) => {
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
@@ -154,7 +141,7 @@ export default function HomeClient() {
   };
 
   // Same movement for a single project: its page restores from the projects
-  // entry.
+  // button.
   const openFeatured = (slug: string) => (e: MouseEvent<HTMLAnchorElement>) => {
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
       return;
@@ -168,59 +155,64 @@ export default function HomeClient() {
 
   return (
     <main data-skin="linux" className="relative h-dvh w-full overflow-hidden">
-      <Sidebar current="home" />
+      <Header current="home" />
 
-      {/* Below 1024px the windows stack and this area scrolls; from there up
-          they tile the screen exactly, 4 columns by 3 rows */}
-      <div className="h-full overflow-y-auto pt-10 xl:pl-52 xl:pt-0">
-        <div className="p-3 md:p-4 lg:h-full xl:p-5">
+      {/* The windows keep the Win95 home page's arrangement: 3 columns from
+          768px up and 4 from 1024px, in three rows that split the screen
+          height. Below 768px they stack and this area scrolls. */}
+      <div className="h-full overflow-y-auto pt-10">
+        <div className="p-3 md:h-full md:p-4">
           <RestoreWindows
             icon="home"
-            className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:h-full lg:grid-cols-4 lg:grid-rows-3 lg:gap-4"
+            className="grid grid-cols-1 gap-3 md:h-full md:auto-rows-fr md:grid-flow-dense md:grid-cols-3 lg:grid-cols-4 lg:gap-4"
           >
-            {/* About: laid out like neofetch's output */}
+            {/* About: laid out like neofetch's output. Its prompt only shows
+                on phones and very tall screens, where there's room for it. */}
             <Window
               id="about"
               title="README.md"
-              className="md:col-span-2 lg:row-span-2"
-              bodyClassName="flex flex-col gap-3 overflow-hidden"
+              className="md:col-span-2"
+              bodyClassName="flex flex-col gap-2 overflow-hidden"
             >
-              <p className="lx-dim">
+              <p className="lx-dim md:hidden md:tall:block">
                 <span aria-hidden="true">$ </span>neofetch
               </p>
 
               <div className="@container flex min-h-0 flex-1 flex-col">
-                <div className="grid min-h-0 flex-1 gap-4 @md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+                <div className="grid min-h-0 flex-1 gap-3 @md:grid-cols-[minmax(0,3fr)_minmax(0,8fr)] shorter:@md:grid-cols-[minmax(0,2fr)_minmax(0,7fr)]">
                   <div className="lx-portrait aspect-[4/3] @md:aspect-auto @md:min-h-0">
                     <Image
                       src="/assets/me.png"
                       alt="Portrait of Jed Lawrence Engbino"
                       fill
                       priority
-                      sizes="(min-width: 1024px) 25vw, 100vw"
+                      sizes="(min-width: 1024px) 15vw, 100vw"
                       className="object-cover object-[55%_35%]"
                     />
                   </div>
 
-                  <div className="flex min-w-0 flex-col gap-3">
+                  <div className="flex min-w-0 flex-col gap-2 shorter:gap-1.5">
                     <div>
-                      <h1 className="text-xl font-bold leading-tight tracking-tight @lg:text-2xl">
+                      <h1 className="text-lg font-bold leading-tight tracking-tight @lg:text-xl shorter:text-base shorter:@lg:text-base">
                         Jed Lawrence Engbino
                       </h1>
-                      <hr className="lx-rule mt-2" />
+                      <hr className="lx-rule mt-1.5 shorter:mt-1" />
                     </div>
 
-                    <dl className="grid grid-cols-[4.25rem_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-[12px] @lg:text-[13px]">
+                    <dl className="grid grid-cols-[3.75rem_minmax(0,1fr)] gap-x-3 gap-y-1 text-[12px] leading-[1.45] shorter:gap-y-0.5">
                       <dt className="lx-dim">role</dt>
                       <dd>Full-stack &amp; Database</dd>
                       <dt className="lx-dim">school</dt>
                       <dd>De La Salle-College of Saint Benilde</dd>
                       <dt className="lx-dim">study</dt>
                       <dd>Information Systems, 3rd year · Dean&apos;s Lister</dd>
-                      <dt className="lx-dim">uptime</dt>
-                      <dd>
-                        <Uptime />
-                      </dd>
+                      {/* Dropped on short screens to keep the rest in view */}
+                      <div className="contents shorter:hidden">
+                        <dt className="lx-dim">uptime</dt>
+                        <dd>
+                          <Uptime />
+                        </dd>
+                      </div>
                       <dt className="lx-dim">based</dt>
                       <dd>Manila, Philippines | Jeddah, Kingdom of Saudi Arabia</dd>
                       <dt className="lx-dim">seeking</dt>
@@ -229,45 +221,13 @@ export default function HomeClient() {
                         remote
                       </dd>
                     </dl>
-
-                    <div aria-hidden="true" className="flex">
-                      {swatches.map((color) => (
-                        <span
-                          key={color}
-                          className="h-3 w-5"
-                          style={{ background: color }}
-                        />
-                      ))}
-                    </div>
-
-                    {/* The top bar and sidebar list these from 1024px up */}
-                    <ul className="mt-auto flex flex-wrap gap-x-3 gap-y-1 lg:hidden">
-                      {links.map((link) => (
-                        <li key={link.label}>
-                          <a
-                            href={link.href}
-                            {...(link.external
-                              ? { target: "_blank", rel: "noopener noreferrer" }
-                              : {})}
-                            className="lx-link"
-                          >
-                            {link.label}
-                            {link.external && (
-                              <span aria-hidden="true" className="lx-dim">
-                                {" "}
-                                ↗
-                              </span>
-                            )}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
                 </div>
               </div>
             </Window>
 
-            {/* GitHub: the contribution calendar, scaled to the window */}
+            {/* GitHub: the calendar's squares are sized to fill the window's
+                height, showing the latest weeks */}
             <Window
               id="github"
               title={
@@ -286,23 +246,22 @@ export default function HomeClient() {
                   github.com/renzoboyy
                 </Link>
               }
-              className="md:col-span-2"
-              bodyClassName="flex flex-col gap-3 overflow-hidden"
+              bodyClassName="flex flex-col gap-2 overflow-hidden"
             >
-              <p className="lx-dim">
+              <p className="lx-dim lx-prompt">
                 <span aria-hidden="true">$ </span>git log --since=&quot;1 year
                 ago&quot;
               </p>
-              <div className="flex min-h-0 flex-1 items-center">
-                <GithubCalendar />
+              <div className="lx-box relative min-h-0 w-full flex-1 overflow-hidden p-3">
+                <GithubCalendar fit />
               </div>
             </Window>
 
-            {/* Skills: a compact list, each row opens its write-up */}
+            {/* Skills: a list, each cell opens its write-up */}
             <Window
               id="skills"
               title="~/skills"
-              className="md:col-span-2"
+              className="md:col-span-2 md:row-span-2"
               bodyClassName="flex flex-col gap-2 overflow-hidden"
             >
               <SkillsList skills={skills} />
@@ -313,27 +272,26 @@ export default function HomeClient() {
             <Window
               id="projects"
               title="~/projects"
-              className="lg:col-span-3"
               bodyClassName="flex flex-col gap-2 overflow-hidden"
             >
-              <p className="lx-dim">
+              <p className="lx-dim lx-prompt">
                 <span aria-hidden="true">$ </span>ls ~/projects
               </p>
-              <ul className="@container flex min-h-0 flex-1 flex-col gap-1.5">
+              <ul className="flex min-h-0 flex-1 flex-col gap-1.5">
                 {projects.map((p) => (
                   <li key={p.slug} className="min-h-0 flex-1">
                     <Link
                       href={`/projects/${p.slug}`}
                       onClick={openFeatured(p.slug)}
-                      className="lx-row lx-box flex h-full flex-col justify-center gap-0 @lg:flex-row @lg:items-baseline @lg:justify-start @lg:gap-3"
+                      className="lx-row lx-box flex h-full flex-col justify-center"
                     >
-                      <span className="shrink-0 font-bold">
+                      <span className="block max-w-full truncate font-bold">
                         <span aria-hidden="true" className="lx-dim">
                           ▸{" "}
                         </span>
                         {p.name}
                       </span>
-                      <span className="lx-dim min-w-0 truncate text-[12px]">
+                      <span className="lx-dim block max-w-full truncate text-[12px]">
                         {p.summary}
                       </span>
                     </Link>
@@ -355,7 +313,7 @@ export default function HomeClient() {
               title="contact.txt"
               bodyClassName="flex flex-col gap-2 overflow-hidden"
             >
-              <p className="lx-dim">
+              <p className="lx-dim lx-prompt">
                 <span aria-hidden="true">$ </span>cat contact.txt
               </p>
               <dl className="flex flex-col gap-3 text-[12px]">

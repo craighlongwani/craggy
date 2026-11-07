@@ -15,6 +15,7 @@
    screen height: tighten spacing below 920px tall, and again below 800px */
 @custom-variant short (@media (min-width: 768px) and (max-height: 920px));
 @custom-variant shorter (@media (min-width: 768px) and (max-height: 800px));
+@custom-variant tall (@media (min-height: 1000px));
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -332,10 +333,12 @@ body:has([data-skin="linux"]) {
   color: var(--lx-dim);
 }
 
-[data-skin="linux"] .lx-label {
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+/* The "$ command" lines above a window's content: dropped on short screens,
+   where the content needs the room more */
+@media (min-width: 768px) and (max-height: 800px) {
+  [data-skin="linux"] .lx-prompt {
+    display: none;
+  }
 }
 
 /* ── Windows: 1px frames that light up under the pointer or focus, like a
@@ -370,7 +373,7 @@ body:has([data-skin="linux"]) {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  min-height: 2rem;
+  min-height: 1.75rem;
   padding: 0 0.75rem;
   background: transparent;
   color: var(--lx-dim);
@@ -389,7 +392,23 @@ body:has([data-skin="linux"]) {
 }
 
 [data-skin="linux"] .win95-titlebar + div {
-  padding: 0.875rem;
+  padding: 0.75rem;
+}
+
+@media (min-width: 768px) and (max-height: 920px) {
+  [data-skin="linux"] .win95-titlebar + div {
+    padding: 0.625rem;
+  }
+}
+
+/* Chrome slims down again on the shortest screens */
+@media (min-width: 768px) and (max-height: 800px) {
+  [data-skin="linux"] .win95-titlebar {
+    min-height: 1.5rem;
+  }
+  [data-skin="linux"] .win95-titlebar + div {
+    padding: 0.5rem;
+  }
 }
 
 /* Rows and links: hover inverts them, like a selected line in a terminal */
@@ -437,29 +456,63 @@ body:has([data-skin="linux"]) {
   border-top: 1px solid var(--lx-line);
 }
 
-/* ── Navigation (sidebar from 1280px, top bar below) ── */
+/* ── Header bar ── */
 
 [data-skin="linux"] .lx-nav {
   background: var(--lx-bg);
   border-color: var(--lx-line);
 }
 
-[data-skin="linux"] .lx-nav-item {
-  display: block;
-  padding: 0.125rem 0.5rem;
+/* Header buttons: [1] home, [2] projects and the links toggle. The current
+   page and the open menu are shown inverted. */
+[data-skin="linux"] .lx-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 1.625rem;
+  padding: 0 0.625rem;
+  border: 1px solid var(--lx-line);
   color: var(--lx-dim);
+  white-space: nowrap;
+  cursor: pointer;
 }
 
-[data-skin="linux"] .lx-nav-item:hover,
-[data-skin="linux"] .lx-nav-item:focus-visible {
+[data-skin="linux"] .lx-btn:hover,
+[data-skin="linux"] .lx-btn:focus-visible {
   color: var(--lx-fg);
+  border-color: var(--lx-fg);
   outline: none;
-  background: var(--lx-raised);
 }
 
-[data-skin="linux"] .lx-nav-item[aria-current="page"] {
+[data-skin="linux"] .lx-btn[aria-current="page"],
+[data-skin="linux"] .lx-btn[aria-expanded="true"] {
+  background: var(--lx-fg);
+  border-color: var(--lx-fg);
+  color: var(--lx-bg);
+}
+
+/* The links dropdown */
+[data-skin="linux"] .lx-menu {
+  background: var(--lx-surface);
+  border: 1px solid var(--lx-fg);
+}
+
+[data-skin="linux"] .lx-menu-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.25rem 0.625rem;
+}
+
+[data-skin="linux"] .lx-menu-item:hover,
+[data-skin="linux"] .lx-menu-item:focus-visible {
   background: var(--lx-fg);
   color: var(--lx-bg);
+  outline: none;
+}
+
+[data-skin="linux"] .lx-menu-item:hover .lx-dim,
+[data-skin="linux"] .lx-menu-item:focus-visible .lx-dim {
+  color: #4a4a4a;
 }
 
 /* Blinking block cursor after the prompt */
@@ -503,24 +556,6 @@ body:has([data-skin="linux"]) {
   );
   background-size: 3px 3px;
   mix-blend-mode: multiply;
-}
-
-/* ── GitHub calendar: the library draws an SVG with a viewBox and sets an
-   inline max-content width on its root, so a stylesheet override
-   (!important, to beat that inline style) is the only way to make the
-   calendar fill the window. ── */
-
-[data-skin="linux"] .lx-calendar .react-activity-calendar {
-  width: 100% !important;
-}
-
-[data-skin="linux"] .lx-calendar .react-activity-calendar__calendar {
-  width: 100%;
-  height: auto;
-}
-
-[data-skin="linux"] .lx-calendar .react-activity-calendar__footer {
-  font-size: 12px;
 }
 
 /* ── Pop-up windows (a skill's write-up): a focused window over a dimmed
