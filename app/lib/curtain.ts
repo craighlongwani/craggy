@@ -1,79 +1,83 @@
-// Minimize/restore animations: a page's windows shrink into its taskbar icon
-// when you leave it, and grow back out of that icon when you arrive, like
-// Win95 windows going to and from the taskbar.
+// Page transitions. Leaving a page closes its windows like a vertical
+// curtain: each window's top and bottom edges slide in until they meet along
+// the middle. The next page's windows open the same way, one after another.
+// Opening a project from /projects is the one exception: the chosen window
+// grows into the project page while all the others close.
 
-export type TaskbarIcon = "home" | "projects";
+export type Page = "home" | "projects";
 
-export const MINIMIZE_MS = 250;
-export const RESTORE_MS = 250;
-export const RESTORE_STAGGER_MS = 50;
+export const CLOSE_MS = 250;
+export const OPEN_MS = 250;
+export const OPEN_STAGGER_MS = 50;
 
-// Center of the taskbar icon, or the bottom middle of the screen if the
-// taskbar isn't rendered
-function anchorPoint(icon: TaskbarIcon) {
-  const target = document.querySelector(`[data-taskbar-icon="${icon}"]`);
-  if (!target) return { x: window.innerWidth / 2, y: window.innerHeight };
-  const rect = target.getBoundingClientRect();
-  return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-}
-
-// transform-origin that puts the anchor point under the element, so scaling
-// it to 0 collapses it onto the anchor
-export function originAtAnchor(el: HTMLElement, icon: TaskbarIcon) {
-  const rect = el.getBoundingClientRect();
-  const { x, y } = anchorPoint(icon);
-  return `${x - rect.left}px ${y - rect.top}px`;
-}
+// clip-path insets: fully shown, and shut to a line across the middle
+const SHOWN = "inset(0% 0 0% 0)";
+const SHUT = "inset(50% 0 50% 0)";
 
 export function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-export function minimizeToAnchor(el: HTMLElement, icon: TaskbarIcon) {
-  el.style.transformOrigin = originAtAnchor(el, icon);
-  return el.animate(
-    [
-      { transform: "scale(1)", opacity: 1 },
-      { transform: "scale(0)", opacity: 0 },
-    ],
-    { duration: MINIMIZE_MS, easing: "ease-in", fill: "forwards" }
-  );
+export function closeCurtain(el: HTMLElement) {
+  return el.animate([{ clipPath: SHOWN }, { clipPath: SHUT }], {
+    duration: CLOSE_MS,
+    easing: "ease-in",
+    fill: "forwards",
+  });
 }
 
-export function restoreFromAnchor(
+export function openCurtain(
   el: HTMLElement,
-  index: number,
-  icon: TaskbarIcon,
-  // Extra wait before the staggered restore begins
-  after = 0
+  index = 0,
+  // Extra wait before the staggered opening begins
+  after = 0,
 ) {
-  el.style.transformOrigin = originAtAnchor(el, icon);
-  return el.animate(
-    [
-      { transform: "scale(0)", opacity: 0 },
-      { transform: "scale(1)", opacity: 1 },
-    ],
-    {
-      duration: RESTORE_MS,
-      delay: after + index * RESTORE_STAGGER_MS,
-      easing: "ease-out",
-      fill: "backwards",
-    }
-  );
+  // Backwards fill keeps the window shut until its turn comes
+  return el.animate([{ clipPath: SHUT }, { clipPath: SHOWN }], {
+    duration: OPEN_MS,
+    delay: after + index * OPEN_STAGGER_MS,
+    easing: "ease-out",
+    fill: "backwards",
+  });
 }
 
-// Set when a page minimizes its windows on the way out, so the next page
-// restores its windows instead of playing the usual page fade. It's a
-// timestamp rather than a one-shot flag so React's dev double-render and
-// the template can both read it safely.
-let minimizedAt = -Infinity;
+// Set when a page closes its windows on the way out, so the next page opens
+// its windows instead of playing the usual page fade. It's a timestamp
+// rather than a one-shot flag so React's dev double-render and the template
+// can both read it safely.
+let closedAt = -Infinity;
 
-export function arrivedFromMinimize() {
-  return performance.now() - minimizedAt < 1500;
+export function arrivedFromCurtain() {
+  return performance.now() - closedAt < 1500;
+}
+
+// Close every window on the page, then run `go` (usually a router.push to the
+// next page)
+export function curtainAndGo(go: () => void) {
+  const windows = document.querySelectorAll<HTMLElement>("main .win95-window");
+  const leave = () => {
+    closedAt = performance.now();
+    go();
+  };
+  if (windows.length === 0 || prefersReducedMotion()) {
+    leave();
+    return;
+  }
+  const animations = Array.from(windows, closeCurtain);
+  // Animations stall when the browser stops drawing frames (e.g. a hidden
+  // tab), so a timer guarantees we still navigate
+  let left = false;
+  const leaveOnce = () => {
+    if (left) return;
+    left = true;
+    leave();
+  };
+  Promise.all(animations.map((a) => a.finished)).then(leaveOnce);
+  setTimeout(leaveOnce, CLOSE_MS + 100);
 }
 
 // ── Opening a project ────────────────────────────────────────────────────
-// On /projects, View minimizes every other window into the taskbar while the
+// On /projects, View closes every other window like a curtain while the
 // chosen one grows to fill the bento area, then the project page loads in
 // that same spot.
 
@@ -134,11 +138,11 @@ export function expandAndGo(selected: HTMLElement, go: () => void) {
     return;
   }
 
-  // Everything else goes to the taskbar
+  // Everything else closes
   const others = Array.from(
     document.querySelectorAll<HTMLElement>("main .win95-window"),
   ).filter((w) => w !== selected);
-  const animations = others.map((w) => minimizeToAnchor(w, "projects"));
+  const animations = others.map(closeCurtain);
 
   // A fixed copy of the chosen window grows to the project page's window, so
   // the grid underneath doesn't reflow. Its contents fade out, leaving an
@@ -185,7 +189,7 @@ export function expandAndGo(selected: HTMLElement, go: () => void) {
     ),
   );
 
-  // Same stalled-animation guard as minimizeAndGo; and never leave the ghost
+  // Same stalled-animation guard as curtainAndGo; and never leave the ghost
   // behind if the next page fails to load
   let left = false;
   const leaveOnce = () => {
@@ -202,39 +206,39 @@ export function expandAndGo(selected: HTMLElement, go: () => void) {
   ghostTimers.add(safety);
 }
 
-// ── Opening a project from the Start menu ────────────────────────────────
-// The Start menu minimizes the current page's windows into its taskbar icon
-// first, then the chosen project page grows its single window back out of the
-// projects icon. This is separate from View's expand-and-go transition above,
-// where the selected window grows straight into the project page.
+// ── Opening a project from the home page ─────────────────────────────────
+// The home page closes its windows first, then the chosen project page opens
+// its single window the same way. This is separate from View's expand-and-go
+// transition above, where the selected window grows straight into the
+// project page.
 
-let startMenuProject: { slug: string; at: number; readAt?: number } | null =
+let openingProject: { slug: string; at: number; readAt?: number } | null =
   null;
 
-// The project that should restore its window on arrival. Still readable for a
+// The project that should open its window on arrival. Still readable for a
 // moment after the first read, because React in dev mounts the page's effects
 // twice; after that a later visit won't replay it.
-export function arrivedFromStartMenu(slug: string) {
-  const p = startMenuProject;
+export function arrivedAtProject(slug: string) {
+  const p = openingProject;
   if (!p || p.slug !== slug) return false;
   const now = performance.now();
   if (now - p.at > 10000) return false;
   p.readAt ??= now;
   if (now - p.readAt > 500) {
-    startMenuProject = null;
+    openingProject = null;
     return false;
   }
   return true;
 }
 
 export function markProjectOpening(slug: string) {
-  startMenuProject = { slug, at: performance.now() };
+  openingProject = { slug, at: performance.now() };
 }
 
 // ── Closing a project ────────────────────────────────────────────────────
 // The reverse: the project page's contents fade out, /projects loads with
 // that window still expanded, it shrinks back into its grid slot, and then
-// the other windows come back out of the taskbar.
+// the other windows open their curtains.
 
 let collapse: { slug: string; at: number; readAt?: number } | null = null;
 
@@ -281,15 +285,11 @@ export function closeProject(
 }
 
 // Shrink `selected` from the expanded project window back into its grid
-// slot, then restore the other windows from the taskbar. Returns a cleanup.
-export function collapseThenRestore(
-  selected: HTMLElement,
-  others: HTMLElement[],
-  icon: TaskbarIcon,
-) {
+// slot, then open the other windows' curtains. Returns a cleanup.
+export function collapseThenOpen(selected: HTMLElement, others: HTMLElement[]) {
   const from = projectWindowRect();
   if (!from) {
-    const anims = others.map((w, i) => restoreFromAnchor(w, i, icon));
+    const anims = others.map((w, i) => openCurtain(w, i));
     return () => anims.forEach((a) => a.cancel());
   }
   const to = selected.getBoundingClientRect();
@@ -338,10 +338,8 @@ export function collapseThenRestore(
     { duration: EXPAND_MS, easing: EXPAND_EASE, fill: "forwards" },
   );
   anims.push(shrink);
-  // The others wait their turn, hidden, until the window is home
-  others.forEach((w, i) =>
-    anims.push(restoreFromAnchor(w, i, icon, EXPAND_MS)),
-  );
+  // The others wait their turn, shut, until the window is home
+  others.forEach((w, i) => anims.push(openCurtain(w, i, EXPAND_MS)));
 
   const land = () => {
     selected.style.visibility = "";
@@ -356,29 +354,4 @@ export function collapseThenRestore(
     anims.forEach((a) => a.cancel());
     land();
   };
-}
-
-// Minimize every window on the page into `icon`, then run `go` (usually a
-// router.push to the next page)
-export function minimizeAndGo(icon: TaskbarIcon, go: () => void) {
-  const windows = document.querySelectorAll<HTMLElement>("main .win95-window");
-  const leave = () => {
-    minimizedAt = performance.now();
-    go();
-  };
-  if (windows.length === 0 || prefersReducedMotion()) {
-    leave();
-    return;
-  }
-  const animations = Array.from(windows, (w) => minimizeToAnchor(w, icon));
-  // Animations stall when the browser stops drawing frames (e.g. a hidden
-  // tab), so a timer guarantees we still navigate
-  let left = false;
-  const leaveOnce = () => {
-    if (left) return;
-    left = true;
-    leave();
-  };
-  Promise.all(animations.map((a) => a.finished)).then(leaveOnce);
-  setTimeout(leaveOnce, MINIMIZE_MS + 100);
 }

@@ -24,8 +24,9 @@ export async function generateMetadata({
   };
 }
 
-// A project's write-up inside its window, in the desktop's Win95 look: gray
-// window, black serif text, sunken white panels and raised chips
+// A project's write-up inside its window, in the site's monochrome Linux
+// look: flat panels, dim secondary text, and the demo video in grayscale
+// until you point at it
 export default async function ProjectPage({
   params,
 }: {
@@ -37,7 +38,7 @@ export default async function ProjectPage({
   return (
     <ProjectWindow slug={project.slug} title={project.name}>
       {/* Event label */}
-      <p className="text-center font-code text-[10px] md:text-xs uppercase tracking-widest text-[#404040]">
+      <p className="lx-dim text-center text-[10px] md:text-xs uppercase tracking-widest">
         {project.event}
       </p>
 
@@ -47,10 +48,10 @@ export default async function ProjectPage({
       </h1>
 
       {/* Role */}
-      <p className="text-center text-sm text-[#404040]">{project.role}</p>
+      <p className="lx-dim text-center text-sm">{project.role}</p>
 
-      {/* Demo video, set into a sunken frame */}
-      <div className="win95-sunken bg-black p-[2px] mt-5">
+      {/* Demo video, framed; grayscale until you point at it */}
+      <div className="lx-box mt-5 bg-black p-[2px]">
         <video
           src={project.video.src}
           autoPlay
@@ -58,13 +59,13 @@ export default async function ProjectPage({
           loop
           playsInline
           aria-label={project.video.label}
-          className="block w-full h-auto"
+          className="block h-auto w-full grayscale transition-[filter] duration-300 hover:grayscale-0"
         />
       </div>
 
       {/* Description + highlights: stacked on mobile, side-by-side on md+ */}
       <div className="flex flex-col md:flex-row mt-5 gap-4 items-start">
-        <div className="flex-1 space-y-3 text-justify text-sm md:text-base">
+        <div className="flex-1 space-y-3 text-sm md:text-base">
           {project.description.map((para) => (
             <p key={para}>{para}</p>
           ))}
@@ -88,8 +89,8 @@ export default async function ProjectPage({
       </h2>
       <ol className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
         {project.steps.items.map(({ step, text }, i) => (
-          <li key={step} className="win95-sunken bg-white p-3">
-            <p className="font-code text-xs text-[#404040]">
+          <li key={step} className="lx-box p-3">
+            <p className="lx-dim text-xs">
               {i + 1}. {step}
             </p>
             <p className="mt-1 text-sm">{text}</p>
@@ -100,16 +101,14 @@ export default async function ProjectPage({
       {/* Tech stack */}
       <ul className="mt-5 flex flex-wrap gap-2">
         {project.tech.map((tech) => (
-          <li key={tech} className="win95-raised px-3 py-1 text-xs">
+          <li key={tech} className="lx-box px-2.5 py-0.5 text-xs">
             {tech}
           </li>
         ))}
       </ul>
 
       {/* Closing statement */}
-      <p className="mt-5 text-justify text-sm md:text-base">
-        {project.closing}
-      </p>
+      <p className="mt-5 text-sm md:text-base">{project.closing}</p>
 
       {/* Source code */}
       <div className="text-right mt-5">
@@ -117,12 +116,12 @@ export default async function ProjectPage({
           <Link
             href={project.source.href}
             target="_blank"
-            className="retro-button px-4 py-1 text-sm"
+            className="lx-btn"
           >
             {project.source.label}
           </Link>
         ) : (
-          <p className="text-sm text-[#404040]">{project.source.note}</p>
+          <p className="lx-dim text-sm">{project.source.note}</p>
         )}
       </div>
     </ProjectWindow>

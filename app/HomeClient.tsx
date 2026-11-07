@@ -3,15 +3,16 @@ import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 import GithubCalendar from "./components/GithubCalendar";
-import RestoreWindows from "./components/RestoreWindows";
+import OpenWindows from "./components/OpenWindows";
 import type { Skill } from "./components/SkillWindow";
 import Window from "./components/Window";
 import Header from "./components/linux/Header";
 import SkillsList from "./components/linux/SkillsList";
 import Uptime from "./components/linux/Uptime";
-import { useEffect, type MouseEvent } from "react";
+import { stack } from "./components/linux/stack";
+import { Fragment, useEffect, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
-import { markProjectOpening, minimizeAndGo } from "./lib/anchor";
+import { curtainAndGo, markProjectOpening } from "./lib/curtain";
 import { projects } from "./projects/data";
 import { hashId, scrollToWindow } from "./lib/windowScroll";
 
@@ -104,6 +105,10 @@ const skills: Skill[] = [
   },
 ];
 
+// neofetch's color blocks, in grays: 16 steps from dark to light, shown as
+// two rows of eight
+const ramp = Array.from({ length: 16 }, (_, i) => `hsl(0 0% ${6 + i * 6}%)`);
+
 export default function HomeClient() {
   const router = useRouter();
 
@@ -130,31 +135,30 @@ export default function HomeClient() {
     };
   }, []);
 
-  // Minimize every window into the header's [1] home button, then open
-  // /projects. Modified clicks (new tab, etc.) keep the link's normal behavior.
+  // Close every window like a curtain, then open /projects. Modified clicks
+  // (new tab, etc.) keep the link's normal behavior.
   const openProjects = (e: MouseEvent<HTMLAnchorElement>) => {
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
       return;
     }
     e.preventDefault();
-    minimizeAndGo("home", () => router.push("/projects"));
+    curtainAndGo(() => router.push("/projects"));
   };
 
-  // Same movement for a single project: its page restores from the projects
-  // button.
+  // Same for a single project: its page opens its own curtain.
   const openFeatured = (slug: string) => (e: MouseEvent<HTMLAnchorElement>) => {
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
       return;
     }
     e.preventDefault();
-    minimizeAndGo("home", () => {
+    curtainAndGo(() => {
       markProjectOpening(slug);
       router.push(`/projects/${slug}`);
     });
   };
 
   return (
-    <main data-skin="linux" className="relative h-dvh w-full overflow-hidden">
+    <main className="relative h-dvh w-full overflow-hidden">
       <Header current="home" />
 
       {/* From 1024px the windows tile the screen exactly: 4 columns by 3 rows.
@@ -163,12 +167,14 @@ export default function HomeClient() {
           scrolls. */}
       <div className="h-full overflow-y-auto pt-10">
         <div className="p-3 md:p-4 lg:h-full">
-          <RestoreWindows
-            icon="home"
+          <OpenWindows
             className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:h-full lg:grid-cols-4 lg:grid-rows-3 lg:gap-4"
           >
-            {/* About: neofetch's output (portrait and facts), then a short bio.
-                The prompts only show where there's room for them. */}
+            {/* About: neofetch's output (portrait, facts and a gray gradient),
+                then a short bio and the tech stack. The neofetch part keeps
+                its size; the bio and stack scroll inside the window when they
+                don't fit. The prompts and the decoration only show where
+                there's room for them. */}
             <Window
               id="about"
               title="README.md"
@@ -180,7 +186,7 @@ export default function HomeClient() {
               </p>
 
               <div className="@container flex min-h-0 flex-1 flex-col gap-3 shorter:gap-2">
-                <div className="grid gap-3 @md:grid-cols-[minmax(0,2fr)_minmax(0,5fr)]">
+                <div className="grid shrink-0 gap-3 @md:grid-cols-[minmax(0,2fr)_minmax(0,5fr)]">
                   <div className="lx-portrait aspect-[4/3] @md:aspect-auto @md:min-h-0">
                     <Image
                       src="/assets/me.png"
@@ -194,6 +200,12 @@ export default function HomeClient() {
 
                   <div className="flex min-w-0 flex-col gap-2 shorter:gap-1.5">
                     <div>
+                      <p
+                        aria-hidden="true"
+                        className="lx-dim mb-0.5 text-[11px] shorter:hidden"
+                      >
+                        jed@renzo
+                      </p>
                       <h1 className="text-lg font-bold leading-tight tracking-tight @lg:text-xl shorter:text-base shorter:@lg:text-base">
                         Jed Lawrence Engbino
                       </h1>
@@ -219,14 +231,41 @@ export default function HomeClient() {
                         remote
                       </dd>
                     </dl>
+
+                    {/* neofetch's color blocks, in grays: one ramp over two rows */}
+                    <div aria-hidden="true" className="mt-auto pt-1 shorter:hidden">
+                      <div className="flex">
+                        {ramp.slice(0, 8).map((color) => (
+                          <span
+                            key={color}
+                            className="h-3.5 w-6"
+                            style={{ background: color }}
+                          />
+                        ))}
+                      </div>
+                      <div className="flex">
+                        {ramp.slice(8).map((color) => (
+                          <span
+                            key={color}
+                            className="h-3.5 w-6"
+                            style={{ background: color }}
+                          />
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="min-h-0 flex-1">
+                <div
+                  role="region"
+                  aria-label="About, and tech stack"
+                  tabIndex={0}
+                  className="lx-scroll min-h-0 flex-1 overflow-y-auto"
+                >
                   <p className="lx-dim lx-prompt mb-1.5">
                     <span aria-hidden="true">$ </span>cat about.txt
                   </p>
-                  <p className="text-[12px] leading-[1.6] shorter:text-[11px] shorter:leading-[1.5]">
+                  <p className="text-[12px] leading-[1.6]">
                     Information Systems student building database-driven web
                     systems end to end, from requirements and ER design to the
                     APIs and screens on top. Led Revora, a verified-onboarding
@@ -240,14 +279,22 @@ export default function HomeClient() {
                     PDFs, household rules and access controls for a Pasay City
                     barangay&apos;s management system. Currently building Bean-o,
                     a recipe-costing and inventory app for small cafés, backed
-                    by automated tests and CI.{" "}
-                    {/* Dropped on short screens, where the bio has to fit */}
-                    <span className="shorter:hidden">
-                      Writes things down as it goes: requirements
-                      specifications, data flow diagrams, and technical
-                      documentation the rest of a team can build from.
-                    </span>
+                    by automated tests and CI. Writes things down as it goes:
+                    requirements specifications, data flow diagrams, and
+                    technical documentation the rest of a team can build from.
                   </p>
+
+                  <p className="lx-dim lx-prompt mb-1.5 mt-3">
+                    <span aria-hidden="true">$ </span>cat stack.txt
+                  </p>
+                  <dl className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-x-3 gap-y-1 text-[12px] leading-[1.45]">
+                    {stack.map(({ label, items }) => (
+                      <Fragment key={label}>
+                        <dt className="lx-dim">{label}</dt>
+                        <dd>{items.join(" · ")}</dd>
+                      </Fragment>
+                    ))}
+                  </dl>
                 </div>
               </div>
             </Window>
@@ -366,7 +413,7 @@ export default function HomeClient() {
                 </div>
               </dl>
             </Window>
-          </RestoreWindows>
+          </OpenWindows>
         </div>
       </div>
     </main>

@@ -4,10 +4,10 @@ import { motion } from "motion/react";
 import { ReactNode, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
+  arrivedAtProject,
+  arrivedFromCurtain,
   arrivedFromExpand,
-  arrivedFromMinimize,
-  arrivedFromStartMenu,
-} from "./lib/anchor";
+} from "./lib/curtain";
 
 export default function Template({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -42,19 +42,18 @@ export default function Template({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("popstate", handlePopState);
   }, [router]);
 
-  // Pages with a taskbar run their own animation instead: windows restoring
-  // from their taskbar icon. /projects always does; home does when you
-  // arrive from another taskbar page; a project page does when its window
-  // just expanded out of /projects or when the Start menu jumped straight to
-  // it. Decided once per visit, so a later re-render can't swap the wrapper
-  // and remount the page.
+  // Every page runs its own animation instead: windows opening like a
+  // curtain. /projects always does; home does when you arrive from another
+  // page; a project page does when its window just expanded out of /projects
+  // or when the home page closed its windows to open it. Decided once per
+  // visit, so a later re-render can't swap the wrapper and remount the page.
   const [ownAnimation] = useState(
     () =>
       pathname === "/projects" ||
-      (pathname === "/" && arrivedFromMinimize()) ||
+      (pathname === "/" && arrivedFromCurtain()) ||
       (pathname.startsWith("/projects/") &&
         (arrivedFromExpand() ||
-          arrivedFromStartMenu(
+          arrivedAtProject(
             pathname.slice("/projects/".length).replace(/\/$/, ""),
           ))),
   );

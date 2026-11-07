@@ -2,10 +2,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { MouseEvent } from "react";
-import { expandAndGo } from "../lib/anchor";
+import { expandAndGo } from "../lib/curtain";
 
-// A project window's View button: minimizes the other windows and grows its
-// own window into the project page
+// A project window's View button: closes the other windows like a curtain and
+// grows its own window into the project page
 export default function ViewLink({
   slug,
   name,
@@ -32,7 +32,7 @@ export default function ViewLink({
       href={href}
       onClick={open}
       aria-label={`View ${name}`}
-      className="retro-button shrink-0 px-4 py-1 text-sm"
+      className="lx-btn shrink-0"
     >
       View
     </Link>

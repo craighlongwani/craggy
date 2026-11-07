@@ -1,4 +1,4 @@
-import { prefersReducedMotion } from "./anchor";
+import { prefersReducedMotion } from "./curtain";
 
 // Scroll the desktop window with this id into view and flash a highlight
 // around it, so a jump from the Start menu lands somewhere obvious.

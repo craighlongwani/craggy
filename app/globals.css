@@ -286,8 +286,9 @@ body {
    Unlayered CSS beats Tailwind's layered utilities, so these rules win over
    classes like p-1.5 or font-win on the same elements. */
 
-/* Match the page behind it, so overscroll never flashes white */
-body:has([data-skin="linux"]) {
+/* The skin sits on <body>, so it covers every page (and overscroll never
+   flashes white) */
+body[data-skin="linux"] {
   background: #0b0b0b;
 }
 
@@ -409,6 +410,27 @@ body:has([data-skin="linux"]) {
   [data-skin="linux"] .win95-titlebar + div {
     padding: 0.5rem;
   }
+}
+
+/* A window that is always the focused one (a project's page) */
+[data-skin="linux"] .win95-window.lx-active {
+  border-color: var(--lx-fg);
+}
+
+[data-skin="linux"] .win95-window.lx-active > .win95-titlebar {
+  color: var(--lx-fg);
+  border-bottom-color: var(--lx-fg);
+}
+
+/* A region that scrolls inside its window, with a slim scrollbar and a
+   focus ring so the keyboard can scroll it */
+[data-skin="linux"] .lx-scroll {
+  scrollbar-width: thin;
+}
+
+[data-skin="linux"] .lx-scroll:focus-visible {
+  outline: 1px solid var(--lx-fg);
+  outline-offset: -1px;
 }
 
 /* Rows and links: hover inverts them, like a selected line in a terminal */

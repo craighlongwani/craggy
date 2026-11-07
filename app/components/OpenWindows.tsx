@@ -1,26 +1,23 @@
 "use client";
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 import {
-  arrivedFromMinimize,
-  collapseThenRestore,
+  arrivedFromCurtain,
+  collapseThenOpen,
   collapsingProject,
+  openCurtain,
   prefersReducedMotion,
-  restoreFromAnchor,
-  type TaskbarIcon,
-} from "../lib/anchor";
+} from "../lib/curtain";
 
-// Wraps a page's grid of windows and grows them out of the page's taskbar
-// icon one by one, like restoring minimized windows. With `always`, it plays
-// on every visit; otherwise only when the previous page minimized into the
-// taskbar on the way here. Coming back from a project page, that project's
-// window (tagged data-project) first shrinks back into its slot.
-export default function RestoreWindows({
-  icon,
+// Wraps a page's grid of windows and opens their curtains one by one. With
+// `always`, it plays on every visit; otherwise only when the previous page
+// closed its own windows on the way here. Coming back from a project page,
+// that project's window (tagged data-project) first shrinks back into its
+// slot.
+export default function OpenWindows({
   always = false,
   className = "",
   children,
 }: {
-  icon: TaskbarIcon;
   always?: boolean;
   className?: string;
   children: ReactNode;
@@ -28,12 +25,12 @@ export default function RestoreWindows({
   const ref = useRef<HTMLDivElement>(null);
 
   // With `always`, the grid starts hidden so the server-rendered windows
-  // don't flash at full size before shrinking into the icon
+  // don't flash open before their curtains start
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
     el.style.opacity = "1";
-    if (!(always || arrivedFromMinimize()) || prefersReducedMotion()) return;
+    if (!(always || arrivedFromCurtain()) || prefersReducedMotion()) return;
     const windows = el.querySelectorAll<HTMLElement>(".win95-window");
     const slug = collapsingProject();
     const selected = slug
@@ -41,13 +38,11 @@ export default function RestoreWindows({
       : null;
     if (selected) {
       const others = Array.from(windows).filter((w) => w !== selected);
-      return collapseThenRestore(selected, others, icon);
+      return collapseThenOpen(selected, others);
     }
-    const animations = Array.from(windows, (w, i) =>
-      restoreFromAnchor(w, i, icon),
-    );
+    const animations = Array.from(windows, (w, i) => openCurtain(w, i));
     return () => animations.forEach((a) => a.cancel());
-  }, [always, icon]);
+  }, [always]);
 
   return (
     <div

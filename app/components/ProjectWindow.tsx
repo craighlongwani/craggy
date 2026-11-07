@@ -7,24 +7,23 @@ import {
   type MouseEvent,
   type ReactNode,
 } from "react";
-import Taskbar from "./Taskbar";
+import Header from "./linux/Header";
 import {
+  arrivedAtProject,
   arrivedFromExpand,
-  arrivedFromStartMenu,
   closeProject,
+  openCurtain,
   prefersReducedMotion,
   removeExpandGhost,
-  restoreFromAnchor,
-} from "../lib/anchor";
+} from "../lib/curtain";
 
-// A project's page: one Win95 window on the teal desktop, in the same bento
-// area as /projects, centered, full height and 25% wider than the old
-// project card (keep the width classes in step with projectWindowRect).
-// When the window just expanded out of /projects, it takes over from that
-// expanding copy and its contents fade in. When the Start menu jumped here
-// instead, the previous page's windows already minimized, so this window
-// restores out of the projects taskbar icon. × plays it in reverse: the
-// contents fade out and the window shrinks back into its slot on /projects.
+// A project's page: one window in the same bento area as /projects, centered,
+// full height and 25% wider than the old project card (keep the width classes
+// in step with projectWindowRect). When the window just expanded out of
+// /projects, it takes over from that expanding copy and its contents fade in.
+// When the home page jumped here instead, it already closed its windows, so
+// this window opens its own curtain. × plays it in reverse: the contents fade
+// out and the window shrinks back into its slot on /projects.
 export default function ProjectWindow({
   slug,
   title,
@@ -48,18 +47,17 @@ export default function ProjectWindow({
   };
 
   useLayoutEffect(() => {
-    const fromStartMenu = arrivedFromStartMenu(slug);
+    const fromHome = arrivedAtProject(slug);
     const expanded = arrivedFromExpand();
     removeExpandGhost();
     if (prefersReducedMotion()) return;
 
-    // Arriving from the Start menu: the previous page's windows already
-    // minimized, so this window restores out of the projects taskbar icon,
-    // just like returning to a taskbar page.
-    if (fromStartMenu) {
+    // Arriving from the home page: it already closed its windows, so this
+    // window opens its curtain, like any other page taking over.
+    if (fromHome) {
       const win = windowRef.current;
       if (!win) return;
-      const a = restoreFromAnchor(win, 0, "projects");
+      const a = openCurtain(win);
       return () => a.cancel();
     }
 
@@ -75,36 +73,39 @@ export default function ProjectWindow({
   }, [slug]);
 
   return (
-    <main className="relative w-full h-screen font-body bg-[#008080]">
-      <div className="absolute inset-x-0 top-0 bottom-10 flex items-center justify-center">
-        <div data-bento className="w-full h-[95%] p-3 md:w-[95vw] md:p-6 lg:p-8">
-          <section
-            ref={windowRef}
-            className="win95-window mx-auto h-full w-full md:w-[93.75vw] lg:w-[62.5vw] max-w-full flex flex-col min-h-0"
-          >
-            <div className="win95-titlebar font-win flex items-center gap-1.5 text-sm md:text-base shrink-0">
-              <span className="flex-1 min-w-0 truncate">{title}</span>
-              {/* Title bar close button: back to all projects */}
-              <Link
-                href="/projects"
-                onClick={close}
-                aria-label="Close"
-                className="win95-raised shrink-0 w-4 h-3.5 md:w-[18px] md:h-4 grid place-items-center text-black text-xs leading-none font-bold"
-              >
-                ×
-              </Link>
-            </div>
-            <div
-              ref={contentRef}
-              className="flex-1 min-h-0 overflow-y-auto p-3 md:p-5 lg:p-6"
-            >
-              {children}
-            </div>
-          </section>
-        </div>
-      </div>
+    <main className="relative h-dvh w-full overflow-hidden">
+      <Header current="projects" />
 
-      <Taskbar current="projects" />
+      {/* The bento area: below the header, with the page's margins as padding
+          (projectWindowRect reads them) */}
+      <div
+        data-bento
+        className="h-full overflow-y-auto p-3 pt-[3.25rem] md:p-4 md:pt-14"
+      >
+        <section
+          ref={windowRef}
+          className="win95-window lx-active mx-auto flex h-full min-h-0 w-full max-w-full flex-col md:w-[93.75vw] lg:w-[62.5vw]"
+        >
+          <div className="win95-titlebar flex shrink-0 items-center gap-1.5">
+            <span className="min-w-0 flex-1 truncate">{title}</span>
+            {/* Title bar close button: back to all projects */}
+            <Link
+              href="/projects"
+              onClick={close}
+              aria-label="Close"
+              className="win95-raised grid h-4 w-5 shrink-0 place-items-center text-xs leading-none"
+            >
+              ×
+            </Link>
+          </div>
+          <div
+            ref={contentRef}
+            className="lx-scroll min-h-0 flex-1 overflow-y-auto"
+          >
+            {children}
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

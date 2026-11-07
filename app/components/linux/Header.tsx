@@ -2,26 +2,26 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { MouseEvent } from "react";
-import { minimizeAndGo, type TaskbarIcon } from "../../lib/anchor";
+import { curtainAndGo, type Page } from "../../lib/curtain";
 import Clock from "./Clock";
 import LinksMenu from "./LinksMenu";
 
 // The pages, numbered like tiling-WM workspaces
-const workspaces: { icon: TaskbarIcon; label: string; href: string }[] = [
+const workspaces: { icon: Page; label: string; href: string }[] = [
   { icon: "home", label: "home", href: "/" },
   { icon: "projects", label: "projects", href: "/projects" },
 ];
 
 // A slim bar across the top: the shell prompt, a button per page, the links
-// dropdown, and the clock. The page buttons are what the window
-// minimize/restore animation aims at.
-export default function Header({ current }: { current: TaskbarIcon }) {
+// dropdown, and the clock. Switching pages closes the current page's
+// windows like a curtain first.
+export default function Header({ current }: { current: Page }) {
   const router = useRouter();
 
   const open = (
     e: MouseEvent<HTMLAnchorElement>,
     href: string,
-    target: TaskbarIcon,
+    target: Page,
   ) => {
     // Modified clicks (new tab, etc.) keep the link's normal behavior
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
@@ -29,7 +29,7 @@ export default function Header({ current }: { current: TaskbarIcon }) {
     }
     e.preventDefault();
     if (target === current) return;
-    minimizeAndGo(current, () => router.push(href));
+    curtainAndGo(() => router.push(href));
   };
 
   return (
@@ -44,7 +44,6 @@ export default function Header({ current }: { current: TaskbarIcon }) {
           <Link
             key={item.icon}
             href={item.href}
-            data-taskbar-icon={item.icon}
             onClick={(e) => open(e, item.href, item.icon)}
             aria-current={item.icon === current ? "page" : undefined}
             aria-label={item.label}
