@@ -176,23 +176,23 @@ export default function HomeClient() {
         style={{ zIndex: 50 }}
       >
         <div
-          className="w-full h-[95%] overflow-y-auto p-3 md:w-[95vw] md:p-6 lg:p-8
+          className="w-full h-[95%] overflow-y-auto p-3 md:w-[95vw] md:p-6 lg:p-8 short:md:p-4 shorter:md:p-3
       scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           <RestoreWindows
             icon="home"
-            className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-5 md:min-h-full md:auto-rows-fr md:grid-flow-dense"
+            className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-5 short:md:gap-3 md:h-full md:auto-rows-fr md:grid-flow-dense"
           >
             {/* Me Card */}
             <Window
               id="about"
               title="About Me"
               className="col-span-1 md:col-span-2 row-span-1 max-md:-order-2"
-              bodyClassName="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] md:items-stretch"
+              bodyClassName="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)] xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] md:items-stretch md:overflow-hidden"
             >
               <div className="flex min-w-0 flex-col justify-between">
                 <div>
-                  <h1 className="text-2xl leading-[1.05] md:text-3xl lg:text-4xl">
+                  <h1 className="text-2xl leading-[1.05] md:text-3xl lg:text-4xl short:lg:text-3xl shorter:md:text-2xl shorter:lg:text-2xl">
                     Jed Lawrence Engbino
                   </h1>
                   <p className="mt-1 font-code text-xs text-[#404040] md:text-sm">
@@ -200,23 +200,23 @@ export default function HomeClient() {
                   </p>
 
                   {/* Education */}
-                  <p className="mt-2 text-xs leading-snug md:text-sm">
+                  <p className="mt-2 short:mt-1 shorter:mt-0.5 text-xs leading-snug md:text-sm shorter:md:text-xs">
                     Information Systems, 3rd year · Dean&apos;s Lister
                   </p>
-                  <p className="text-xs leading-snug text-[#404040] md:text-sm">
+                  <p className="text-xs leading-snug text-[#404040] md:text-sm shorter:md:text-xs">
                     De La Salle-College of Saint Benilde
                   </p>
-                  <p className="mt-2 text-xs leading-snug md:text-sm">
+                  <p className="mt-2 short:mt-1 shorter:mt-0.5 text-xs leading-snug md:text-sm shorter:md:text-xs">
                     @ Manila, Philippines | Jeddah, Kingdom of Saudi Arabia
                   </p>
-                  <p className="mt-2 text-xs leading-snug md:text-sm">
+                  <p className="mt-2 short:mt-1 shorter:mt-0.5 text-xs leading-snug md:text-sm shorter:md:text-xs">
                     Seeking IS / software engineering internships · Metro
                     Manila / remote
                   </p>
                 </div>
 
                 {/* Socials + résumé */}
-                <div className="mt-3 flex flex-wrap items-center gap-2.5 md:gap-3">
+                <div className="mt-3 short:mt-2 shorter:mt-1.5 flex flex-wrap items-center gap-2.5 md:gap-3">
                   <Link
                     href="https://www.linkedin.com/in/jed-lawrence-engbino-629997372/"
                     target="_blank"
@@ -227,7 +227,7 @@ export default function HomeClient() {
                       width={24}
                       height={24}
                       alt=""
-                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6"
+                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6 short:md:h-5 short:md:w-5"
                     />
                   </Link>
                   <Link
@@ -240,7 +240,7 @@ export default function HomeClient() {
                       width={24}
                       height={24}
                       alt=""
-                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6"
+                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6 short:md:h-5 short:md:w-5"
                     />
                   </Link>
                   <Link
@@ -253,7 +253,7 @@ export default function HomeClient() {
                       width={24}
                       height={24}
                       alt=""
-                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6"
+                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6 short:md:h-5 short:md:w-5"
                     />
                   </Link>
                   <Link
@@ -266,7 +266,7 @@ export default function HomeClient() {
                       width={24}
                       height={24}
                       alt=""
-                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6"
+                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6 short:md:h-5 short:md:w-5"
                     />
                   </Link>
                   <Link
@@ -279,7 +279,7 @@ export default function HomeClient() {
                       width={24}
                       height={24}
                       alt=""
-                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6"
+                      className="pointer-events-none h-5 w-5 md:h-6 md:w-6 short:md:h-5 short:md:w-5"
                     />
                   </Link>
 
@@ -350,22 +350,22 @@ export default function HomeClient() {
               id="projects"
               title="Featured Work"
               className="col-span-1 row-span-1"
-              bodyClassName="flex flex-col gap-2 min-h-0"
+              bodyClassName="flex flex-col gap-2 short:gap-1.5 min-h-0 overflow-hidden"
             >
-              <div className="flex flex-col gap-2 flex-1 min-h-0">
+              <div className="flex flex-col gap-2 short:gap-1.5 flex-1 min-h-0">
                 {projects.map((p) => (
                   <Link
                     key={p.slug}
                     href={`/projects/${p.slug}`}
                     onClick={openFeatured(p.slug)}
-                    className="win95-sunken group flex flex-1 min-h-0 items-center gap-3 bg-white p-2.5 hover:bg-[#000080] hover:text-white"
+                    className="win95-sunken group flex flex-1 min-h-0 items-center gap-3 bg-white p-2.5 short:p-1.5 hover:bg-[#000080] hover:text-white"
                   >
                     <Image
                       src={p.logo}
                       alt=""
                       width={32}
                       height={32}
-                      className="h-8 w-8 shrink-0 object-contain"
+                      className="h-8 w-8 short:h-6 short:w-6 shrink-0 object-contain"
                     />
                     <span className="block min-w-0">
                       <span className="block text-sm font-bold">{p.name}</span>
@@ -380,7 +380,7 @@ export default function HomeClient() {
               <Link
                 href="/projects"
                 onClick={openProjects}
-                className="retro-button shrink-0 self-center px-4 py-1 text-sm"
+                className="retro-button shrink-0 self-center px-4 py-1 short:py-0.5 text-sm"
               >
                 All projects →
               </Link>

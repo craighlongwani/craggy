@@ -11,6 +11,11 @@
   --font-code: var(--font-jetbrains), ui-monospace, monospace;
 }
 
+/* Short laptop screens, where the home bento grid has to squeeze into one
+   screen height: tighten spacing below 920px tall, and again below 800px */
+@custom-variant short (@media (min-width: 768px) and (max-height: 920px));
+@custom-variant shorter (@media (min-width: 768px) and (max-height: 800px));
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
