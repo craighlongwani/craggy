@@ -6,11 +6,11 @@ import ViewLink from "./ViewLink";
 
 // The projects board of the home page: every project in its own window, laid
 // out as a bento grid like the home board; each window's View button opens
-// that project's page. The windows open when the board scrolls into view. The
-// padding is what projectWindowRect reads (the page's margins).
+// that project's page, as a window over the board. The windows open when the
+// board scrolls into view.
 export default function ProjectsBoard() {
   return (
-    <div data-bento className="p-3 md:p-4 lg:h-full">
+    <div className="p-3 md:p-4 lg:h-full">
       <OpenWindows
         onView
         className="grid grid-cols-1 gap-3 md:min-h-full md:auto-rows-fr md:grid-cols-3 md:gap-4 lg:grid-cols-4"

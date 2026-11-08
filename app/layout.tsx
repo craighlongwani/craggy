@@ -44,6 +44,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <head>
         <meta name="darkreader-lock" />
+        {/* The site is one page, so Back/Forward only ever moves between its
+            hashes (#projects, #projects/<slug>): the page follows those
+            itself (an "lx-popstate" event), and Next's router, which would
+            refetch and re-render the page, never sees them. Registered here
+            so it runs before Next's own listener. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'addEventListener("popstate",function(e){if(location.pathname==="/"){e.stopImmediatePropagation();dispatchEvent(new Event("lx-popstate"))}});',
+          }}
+        />
         {/* Applies the saved theme before first paint, so light mode never
             flashes dark */}
         <script

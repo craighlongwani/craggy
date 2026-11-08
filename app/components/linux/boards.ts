@@ -30,6 +30,28 @@ export function useActiveBoard(): BoardId {
   return useSyncExternalStore(subscribe, () => active, () => "home");
 }
 
+// Right after a page loads, the boards are still growing (the calendar sizes
+// itself, images load), and a scroll made early is clamped to the page as it
+// was then. Keep the board at the top of the screen as they settle, until the
+// user takes over the scrolling or `ms` has passed.
+export function settleOnBoard(id: BoardId, ms = 1500) {
+  const el = document.getElementById(id);
+  const scroller = el?.closest<HTMLElement>(".lx-boards");
+  if (!el || !scroller) return () => {};
+  const takeOver = ["wheel", "touchstart", "keydown", "pointerdown"];
+  const realign = () => el.scrollIntoView({ behavior: "auto", block: "start" });
+  const observer = new ResizeObserver(realign);
+  scroller.querySelectorAll("[data-board]").forEach((b) => observer.observe(b));
+  const stop = () => {
+    observer.disconnect();
+    clearTimeout(timer);
+    takeOver.forEach((t) => scroller.removeEventListener(t, stop));
+  };
+  const timer = setTimeout(stop, ms);
+  takeOver.forEach((t) => scroller.addEventListener(t, stop, { passive: true }));
+  return stop;
+}
+
 // Scrolls to a board and puts it in the URL (replacing the history entry, so
 // the back button isn't filled with every board visited). Returns false when
 // the page has no such board.

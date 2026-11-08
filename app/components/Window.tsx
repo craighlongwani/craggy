@@ -13,7 +13,7 @@ export default function Window({
   title: ReactNode;
   className?: string;
   bodyClassName?: string;
-  // Tags a project's window so it can expand into / collapse from its page
+  // Tags a project's card: its window grows out of / shrinks back into it
   project?: string;
   // Anchor used by the Start menu and #hash URLs to jump to this window
   id?: string;

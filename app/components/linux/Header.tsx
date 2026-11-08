@@ -1,47 +1,34 @@
 "use client";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import type { MouseEvent } from "react";
-import { curtainAndGo, type Page } from "../../lib/curtain";
+import { closeProject, openProjectNow } from "../../lib/project";
 import Clock from "./Clock";
-import { jumpToBoard, useActiveBoard } from "./boards";
+import { jumpToBoard, useActiveBoard, type BoardId } from "./boards";
 import LinksMenu from "./LinksMenu";
 import PaletteToggle from "./PaletteToggle";
 import ThemeToggle from "./ThemeToggle";
 
-// The pages, numbered like tiling-WM workspaces
-const workspaces: { icon: Page; label: string; href: string }[] = [
-  { icon: "home", label: "home", href: "/" },
-  { icon: "projects", label: "projects", href: "/#projects" },
+// The boards, numbered like tiling-WM workspaces
+const workspaces: { id: BoardId; href: string }[] = [
+  { id: "home", href: "/" },
+  { id: "projects", href: "/#projects" },
 ];
 
-// A slim bar across the top: the shell prompt, a button per page, the links
-// dropdown, and the clock. Switching pages closes the current page's
-// windows like a curtain first.
-export default function Header({ current }: { current: Page }) {
-  const router = useRouter();
-  const pathname = usePathname();
+// The bar along the bottom: the shell prompt, a button per board, the links
+// dropdown, the palette/theme toggles and the clock. A board button scrolls
+// to that board (closing an open project first) and the one on screen is
+// highlighted.
+export default function Header() {
   const board = useActiveBoard();
-  // On the home page the pages are boards of one scroll, so the footer
-  // scrolls to them and highlights the one on screen
-  const onHome = pathname === "/";
-  const shown = onHome ? board : current;
 
-  const open = (
-    e: MouseEvent<HTMLAnchorElement>,
-    href: string,
-    target: Page,
-  ) => {
+  const open = (e: MouseEvent<HTMLAnchorElement>, target: BoardId) => {
     // Modified clicks (new tab, etc.) keep the link's normal behavior
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
       return;
     }
     e.preventDefault();
-    if (onHome) {
-      jumpToBoard(target);
-      return;
-    }
-    curtainAndGo(() => router.push(href));
+    if (openProjectNow()) closeProject(() => jumpToBoard(target));
+    else jumpToBoard(target);
   };
 
   return (
@@ -56,16 +43,16 @@ export default function Header({ current }: { current: Page }) {
       <nav aria-label="Primary" className="flex items-center gap-1.5">
         {workspaces.map((item, i) => (
           <Link
-            key={item.icon}
+            key={item.id}
             href={item.href}
-            onClick={(e) => open(e, item.href, item.icon)}
-            aria-current={item.icon === shown ? "page" : undefined}
-            aria-label={item.label}
-            title={item.label}
+            onClick={(e) => open(e, item.id)}
+            aria-current={item.id === board ? "page" : undefined}
+            aria-label={item.id}
+            title={item.id}
             className="lx-btn"
           >
             [{i + 1}]
-            <span className="hidden sm:inline">&nbsp;{item.label}</span>
+            <span className="hidden sm:inline">&nbsp;{item.id}</span>
           </Link>
         ))}
         <LinksMenu />

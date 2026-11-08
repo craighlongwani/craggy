@@ -10,11 +10,16 @@ import Header from "./components/linux/Header";
 import ResumeButton from "./components/linux/ResumeButton";
 import SkillsLoop from "./components/linux/SkillsLoop";
 import Uptime from "./components/linux/Uptime";
-import { isBoard, jumpToBoard } from "./components/linux/boards";
+import { isBoard, jumpToBoard, settleOnBoard } from "./components/linux/boards";
 import { stack } from "./components/linux/stack";
-import { useEffect, type MouseEvent } from "react";
-import { useRouter } from "next/navigation";
-import { curtainAndGo, markProjectOpening } from "./lib/curtain";
+import { useEffect, type MouseEvent, type ReactNode } from "react";
+import ProjectView from "./components/ProjectView";
+import {
+  consumeSelfHash,
+  hashProject,
+  openProject,
+  syncProjectFromUrl,
+} from "./lib/project";
 import { projects } from "./projects/data";
 import ProjectsBoard from "./projects/ProjectsBoard";
 import { hashId, scrollToWindow } from "./lib/windowScroll";
@@ -28,36 +33,73 @@ const ramp = [
   "#6c782e", "#4c7a5d", "#45707a", "#945e80",
 ];
 
-export default function HomeClient() {
-  const router = useRouter();
-
-  // Deep links such as /#skills (used by the Start menu) scroll the page's
-  // own scroll area, since the page itself doesn't scroll. Also runs on
-  // hashchange so jumping within the page doesn't reload it.
+export default function HomeClient({
+  projectViews,
+}: {
+  // Each project's write-up, rendered on the server
+  projectViews: { slug: string; title: string; content: ReactNode }[];
+}) {
+  // Deep links: /#skills (used by the Start menu) scrolls to that window,
+  // /#projects to that board, and /#projects/<slug> opens that project over
+  // its board. The page's own scroll area does the scrolling, since the page
+  // itself doesn't scroll. Also follows the URL on Back/Forward and on a
+  // typed hash, without reloading.
   useEffect(() => {
+    let poppedAt = -Infinity;
     const jump = () => {
       const id = hashId();
       if (!id) return;
-      const frame = requestAnimationFrame(() =>
-        isBoard(id) ? jumpToBoard(id) : scrollToWindow(id),
-      );
-      return () => cancelAnimationFrame(frame);
+      // A project: its board goes under it (so closing lands on its card)
+      // and it opens right away
+      if (hashProject()) {
+        document.getElementById("projects")?.scrollIntoView({ block: "start" });
+        const stop = settleOnBoard("projects");
+        syncProjectFromUrl();
+        return stop;
+      }
+      let stop = () => {};
+      const frame = requestAnimationFrame(() => {
+        if (isBoard(id)) {
+          jumpToBoard(id);
+          stop = settleOnBoard(id);
+        } else scrollToWindow(id);
+      });
+      return () => {
+        cancelAnimationFrame(frame);
+        stop();
+      };
     };
 
     let cancel = jump();
+    const onPop = () => {
+      poppedAt = performance.now();
+      syncProjectFromUrl();
+    };
     const onHash = () => {
+      // Opening/closing a project changed the hash itself: nothing to follow
+      if (consumeSelfHash()) return;
+      // Back/Forward over a project fires this too, right after popstate,
+      // which already handled it (and the board mustn't move under the
+      // window shrinking back into it)
+      const id = hashId();
+      const popped = performance.now() - poppedAt < 100;
+      if (popped && (!id || id === "projects" || hashProject())) return;
       cancel?.();
       cancel = jump();
+      syncProjectFromUrl();
     };
+    // Back/Forward (layout.tsx relays it as lx-popstate)
+    window.addEventListener("lx-popstate", onPop);
     window.addEventListener("hashchange", onHash);
     return () => {
       cancel?.();
+      window.removeEventListener("lx-popstate", onPop);
       window.removeEventListener("hashchange", onHash);
     };
   }, []);
 
-  // Close every window like a curtain, then open /projects. Modified clicks
-  // (new tab, etc.) keep the link's normal behavior.
+  // Scroll to the projects board. Modified clicks (new tab, etc.) keep the
+  // link's normal behavior.
   const openProjects = (e: MouseEvent<HTMLAnchorElement>) => {
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
       return;
@@ -66,21 +108,19 @@ export default function HomeClient() {
     jumpToBoard("projects");
   };
 
-  // Same for a single project: its page opens its own curtain.
+  // A single project
   const openFeatured = (slug: string) => (e: MouseEvent<HTMLAnchorElement>) => {
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
       return;
     }
     e.preventDefault();
-    curtainAndGo(() => {
-      markProjectOpening(slug);
-      router.push(`/projects/${slug}`);
-    });
+    // The project's window grows out of this row
+    openProject(slug, e.currentTarget);
   };
 
   return (
     <main className="relative h-dvh w-full overflow-hidden">
-      <Header current="home" />
+      <Header />
 
       {/* From 1024px the windows tile the screen exactly: 4 columns by 3 rows.
           About is 2x2; Projects and Skills are 2x1 on the right; GitHub is 2x1
@@ -217,7 +257,7 @@ export default function HomeClient() {
             </Window>
 
             {/* Projects: one row per project (they follow data.ts), plus the
-                link to the full /projects page */}
+                link to the projects board */}
             <Window
               id="home-projects"
               title="~/projects"
@@ -231,7 +271,7 @@ export default function HomeClient() {
                 {projects.map((p) => (
                   <li key={p.slug} className="min-h-0 flex-1">
                     <Link
-                      href={`/projects/${p.slug}`}
+                      href={`/#projects/${p.slug}`}
                       onClick={openFeatured(p.slug)}
                       className="lx-row lx-box flex h-full flex-col justify-center"
                     >
@@ -343,6 +383,7 @@ export default function HomeClient() {
           <ProjectsBoard />
         </Board>
       </Boards>
+      <ProjectView projects={projectViews} />
     </main>
   );
 }

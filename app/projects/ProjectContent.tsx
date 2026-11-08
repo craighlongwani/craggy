@@ -1,41 +1,13 @@
-import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import ProjectWindow from "../../components/ProjectWindow";
-import { getProject, projects } from "../data";
+import type { Project } from "./data";
 
-// One page per entry in data.ts, prerendered; any other slug is a 404
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return projects.map((p) => ({ slug: p.slug }));
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const project = getProject((await params).slug);
-  if (!project) return {};
-  return {
-    title: `${project.name} · Jed Lawrence Engbino`,
-    description: `${project.name}: ${project.summary}`,
-  };
-}
-
-// A project's write-up inside its window, in the site's monochrome Linux
-// look: flat panels, dim secondary text, and the demo video in full color
-export default async function ProjectPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const project = getProject((await params).slug);
-  if (!project) notFound();
-
+// A project's write-up, in the site's monochrome Linux look: flat panels, dim
+// secondary text, and the demo video in full color. Shown in the project's
+// window (ProjectView), which starts the video when it opens; until then it
+// isn't downloaded.
+export default function ProjectContent({ project }: { project: Project }) {
   return (
-    <ProjectWindow slug={project.slug} title={project.name}>
+    <>
       {/* Event label */}
       <p className="lx-dim text-center text-[10px] md:text-xs uppercase tracking-widest">
         {project.event}
@@ -53,7 +25,7 @@ export default async function ProjectPage({
       <div className="lx-box mt-5 bg-black p-[2px]">
         <video
           src={project.video.src}
-          autoPlay
+          preload="none"
           muted
           loop
           playsInline
@@ -123,6 +95,6 @@ export default async function ProjectPage({
           <p className="lx-dim text-sm">{project.source.note}</p>
         )}
       </div>
-    </ProjectWindow>
+    </>
   );
 }
