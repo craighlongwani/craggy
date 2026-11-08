@@ -1,12 +1,7 @@
 "use client";
 import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import { openCurtain, prefersReducedMotion } from "../lib/curtain";
-import {
-  closeProject,
-  takeOrigin,
-  useLastProject,
-  useOpenProject,
-} from "../lib/project";
+import { closeProject, useLastProject, useOpenProject } from "../lib/project";
 
 const DIM_MS = 200;
 // Closing squishes the window shut like a vertical curtain
@@ -52,12 +47,25 @@ export default function ProjectView({
 
     // ── Open ──
     if (want) {
-      // Where it was opened from doesn't matter any more: drop it
-      takeOrigin();
       finishClose.current?.();
       stopAnims();
       root.hidden = false;
       body.scrollTop = 0;
+      // Opened cold (a deep link, a touch): the video's first frame isn't
+      // decoded yet (see warmProject), so it fades in when it is, rather
+      // than popping in over its black box
+      const first = video();
+      if (first && first.readyState < 2) {
+        first.preload = "auto";
+        first.style.opacity = "0";
+        const show = () => {
+          clearTimeout(timer);
+          first.style.transition = "opacity 200ms";
+          first.style.opacity = "";
+        };
+        const timer = setTimeout(show, 1500);
+        first.addEventListener("loadeddata", show, { once: true });
+      }
       const play = () => void video()?.play().catch(() => {});
       if (prefersReducedMotion()) {
         play();
@@ -148,7 +156,7 @@ export default function ProjectView({
         </div>
         <div ref={bodyRef} className="lx-scroll min-h-0 flex-1 overflow-y-auto">
           {projects.map((p) => (
-            <article key={p.slug} hidden={p.slug !== shown}>
+            <article key={p.slug} data-slug={p.slug} hidden={p.slug !== shown}>
               {p.content}
             </article>
           ))}

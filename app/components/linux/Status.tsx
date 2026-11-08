@@ -1,7 +1,5 @@
-"use client";
-import Link from "next/link";
-import type { MouseEvent, ReactNode } from "react";
-import { openProject } from "../../lib/project";
+import type { ReactNode } from "react";
+import ProjectLink from "../../projects/ProjectLink";
 
 // Who the work was for, as `who` would list logged-in users
 const who = [
@@ -42,15 +40,6 @@ function Prompt({ children }: { children: ReactNode }) {
 // (`who`), and one strength per project with proof from its repo (`grep`);
 // each project name opens that project.
 export default function Status() {
-  const open = (slug: string) => (e: MouseEvent<HTMLAnchorElement>) => {
-    // Modified clicks (new tab, etc.) keep the link's normal behavior
-    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
-      return;
-    }
-    e.preventDefault();
-    openProject(slug, e.currentTarget);
-  };
-
   return (
     <div className="lx-scroll @container flex min-h-0 flex-1 flex-col justify-between gap-0.5 overflow-y-auto text-[12px] leading-[1.3]">
       <section>
@@ -93,9 +82,9 @@ export default function Status() {
             <div key={s.slug} className="contents">
               <dt className="lx-dim hidden @[34rem]:block">{s.area}</dt>
               <dd>
-                <Link href={`/#projects/${s.slug}`} onClick={open(s.slug)} className="lx-link font-bold">
+                <ProjectLink slug={s.slug} className="lx-link font-bold">
                   {s.slug}/
-                </Link>
+                </ProjectLink>
               </dd>
               <dd>{s.proof}</dd>
             </div>

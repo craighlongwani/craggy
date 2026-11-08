@@ -4,10 +4,9 @@
 export type Project = {
   slug: string;
   name: string;
-  logo: string;
-  // Fills the space around the logo when its box isn't square; matches the
-  // logo's own edge color
-  logoBackground: string;
+  // The card preview's backdrop, shown until the video's first frame loads
+  // (the project's brand color)
+  previewBackground: string;
   event: string;
   // Short context shown beside the project on the home page
   badge: string;
@@ -34,8 +33,7 @@ export const projects: Project[] = [
   {
     slug: "verifai",
     name: "VerifAI",
-    logo: "/assets/projects/VerifAI/Logo.png",
-    logoBackground: "#061947",
+    previewBackground: "#061947",
     event: "HackFest GDG Loyola 2026 · Ateneo De Manila University · March 2026",
     badge: "HackFest GDG Loyola 2026",
     summary: "AI-Powered Source Verification for Student Research Papers",
@@ -90,8 +88,7 @@ export const projects: Project[] = [
   {
     slug: "revora",
     name: "Revora",
-    logo: "/assets/projects/Revora/logo.png",
-    logoBackground: "linear-gradient(135deg, #2f9362, #164f37)",
+    previewBackground: "linear-gradient(135deg, #2f9362, #164f37)",
     event: "Database Management Course Project · May to August 2026",
     badge: "Database Management course project",
     summary: "Verified Onboarding for a Circular Material Exchange",
@@ -148,8 +145,7 @@ export const projects: Project[] = [
   {
     slug: "barangay",
     name: "Barangay Management System",
-    logo: "/assets/projects/BMS/logo.png",
-    logoBackground: "#fff",
+    previewBackground: "#fff",
     event: "Barangay 43, Pasay City · May to August 2026",
     badge: "Barangay 43, Pasay City",
     summary: "Digital Records and Services for a Local Government Unit",
@@ -201,7 +197,3 @@ export const projects: Project[] = [
     source: { note: "Source code available on request" },
   },
 ];
-
-export function getProject(slug: string) {
-  return projects.find((p) => p.slug === slug);
-}

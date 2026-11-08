@@ -1,25 +1,21 @@
-"use client";
 import Image from "next/image";
 import Link from "next/link";
-import "./globals.css";
+import type { ReactNode } from "react";
 import Boards, { Board } from "./components/Boards";
 import GithubCalendar from "./components/GithubCalendar";
+import HashSync from "./components/HashSync";
 import OpenWindows from "./components/OpenWindows";
+import ProjectView from "./components/ProjectView";
 import Window from "./components/Window";
+import Donut from "./components/linux/Donut";
 import Header from "./components/linux/Header";
 import ResumeButton from "./components/linux/ResumeButton";
-import Donut from "./components/linux/Donut";
 import SkillsLoop from "./components/linux/SkillsLoop";
 import Status from "./components/linux/Status";
 import Uptime from "./components/linux/Uptime";
-import { isBoard, jumpToBoard, settleOnBoard } from "./components/linux/boards";
 import { stack } from "./components/linux/stack";
-import { useEffect, type ReactNode } from "react";
-import ProjectView from "./components/ProjectView";
-import { consumeSelfHash, hashProject, syncProjectFromUrl } from "./lib/project";
-import ProjectsBoard from "./projects/ProjectsBoard";
-import { hashId, scrollToWindow } from "./lib/windowScroll";
 import type { Contributions } from "./lib/github";
+import ProjectsBoard from "./projects/ProjectsBoard";
 
 // neofetch's color blocks in the Gruvbox Material palette: the soft colors,
 // then the deeper ones, shown as two rows of eight
@@ -30,7 +26,10 @@ const ramp = [
   "#6c782e", "#4c7a5d", "#45707a", "#945e80",
 ];
 
-export default function HomeClient({
+// The home page, rendered on the server: only its interactive pieces (the
+// footer, windows opening, the donut, links that open projects, the project
+// window, HashSync) run in the browser.
+export default function HomePage({
   projectViews,
   contributions,
 }: {
@@ -39,67 +38,9 @@ export default function HomeClient({
   // The GitHub calendar, fetched on the server (null if unavailable)
   contributions: Contributions | null;
 }) {
-  // Deep links: /#skills (used by the Start menu) scrolls to that window,
-  // /#projects to that board, and /#projects/<slug> opens that project over
-  // its board. The page's own scroll area does the scrolling, since the page
-  // itself doesn't scroll. Also follows the URL on Back/Forward and on a
-  // typed hash, without reloading.
-  useEffect(() => {
-    let poppedAt = -Infinity;
-    const jump = () => {
-      const id = hashId();
-      if (!id) return;
-      // A project: its board goes under it (so closing lands on its card)
-      // and it opens right away
-      if (hashProject()) {
-        document.getElementById("projects")?.scrollIntoView({ block: "start" });
-        const stop = settleOnBoard("projects");
-        syncProjectFromUrl();
-        return stop;
-      }
-      let stop = () => {};
-      const frame = requestAnimationFrame(() => {
-        if (isBoard(id)) {
-          jumpToBoard(id);
-          stop = settleOnBoard(id);
-        } else scrollToWindow(id);
-      });
-      return () => {
-        cancelAnimationFrame(frame);
-        stop();
-      };
-    };
-
-    let cancel = jump();
-    const onPop = () => {
-      poppedAt = performance.now();
-      syncProjectFromUrl();
-    };
-    const onHash = () => {
-      // Opening/closing a project changed the hash itself: nothing to follow
-      if (consumeSelfHash()) return;
-      // Back/Forward over a project fires this too, right after popstate,
-      // which already handled it (and the board mustn't move under the
-      // window shrinking back into it)
-      const id = hashId();
-      const popped = performance.now() - poppedAt < 100;
-      if (popped && (!id || id === "projects" || hashProject())) return;
-      cancel?.();
-      cancel = jump();
-      syncProjectFromUrl();
-    };
-    // Back/Forward (layout.tsx relays it as lx-popstate)
-    window.addEventListener("lx-popstate", onPop);
-    window.addEventListener("hashchange", onHash);
-    return () => {
-      cancel?.();
-      window.removeEventListener("lx-popstate", onPop);
-      window.removeEventListener("hashchange", onHash);
-    };
-  }, []);
-
   return (
     <main className="relative h-dvh w-full overflow-hidden">
+      <HashSync />
       <Header />
 
       {/* From 1024px the windows tile the screen exactly: 4 columns by 3 rows.

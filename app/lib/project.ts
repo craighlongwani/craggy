@@ -1,7 +1,6 @@
 "use client";
 import { useSyncExternalStore } from "react";
 import { whenSwept } from "../components/linux/theme";
-import { projects } from "../projects/data";
 
 // Which project's window is open over the page, if any. The site is a single
 // page: opening a project is page state, mirrored in the URL as
@@ -14,8 +13,6 @@ import { projects } from "../projects/data";
 let open: string | null = null;
 // The last project opened: its write-up stays in the window while it closes
 let last: string | null = null;
-// The element the window grows out of (the clicked card or link)
-let origin: HTMLElement | null = null;
 // Whether opening added a history entry, which closing then goes back over
 let pushed = false;
 // A hash change made here, which the page's hashchange handler should skip
@@ -48,12 +45,6 @@ export function openProjectNow() {
   return open;
 }
 
-export function takeOrigin() {
-  const el = origin;
-  origin = null;
-  return el;
-}
-
 // True once for a hash change this module made itself
 export function consumeSelfHash() {
   const was = selfHash;
@@ -61,20 +52,35 @@ export function consumeSelfHash() {
   return was;
 }
 
-// The project named by the URL's hash (#projects/<slug>), if it's a real one
+// The project named by the URL's hash (#projects/<slug>), if it's a real
+// one: one with a write-up on the page (ProjectView renders them all, so the
+// project data itself never has to reach the browser)
 export function hashProject() {
   const m = window.location.hash.match(/^#projects\/([\w-]+)\/?$/);
-  return m && projects.some((p) => p.slug === m[1]) ? m[1] : null;
+  return m && document.querySelector(`[data-project-view] article[data-slug="${m[1]}"]`)
+    ? m[1]
+    : null;
+}
+
+// Starts decoding a project's write-up video ahead of its window opening
+// (when the pointer reaches the card or link that opens it). The video is
+// only told to fetch its metadata until then, so without this its first
+// frame arrived after the window was already showing: a black box that
+// popped into a picture. The file is the card preview's, already cached.
+export function warmProject(slug: string) {
+  const video = document.querySelector<HTMLVideoElement>(
+    `[data-project-view] article[data-slug="${slug}"] video`,
+  );
+  if (video && video.preload !== "auto") video.preload = "auto";
 }
 
 // Opening, closing and following the URL wait for a palette sweep to end
 // (whenSwept, theme.ts)
-export function openProject(slug: string, from?: HTMLElement | null) {
-  whenSwept(() => openNow(slug, from));
+export function openProject(slug: string) {
+  whenSwept(() => openNow(slug));
 }
 
-function openNow(slug: string, from?: HTMLElement | null) {
-  origin = from ?? null;
+function openNow(slug: string) {
   if (open === slug) return;
   selfHash = true;
   if (open) {

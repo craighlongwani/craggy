@@ -39,13 +39,13 @@ function remember(key: string, value: string) {
   }
 }
 
-export function setTheme(theme: Theme) {
+function setTheme(theme: Theme) {
   if (theme === "light") document.documentElement.dataset.theme = "light";
   else delete document.documentElement.dataset.theme;
   remember("theme", theme);
 }
 
-export function setPalette(palette: Palette) {
+function setPalette(palette: Palette) {
   if (palette === "mono") document.documentElement.dataset.palette = "mono";
   else delete document.documentElement.dataset.palette;
   remember("palette", palette);

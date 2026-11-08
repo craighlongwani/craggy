@@ -1,290 +1,15 @@
 @import "tailwindcss";
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --text-tiny: 0.625rem;
-  --font-win: var(--font-w95), "MS Sans Serif", Tahoma, sans-serif;
-  --font-body: "Times New Roman", Times, serif;
-  --font-code: var(--font-jetbrains), ui-monospace, monospace;
-}
-
 /* Short laptop screens, where the home bento grid has to squeeze into one
-   screen height: tighten spacing below 920px tall, and again below 800px */
-@custom-variant short (@media (min-width: 768px) and (max-height: 920px));
+   screen height: tighten spacing below 800px tall */
 @custom-variant shorter (@media (min-width: 768px) and (max-height: 800px));
-@custom-variant tall (@media (min-height: 1000px));
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-* {
-  scrollbar-color: #6b7280 transparent; /* gray-500 thumb, transparent track */
-}
-
-/* ── Windows 95 chrome ──────────────────────────────────────────────────
-   Bevels are stacked inset shadows: a light top-left edge and a dark
-   bottom-right edge make a surface look raised; swapping them sinks it. */
-
-.win95-window {
-  background: #c0c0c0;
-  color: #000;
-  padding: 3px;
-  box-shadow:
-    inset -1px -1px #0a0a0a,
-    inset 1px 1px #dfdfdf,
-    inset -2px -2px #808080,
-    inset 2px 2px #fff;
-}
-
-.win95-titlebar {
-  background: linear-gradient(90deg, #000080, #1084d0);
-  color: #fff;
-  padding: 3px 4px;
-  font-weight: bold;
-  letter-spacing: 0.02em;
-}
-
-/* Raised control, e.g. a push button */
-.win95-raised {
-  background: #c0c0c0;
-  box-shadow:
-    inset -1px -1px #0a0a0a,
-    inset 1px 1px #fff,
-    inset -2px -2px #808080,
-    inset 2px 2px #dfdfdf;
-}
-
-.win95-raised:active {
-  box-shadow:
-    inset -1px -1px #fff,
-    inset 1px 1px #0a0a0a,
-    inset -2px -2px #dfdfdf,
-    inset 2px 2px #808080;
-}
-
-/* Sunken field, e.g. a text box or list view */
-.win95-sunken {
-  box-shadow:
-    inset -1px -1px #fff,
-    inset 1px 1px #808080,
-    inset -2px -2px #dfdfdf,
-    inset 2px 2px #0a0a0a;
-}
-
-/* Taskbar: gray strip with a light line along its top edge */
-.win95-taskbar {
-  background: #c0c0c0;
-  box-shadow:
-    inset 0 1px #dfdfdf,
-    inset 0 2px #fff;
-}
-
-/* The current page's taskbar button: pressed in, with the checkered
-   highlight Win95 used for the active window's button */
-.win95-taskbar-active {
-  background-color: #fff;
-  background-image: repeating-conic-gradient(#c0c0c0 0% 25%, #fff 0% 50%);
-  background-size: 2px 2px;
-  box-shadow:
-    inset -1px -1px #fff,
-    inset 1px 1px #0a0a0a,
-    inset -2px -2px #dfdfdf,
-    inset 2px 2px #808080;
-}
-
-/* Held-down control, e.g. the Start button while its menu is open */
-.win95-pressed {
-  background: #c0c0c0;
-  box-shadow:
-    inset -1px -1px #fff,
-    inset 1px 1px #0a0a0a,
-    inset -2px -2px #dfdfdf,
-    inset 2px 2px #808080;
-}
-
-/* Skill window: a Win95 window in the top layer, with no dimmed backdrop
-   (Win95 windows just sat on top of the desktop) */
-.skill-window::backdrop {
-  background: transparent;
-}
-
-/* Etched separator line */
-.win95-etched {
-  border: 0;
-  border-top: 1px solid #808080;
-  border-bottom: 1px solid #fff;
-}
-
-/* Geocities-style "Click me!" sticker: red and yellow, tilted, blinking */
-.click-me-badge {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  padding: 2px 6px;
-  color: #ffff00;
-  background: #ff0000;
-  border: 2px solid #ffff00;
-  box-shadow: 2px 2px 0 #000;
-  font-size: 0.75rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  white-space: nowrap;
-  transform: rotate(10deg);
-  pointer-events: none;
-  animation: retro-blink 1s steps(1, end) infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .click-me-badge {
-    animation: none;
-  }
-}
-
-/* Pixel-art pointing hand, the classic 90s link cursor. The hotspot is the
-   fingertip (5, 0); browsers that can't load it fall back to "pointer". */
-.pixel-hand {
-  cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='17' height='20' shape-rendering='crispEdges'><rect x='5' y='0' width='2' height='1' fill='%23000'/><rect x='4' y='1' width='1' height='1' fill='%23000'/><rect x='5' y='1' width='2' height='1' fill='%23fff'/><rect x='7' y='1' width='1' height='1' fill='%23000'/><rect x='4' y='2' width='1' height='1' fill='%23000'/><rect x='5' y='2' width='2' height='1' fill='%23fff'/><rect x='7' y='2' width='1' height='1' fill='%23000'/><rect x='4' y='3' width='1' height='1' fill='%23000'/><rect x='5' y='3' width='2' height='1' fill='%23fff'/><rect x='7' y='3' width='1' height='1' fill='%23000'/><rect x='4' y='4' width='1' height='1' fill='%23000'/><rect x='5' y='4' width='2' height='1' fill='%23fff'/><rect x='7' y='4' width='3' height='1' fill='%23000'/><rect x='4' y='5' width='1' height='1' fill='%23000'/><rect x='5' y='5' width='2' height='1' fill='%23fff'/><rect x='7' y='5' width='1' height='1' fill='%23000'/><rect x='8' y='5' width='2' height='1' fill='%23fff'/><rect x='10' y='5' width='3' height='1' fill='%23000'/><rect x='4' y='6' width='1' height='1' fill='%23000'/><rect x='5' y='6' width='2' height='1' fill='%23fff'/><rect x='7' y='6' width='1' height='1' fill='%23000'/><rect x='8' y='6' width='2' height='1' fill='%23fff'/><rect x='10' y='6' width='1' height='1' fill='%23000'/><rect x='11' y='6' width='2' height='1' fill='%23fff'/><rect x='13' y='6' width='2' height='1' fill='%23000'/><rect x='0' y='7' width='2' height='1' fill='%23000'/><rect x='4' y='7' width='1' height='1' fill='%23000'/><rect x='5' y='7' width='2' height='1' fill='%23fff'/><rect x='7' y='7' width='1' height='1' fill='%23000'/><rect x='8' y='7' width='2' height='1' fill='%23fff'/><rect x='10' y='7' width='1' height='1' fill='%23000'/><rect x='11' y='7' width='2' height='1' fill='%23fff'/><rect x='13' y='7' width='1' height='1' fill='%23000'/><rect x='14' y='7' width='1' height='1' fill='%23fff'/><rect x='15' y='7' width='1' height='1' fill='%23000'/><rect x='0' y='8' width='1' height='1' fill='%23000'/><rect x='1' y='8' width='1' height='1' fill='%23fff'/><rect x='2' y='8' width='1' height='1' fill='%23000'/><rect x='4' y='8' width='1' height='1' fill='%23000'/><rect x='5' y='8' width='8' height='1' fill='%23fff'/><rect x='13' y='8' width='1' height='1' fill='%23000'/><rect x='14' y='8' width='1' height='1' fill='%23fff'/><rect x='15' y='8' width='1' height='1' fill='%23000'/><rect x='0' y='9' width='1' height='1' fill='%23000'/><rect x='1' y='9' width='2' height='1' fill='%23fff'/><rect x='3' y='9' width='2' height='1' fill='%23000'/><rect x='5' y='9' width='10' height='1' fill='%23fff'/><rect x='15' y='9' width='1' height='1' fill='%23000'/><rect x='1' y='10' width='1' height='1' fill='%23000'/><rect x='2' y='10' width='2' height='1' fill='%23fff'/><rect x='4' y='10' width='1' height='1' fill='%23000'/><rect x='5' y='10' width='10' height='1' fill='%23fff'/><rect x='15' y='10' width='1' height='1' fill='%23000'/><rect x='2' y='11' width='1' height='1' fill='%23000'/><rect x='3' y='11' width='12' height='1' fill='%23fff'/><rect x='15' y='11' width='1' height='1' fill='%23000'/><rect x='2' y='12' width='1' height='1' fill='%23000'/><rect x='3' y='12' width='12' height='1' fill='%23fff'/><rect x='15' y='12' width='1' height='1' fill='%23000'/><rect x='3' y='13' width='1' height='1' fill='%23000'/><rect x='4' y='13' width='11' height='1' fill='%23fff'/><rect x='15' y='13' width='1' height='1' fill='%23000'/><rect x='3' y='14' width='1' height='1' fill='%23000'/><rect x='4' y='14' width='10' height='1' fill='%23fff'/><rect x='14' y='14' width='1' height='1' fill='%23000'/><rect x='4' y='15' width='1' height='1' fill='%23000'/><rect x='5' y='15' width='9' height='1' fill='%23fff'/><rect x='14' y='15' width='1' height='1' fill='%23000'/><rect x='4' y='16' width='1' height='1' fill='%23000'/><rect x='5' y='16' width='9' height='1' fill='%23fff'/><rect x='14' y='16' width='1' height='1' fill='%23000'/><rect x='5' y='17' width='1' height='1' fill='%23000'/><rect x='6' y='17' width='7' height='1' fill='%23fff'/><rect x='13' y='17' width='1' height='1' fill='%23000'/><rect x='5' y='18' width='1' height='1' fill='%23000'/><rect x='6' y='18' width='7' height='1' fill='%23fff'/><rect x='13' y='18' width='1' height='1' fill='%23000'/><rect x='5' y='19' width='9' height='1' fill='%23000'/></svg>") 5 0, pointer;
-}
-
-/* Win95 status bar: a sunken strip of text along the bottom of a window */
-.win95-statusbar {
-  box-shadow:
-    inset -1px -1px #fff,
-    inset 1px 1px #808080;
-}
-
-/* Win95's dotted focus rectangle, used as the hover state too */
-.win95-focus:hover,
-.win95-focus:focus-visible {
-  outline: 1px dotted #000;
-  outline-offset: -4px;
-}
-
-/* Push button with a retro hover: it lights up in Win95 selection navy, a
-   blinking pixel arrow appears, and pressing sinks the bevel and nudges the
-   label down-right like a real button. */
-.retro-button {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  color: #000;
-  background: #c0c0c0;
-  box-shadow:
-    inset -1px -1px #0a0a0a,
-    inset 1px 1px #fff,
-    inset -2px -2px #808080,
-    inset 2px 2px #dfdfdf;
-}
-
-.retro-button::before {
-  content: "►";
-  display: none;
-  font-size: 0.625em;
-  animation: retro-blink 0.8s steps(1, end) infinite;
-}
-
-.retro-button:hover,
-.retro-button:focus-visible {
-  color: #fff;
-  background: #000080;
-  outline: 1px dotted #fff;
-  outline-offset: -4px;
-}
-
-.retro-button:hover::before,
-.retro-button:focus-visible::before {
-  display: inline;
-}
-
-.retro-button:active {
-  box-shadow:
-    inset -1px -1px #fff,
-    inset 1px 1px #0a0a0a,
-    inset -2px -2px #dfdfdf,
-    inset 2px 2px #808080;
-  padding-top: calc(0.25rem + 1px);
-  padding-left: calc(1rem + 1px);
-  padding-bottom: calc(0.25rem - 1px);
-  padding-right: calc(1rem - 1px);
-}
-
-@keyframes retro-blink {
-  50% {
-    visibility: hidden;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .retro-button::before {
-    animation: none;
-  }
-}
-
-/* ── Start menu ───────────────────────────────────────────────────────── */
-
-/* Briefly rings a window after the Start menu jumps to it */
-.window-target {
-  outline: 3px solid #ffff00;
-  outline-offset: 2px;
-  animation: window-target-flash 1.6s steps(1, end);
-}
-
-@keyframes window-target-flash {
-  0%,
-  55% {
-    outline-color: #ffff00;
-  }
-  100% {
-    outline-color: transparent;
-  }
-}
-
-/* The classic orange "safe to turn off" screen */
-.shutdown-screen {
-  background: #ffa500;
-  color: #000;
-  animation: shutdown-in 160ms steps(2, end);
-}
-
-@keyframes shutdown-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .shutdown-screen {
-    animation: none;
-  }
-  .window-target {
-    animation: none;
-  }
-}
 
 /* ── Linux monochrome skin ───────────────────────────────────────────────
-   A flat black-and-white tiling-window-manager look. It's scoped to a
-   [data-skin="linux"] wrapper (the home page), so every other page keeps the
-   Win95 styling above. Inside the wrapper the shared Window and SkillWindow
-   components keep their markup and class names; this block restyles them.
-   Unlayered CSS beats Tailwind's layered utilities, so these rules win over
-   classes like p-1.5 or font-win on the same elements. */
+   A flat tiling-window-manager look, on <body data-skin="linux">. The
+   windows keep their Win95-era class names (win95-window, win95-titlebar,
+   win95-raised) from the site's first skin; these rules are their only
+   styling. Unlayered CSS beats Tailwind's layered utilities, so these rules
+   win over utilities on the same elements. */
 
 /* The skin sits on <body>, so it covers every page (and overscroll never
    flashes white) */
@@ -301,8 +26,7 @@ body[data-skin="linux"] {
   --lx-dim: #a89984;
   --lx-faint: #7c6f64;
   --lx-inv-dim: #504945;
-  /* GitHub calendar: contribution levels 0 (none) to 4 (most) */
-  --lx-cal-0: #32302f;
+  /* GitHub calendar: contribution levels 1 to 4 (most) */
   --lx-cal-1: #697a3e;
   --lx-cal-2: #8a9a4a;
   --lx-cal-3: #a9b665;
@@ -332,7 +56,6 @@ body[data-skin="linux"] {
   --lx-dim: #a89984;
   --lx-faint: #7c6f64;
   --lx-inv-dim: #504945;
-  --lx-cal-0: #32302f;
   --lx-cal-1: #697a3e;
   --lx-cal-2: #8a9a4a;
   --lx-cal-3: #a9b665;
@@ -349,7 +72,6 @@ html[data-theme="light"] [data-skin="linux"],
   --lx-dim: #7c6f64;
   --lx-faint: #a89984;
   --lx-inv-dim: #e5d5ad;
-  --lx-cal-0: #eee0b7;
   --lx-cal-1: #c9c47f;
   --lx-cal-2: #a2a84f;
   --lx-cal-3: #6c782e;
@@ -366,7 +88,6 @@ html[data-palette="mono"] [data-skin="linux"],
   --lx-dim: #9a9a9a;
   --lx-faint: #5f5f5f;
   --lx-inv-dim: #4a4a4a;
-  --lx-cal-0: #1f1f1f;
   --lx-cal-1: #434343;
   --lx-cal-2: #7a7a7a;
   --lx-cal-3: #b4b4b4;
@@ -383,7 +104,6 @@ html[data-palette="mono"][data-theme="light"] [data-skin="linux"],
   --lx-dim: #4d4d4d;
   --lx-faint: #8a8a8a;
   --lx-inv-dim: #b3b3b3;
-  --lx-cal-0: #ebebeb;
   --lx-cal-1: #b4b4b4;
   --lx-cal-2: #7a7a7a;
   --lx-cal-3: #434343;
@@ -417,12 +137,6 @@ html[data-theme="light"] [data-skin="linux"] .skill-window::backdrop {
 [data-skin="linux"] ::selection {
   background: var(--lx-fg);
   color: var(--lx-bg);
-}
-
-/* Everything inherits the mono font, including the Win95-era font classes */
-[data-skin="linux"] .font-win,
-[data-skin="linux"] .font-body {
-  font-family: inherit;
 }
 
 [data-skin="linux"] .lx-dim {
@@ -532,17 +246,10 @@ html[data-theme="light"] [data-skin="linux"] .skill-window::backdrop {
   outline-offset: -1px;
 }
 
-/* Rows and links: hover inverts them, like a selected line in a terminal */
+/* Boxes and links: hover inverts links, like a selected line in a terminal */
 
 [data-skin="linux"] .lx-box {
   border: 1px solid var(--lx-line);
-}
-
-[data-skin="linux"] .lx-row {
-  width: 100%;
-  padding: 0.25rem 0.625rem;
-  text-align: left;
-  cursor: pointer;
 }
 
 /* A clickable card (the projects board): its window lights up like the
@@ -558,19 +265,6 @@ html:not(.theme-sweeping) [data-skin="linux"] .lx-card:hover > .win95-window > .
 [data-skin="linux"] .lx-card[data-hover] > .win95-window > .win95-titlebar {
   color: var(--lx-fg);
   border-bottom-color: var(--lx-fg);
-}
-
-[data-skin="linux"] .lx-row:hover,
-[data-skin="linux"] .lx-row:focus-visible {
-  background: var(--lx-fg);
-  border-color: var(--lx-fg);
-  color: var(--lx-bg);
-  outline: none;
-}
-
-[data-skin="linux"] .lx-row:hover .lx-dim,
-[data-skin="linux"] .lx-row:focus-visible .lx-dim {
-  color: var(--lx-inv-dim);
 }
 
 [data-skin="linux"] .lx-link {
@@ -842,35 +536,6 @@ html:not(.theme-sweeping) [data-skin="linux"] .lx-card:hover > .win95-window > .
 [data-skin="linux"] .skill-window .win95-titlebar .win95-raised:hover {
   background: var(--lx-bg);
   color: var(--lx-fg);
-}
-
-[data-skin="linux"] .win95-sunken {
-  background: transparent;
-  border: 1px solid var(--lx-line);
-  box-shadow: none;
-}
-
-/* The skill's art sits on an inline pastel color; swap it for a theme panel */
-[data-skin="linux"] .win95-sunken[style] {
-  background: var(--lx-raised) !important;
-}
-
-[data-skin="linux"] .win95-etched {
-  border: 0;
-  border-top: 1px solid var(--lx-line);
-}
-
-[data-skin="linux"] .skill-window .text-\[\#404040\] {
-  color: var(--lx-dim);
-}
-
-[data-skin="linux"] .win95-focus:hover {
-  outline: none;
-}
-
-[data-skin="linux"] .win95-focus:focus-visible {
-  outline: 1px solid var(--lx-fg);
-  outline-offset: 2px;
 }
 
 /* Briefly rings a window after a #hash jump lands on it */

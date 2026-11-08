@@ -1,4 +1,4 @@
-import HomeClient from "./HomeClient";
+import HomePage from "./HomePage";
 import { getContributions } from "./lib/github";
 import { projects } from "./projects/data";
 import ProjectContent from "./projects/ProjectContent";
@@ -14,7 +14,7 @@ export const revalidate = 3600;
 export default async function Home() {
   const contributions = await getContributions();
   return (
-    <HomeClient
+    <HomePage
       contributions={contributions}
       projectViews={projects.map((p) => ({
         slug: p.slug,

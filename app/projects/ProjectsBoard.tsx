@@ -1,12 +1,9 @@
-"use client";
 import Link from "next/link";
-import { useEffect } from "react";
 import OpenWindows from "../components/OpenWindows";
-import { isSweeping, SWEEP_END } from "../components/linux/theme";
 import Window from "../components/Window";
-import { openProject } from "../lib/project";
 import { projects } from "./data";
-import ViewLink from "./ViewLink";
+import ProjectCard from "./ProjectCard";
+import ProjectLink from "./ProjectLink";
 
 // How many tech chips a card shows before "+N more"
 const CHIPS = 5;
@@ -15,30 +12,10 @@ const CHIPS = 5;
 // the page; a new project is one more card. Each card is a window titled like
 // a folder, with its demo video as the preview (its first frame, playing on
 // hover), when it was done and for what, the pitch, the stack, and links.
-// "open" grows the card into the project's window. The windows open as they
-// scroll into view.
-function play(card: Element) {
-  void card.querySelector("video")?.play().catch(() => {});
-}
-
-function pause(card: Element) {
-  card.querySelector("video")?.pause();
-}
-
+// Clicking a card opens the project's window. The windows open as they
+// scroll into view. Rendered on the server; only the card's shell
+// (ProjectCard) and its links run in the browser.
 export default function ProjectsBoard() {
-  // Cards ignore the pointer while a palette sweep plays (see theme.ts);
-  // when it ends, each card catches up with where the pointer is now
-  useEffect(() => {
-    const catchUp = () => {
-      document.querySelectorAll(".lx-card").forEach((card) => {
-        if (card.matches(":hover")) play(card);
-        else pause(card);
-      });
-    };
-    window.addEventListener(SWEEP_END, catchUp);
-    return () => window.removeEventListener(SWEEP_END, catchUp);
-  }, []);
-
   return (
     <div className="p-3 md:p-4">
       <h2 className="mb-3 flex items-baseline gap-3 md:mb-4">
@@ -54,25 +31,13 @@ export default function ProjectsBoard() {
         className="grid grid-cols-1 gap-3 md:mx-auto md:w-[calc(80%+0.2rem)] md:grid-cols-2 md:gap-4"
       >
         {projects.map((p) => (
-          // The whole card opens the project (its links still do their
-          // own thing), and pointing at it plays the preview
-          <div
-            key={p.slug}
-            className="lx-card cursor-pointer"
-            onClick={(e) => {
-              if ((e.target as Element).closest("a")) return;
-              openProject(p.slug, e.currentTarget.querySelector<HTMLElement>(".win95-window"));
-            }}
-            onMouseEnter={(e) => !isSweeping() && play(e.currentTarget)}
-            onMouseLeave={(e) => !isSweeping() && pause(e.currentTarget)}
-          >
+          <ProjectCard key={p.slug} slug={p.slug}>
           <Window
-            project={p.slug}
             title={`${p.slug}/`}
             className="h-full"
             bodyClassName="flex flex-col gap-2"
           >
-            <Preview src={p.video.src} label={p.video.label} background={p.logoBackground} />
+            <Preview src={p.video.src} label={p.video.label} background={p.previewBackground} />
 
             <p className="lx-dim mt-1 text-[11px]">
               {p.when} · {p.badge}
@@ -104,11 +69,17 @@ export default function ProjectsBoard() {
                 <span className="lx-dim min-w-0 truncate">{p.source.note}</span>
               )}
               <span className="ml-auto">
-                <ViewLink slug={p.slug} name={p.name} />
+                <ProjectLink
+                  slug={p.slug}
+                  label={`Open ${p.name}`}
+                  className="lx-link shrink-0 whitespace-nowrap"
+                >
+                  open ↗
+                </ProjectLink>
               </span>
             </div>
           </Window>
-          </div>
+          </ProjectCard>
         ))}
       </OpenWindows>
 

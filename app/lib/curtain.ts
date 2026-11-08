@@ -6,9 +6,9 @@
 // One window's whole sequence: cursor fades in, the drag, then the fade out
 const FADE_MS = 110;
 const DRAG_MS = 420;
-export const OPEN_MS = FADE_MS + DRAG_MS + FADE_MS;
+const OPEN_MS = FADE_MS + DRAG_MS + FADE_MS;
 // Wait between one window starting to open and the next
-export const OPEN_STAGGER_MS = 120;
+const OPEN_STAGGER_MS = 120;
 
 const DRAG_EASE = "cubic-bezier(0.45, 0, 0.25, 1)";
 const OUTLINE = "var(--lx-fg)";
