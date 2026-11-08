@@ -26,11 +26,12 @@ body[data-skin="linux"] {
   --lx-dim: #a89984;
   --lx-faint: #7c6f64;
   --lx-inv-dim: #504945;
-  /* GitHub calendar: contribution levels 1 to 4 (most) */
-  --lx-cal-1: #697a3e;
-  --lx-cal-2: #8a9a4a;
+  /* GitHub calendar: contribution levels 1 to 4 (most), about 2x apart in
+     contrast from one level to the next */
+  --lx-cal-1: #3a5223;
+  --lx-cal-2: #6d8041;
   --lx-cal-3: #a9b665;
-  --lx-cal-4: #c5d17f; /* dim text on an inverted (selected) row */
+  --lx-cal-4: #fff3a0;
   background: var(--lx-bg);
   color: var(--lx-fg);
   font-family:
@@ -56,10 +57,10 @@ body[data-skin="linux"] {
   --lx-dim: #a89984;
   --lx-faint: #7c6f64;
   --lx-inv-dim: #504945;
-  --lx-cal-1: #697a3e;
-  --lx-cal-2: #8a9a4a;
+  --lx-cal-1: #3a5223;
+  --lx-cal-2: #6d8041;
   --lx-cal-3: #a9b665;
-  --lx-cal-4: #c5d17f;
+  --lx-cal-4: #fff3a0;
 }
 
 html[data-theme="light"] [data-skin="linux"],
@@ -72,10 +73,10 @@ html[data-theme="light"] [data-skin="linux"],
   --lx-dim: #7c6f64;
   --lx-faint: #a89984;
   --lx-inv-dim: #e5d5ad;
-  --lx-cal-1: #c9c47f;
-  --lx-cal-2: #a2a84f;
-  --lx-cal-3: #6c782e;
-  --lx-cal-4: #4a5a1f;
+  --lx-cal-1: #c2c783;
+  --lx-cal-2: #838d45;
+  --lx-cal-3: #4e5d21;
+  --lx-cal-4: #1f2e08;
 }
 
 html[data-palette="mono"] [data-skin="linux"],
@@ -88,10 +89,10 @@ html[data-palette="mono"] [data-skin="linux"],
   --lx-dim: #9a9a9a;
   --lx-faint: #5f5f5f;
   --lx-inv-dim: #4a4a4a;
-  --lx-cal-1: #434343;
-  --lx-cal-2: #7a7a7a;
-  --lx-cal-3: #b4b4b4;
-  --lx-cal-4: #f2f2f2;
+  --lx-cal-1: #4d4d4d;
+  --lx-cal-2: #858585;
+  --lx-cal-3: #c4c4c4;
+  --lx-cal-4: #ffffff;
 }
 
 html[data-palette="mono"][data-theme="light"] [data-skin="linux"],
@@ -104,9 +105,9 @@ html[data-palette="mono"][data-theme="light"] [data-skin="linux"],
   --lx-dim: #4d4d4d;
   --lx-faint: #8a8a8a;
   --lx-inv-dim: #b3b3b3;
-  --lx-cal-1: #b4b4b4;
-  --lx-cal-2: #7a7a7a;
-  --lx-cal-3: #434343;
+  --lx-cal-1: #bdbdbd;
+  --lx-cal-2: #858585;
+  --lx-cal-3: #484848;
   --lx-cal-4: #000000;
 }
 
@@ -416,33 +417,35 @@ html:not(.theme-sweeping) [data-skin="linux"] .lx-card:hover > .win95-window > .
   justify-content: flex-end;
 }
 
-/* A square cell: two of the grid font's characters wide (0.6em each) and
-   one line tall (1.2em), whatever font draws the glyph, so the weeks line
-   up under the month names. The shade characters come from a fallback font
-   whose blocks are 1em wide and 1.64em tall: drawn at 60% they're about
-   1em of the grid's font tall, and stretched 1.64x sideways they're as
-   wide, a square with an even gap around it. (In the cell's own font size,
-   the cell is 2em square.) */
+/* A day: a square cell two of the grid font's characters wide (0.6em each,
+   so the weeks line up under the month names) and one line tall (1.2em),
+   with a filled square centered in it. The square's side (--s) grows with
+   the day's level, and so does its color: a day with nothing is a tiny dim
+   square, the busiest day almost fills its cell. */
 [data-skin="linux"] .lx-heat-cell {
-  display: inline-block;
-  font-size: 0.6em;
-  width: 2em;
-  line-height: 2em;
-  text-align: center;
+  display: inline-grid;
+  place-items: center;
+  width: 1.2em;
+  height: 1.2em;
   vertical-align: top;
 }
 
 [data-skin="linux"] .lx-heat-cell > span {
-  display: inline-block;
-  /* Nudged down to center it: the glyph sits a little high in its line */
-  transform: translateY(0.05em) scaleX(1.64);
+  width: var(--s);
+  height: var(--s);
+  background: currentColor;
 }
 
-[data-skin="linux"] .lx-heat-0 { color: var(--lx-dim); }
-[data-skin="linux"] .lx-heat-1 { color: var(--lx-cal-1); }
-[data-skin="linux"] .lx-heat-2 { color: var(--lx-cal-2); }
-[data-skin="linux"] .lx-heat-3 { color: var(--lx-cal-3); }
-[data-skin="linux"] .lx-heat-4 { color: var(--lx-cal-4); }
+/* A day with nothing is barely there: the dim text color at 18%, fading
+   toward the window's background so it works in every palette and in light
+   mode. (At 50% it was nearly the same shade as level 1 in the mono
+   palette.) */
+[data-skin="linux"] .lx-heat-0 { --s: 0.3em; color: var(--lx-dim); }
+[data-skin="linux"] .lx-heat-0 > span { opacity: 0.18; }
+[data-skin="linux"] .lx-heat-1 { --s: 0.5em; color: var(--lx-cal-1); }
+[data-skin="linux"] .lx-heat-2 { --s: 0.68em; color: var(--lx-cal-2); }
+[data-skin="linux"] .lx-heat-3 { --s: 0.84em; color: var(--lx-cal-3); }
+[data-skin="linux"] .lx-heat-4 { --s: 0.98em; color: var(--lx-cal-4); }
 
 [data-skin="linux"] .lx-heat-stats {
   display: flex;

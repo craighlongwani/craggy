@@ -1,11 +1,11 @@
 import type { Contributions } from "../lib/github";
 
-// The GitHub window's contribution calendar, drawn as text: one character per
-// day (each in a fixed two-character cell: the shade characters aren't in
-// the site font's subset, and the fallback font's are wider), shaded by how much was committed (· ░ ▒ ▓ █, also colored with
-// --lx-cal-1 to --lx-cal-4, so the palette and theme recolor it in place),
-// weeks as columns and weekdays as rows, like GitHub's own. The data comes
-// from GitHub's API, fetched on the server (lib/github.ts).
+// The GitHub window's contribution calendar, laid out like a terminal's
+// text grid: one square per day, weeks as columns and weekdays as rows, like
+// GitHub's own. A day's square gets bigger and brighter with how much was
+// committed (levels 0 to 4, colored with --lx-cal-1 to --lx-cal-4, so the
+// palette and theme recolor it in place). The data comes from GitHub's API,
+// fetched on the server (lib/github.ts).
 //
 // Everything is worked out in UTC from the dates themselves, so the server and
 // the browser draw exactly the same thing (no hydration mismatch, and no
@@ -13,7 +13,7 @@ import type { Contributions } from "../lib/github";
 // text to fill the box; when even the smallest size is too wide, the oldest
 // weeks (the left) are cropped.
 
-const GLYPHS = ["·", "░", "▒", "▓", "█"];
+const LEVELS = [0, 1, 2, 3, 4];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 // GitHub's rows run Sunday to Saturday; label Mon, Wed and Fri
 const WEEKDAYS = ["", "M", "", "W", "", "F", ""];
@@ -126,7 +126,7 @@ export default function GithubCalendar({
                       className={`lx-heat-cell lx-heat-${day.level}`}
                       title={label(day)}
                     >
-                      <span>{GLYPHS[day.level]}</span>
+                      <span />
                     </span>
                   );
                 })}
@@ -146,9 +146,9 @@ export default function GithubCalendar({
         </p>
         <p className="lx-heat-legend lx-dim" aria-hidden="true">
           less{" "}
-          {GLYPHS.map((g, i) => (
+          {LEVELS.map((i) => (
             <span key={i} className={`lx-heat-cell lx-heat-${i}`}>
-              <span>{g}</span>
+              <span />
             </span>
           ))}{" "}
           more
