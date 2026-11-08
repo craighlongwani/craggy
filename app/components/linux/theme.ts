@@ -66,6 +66,27 @@ let switching = false;
 // could differ from the live page by a pixel and show as a one-frame jump
 // when swapped back. When the sweep ends the real page changes underneath the
 // copy, which looks identical, and the copy is removed in the same task.
+// A canvas standing in for a video in the sweep's copy: the video's current
+// frame at its own resolution, sized and styled like the video (so the copy
+// lays out the same)
+function videoStill(video: HTMLVideoElement | undefined, clone: HTMLVideoElement) {
+  const still = document.createElement("canvas");
+  still.className = clone.className;
+  const style = clone.getAttribute("style");
+  if (style) still.setAttribute("style", style);
+  if (!video) return still;
+  still.width = video.videoWidth || video.clientWidth || 1;
+  still.height = video.videoHeight || video.clientHeight || 1;
+  if (video.readyState >= 2) {
+    try {
+      still.getContext("2d")?.drawImage(video, 0, 0, still.width, still.height);
+    } catch {
+      // Not drawable: an empty box the video's size
+    }
+  }
+  return still;
+}
+
 export function switchTo(next: { theme?: Theme; palette?: Palette }) {
   // A second click mid-drag would stack a second copy
   if (switching) return;
@@ -93,6 +114,18 @@ export function switchTo(next: { theme?: Theme; palette?: Palette }) {
   overlay.style.cssText =
     "position:fixed;inset:0;z-index:190;overflow:hidden;pointer-events:none;clip-path:inset(0 100% 100% 0);";
   const copies = page.map((el) => el.cloneNode(true) as Element);
+  // A cloned <video> is a new player: it shows nothing until it has loaded
+  // the file again (a blank flash in the swept area, and a burst of
+  // downloads). The copy gets a still of each video's current frame instead,
+  // one for one, so the copy's elements still line up with the page's.
+  page.forEach((el, i) => {
+    const originals = el.querySelectorAll("video");
+    copies[i].querySelectorAll("video").forEach((v, n) => {
+      v.removeAttribute("src");
+      v.load();
+      v.replaceWith(videoStill(originals[n], v));
+    });
+  });
   overlay.append(...copies);
   // The copy's toggles already show the labels they'll have afterwards
   overlay
@@ -104,8 +137,8 @@ export function switchTo(next: { theme?: Theme; palette?: Palette }) {
   document.body.append(overlay);
 
   // Scroll positions aren't cloned: copy them across, and keep them in step
-  // while the sweep plays (the real page can still be scrolled, or snap), so
-  // both palettes always show the same part of the page
+  // while the sweep plays (the real page can still be scrolled), so both
+  // palettes always show the same part of the page
   const twins = new Map<Element, Element>();
   page.forEach((el, i) => {
     const from = el.querySelectorAll("*");
@@ -113,7 +146,6 @@ export function switchTo(next: { theme?: Theme; palette?: Palette }) {
     from.forEach((node, n) => {
       if (node.scrollHeight > node.clientHeight || node.scrollWidth > node.clientWidth) {
         twins.set(node, to[n]);
-        (to[n] as HTMLElement).style.scrollSnapType = "none";
       }
       if (node.scrollTop || node.scrollLeft) {
         to[n].scrollTop = node.scrollTop;

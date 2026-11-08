@@ -2,10 +2,10 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { boardIds, setActiveBoard, type BoardId } from "./linux/boards";
 
-// The scroll area holding the home page's boards. From 1024px each board is
-// one screen tall, and scrolling settles onto a board when it ends close to
-// one (proximity snapping); below that the boards just stack. Whichever
-// board shows the most is the active one (the highlighted footer button).
+// The scroll area holding the home page's boards, which scrolls freely. From
+// 1024px the home board is one screen tall; below that the boards just
+// stack. Whichever board shows the most is the active one (the highlighted
+// footer button).
 export default function Boards({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -42,10 +42,23 @@ export default function Boards({ children }: { children: ReactNode }) {
   );
 }
 
-// One board: a section of the scroll, one screen tall from 1024px
-export function Board({ id, children }: { id: BoardId; children: ReactNode }) {
+// One board: a section of the scroll, one screen tall from 1024px. A `long`
+// board (a catalog that grows with its content) is at least one screen tall.
+export function Board({
+  id,
+  long = false,
+  children,
+}: {
+  id: BoardId;
+  long?: boolean;
+  children: ReactNode;
+}) {
   return (
-    <section id={id} data-board className="lx-board lg:h-full">
+    <section
+      id={id}
+      data-board
+      className={`lx-board ${long ? "lg:min-h-full" : "lg:h-full"}`}
+    >
       {children}
     </section>
   );

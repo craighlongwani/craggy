@@ -52,7 +52,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           dangerouslySetInnerHTML={{
             __html:
-              'addEventListener("popstate",function(e){if(location.pathname==="/"){e.stopImmediatePropagation();dispatchEvent(new Event("lx-popstate"))}});',
+              'addEventListener("popstate",function(e){if(location.pathname==="/"){e.stopImmediatePropagation();dispatchEvent(new Event("lx-popstate"))}});' +
+              // A refresh always starts over on the home board: the hash
+              // (an open project, another board) is dropped before anything
+              // reads it, so it boots like a fresh visit. Shared links
+              // (not a reload) still open where they point.
+              'try{var n=performance.getEntriesByType("navigation")[0];if(n&&n.type==="reload"&&location.pathname==="/"&&location.hash){history.replaceState(null,"","/"+location.search)}history.scrollRestoration="manual"}catch(e){}',
           }}
         />
         {/* Applies the saved theme before first paint, so light mode never

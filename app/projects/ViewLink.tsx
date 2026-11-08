@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { MouseEvent } from "react";
 import { openProject } from "../lib/project";
 
-// A project window's View button: the window itself grows into the project's
+// A project card's "open" link: the card itself grows into the project's
 // write-up, over the page (ProjectView)
 export default function ViewLink({
   slug,
@@ -25,10 +25,10 @@ export default function ViewLink({
     <Link
       href={`/#projects/${slug}`}
       onClick={open}
-      aria-label={`View ${name}`}
-      className="lx-btn shrink-0"
+      aria-label={`Open ${name}`}
+      className="lx-link shrink-0 whitespace-nowrap"
     >
-      View
+      open ↗
     </Link>
   );
 }

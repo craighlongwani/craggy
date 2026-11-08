@@ -541,6 +541,17 @@ html[data-theme="light"] [data-skin="linux"] .skill-window::backdrop {
   cursor: pointer;
 }
 
+/* A clickable card (the projects board): its window lights up like the
+   active window while pointed at */
+[data-skin="linux"] .lx-card:hover > .win95-window {
+  border-color: var(--lx-fg);
+}
+
+[data-skin="linux"] .lx-card:hover > .win95-window > .win95-titlebar {
+  color: var(--lx-fg);
+  border-bottom-color: var(--lx-fg);
+}
+
 [data-skin="linux"] .lx-row:hover,
 [data-skin="linux"] .lx-row:focus-visible {
   background: var(--lx-fg);
@@ -842,18 +853,6 @@ html[data-theme="light"] [data-skin="linux"] .skill-window::backdrop {
   }
   100% {
     outline-color: transparent;
-  }
-}
-
-/* Boards (Boards.tsx): the home page's vertical scroll. Scrolling settles
-   onto a board when it ends near one; below 1024px they just stack. */
-@media (min-width: 1024px) {
-  .lx-boards {
-    scroll-snap-type: y proximity;
-  }
-
-  .lx-board {
-    scroll-snap-align: start;
   }
 }
 

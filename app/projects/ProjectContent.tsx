@@ -3,8 +3,9 @@ import type { Project } from "./data";
 
 // A project's write-up, in the site's monochrome Linux look: flat panels, dim
 // secondary text, and the demo video in full color. Shown in the project's
-// window (ProjectView), which starts the video when it opens; until then it
-// isn't downloaded.
+// window (ProjectView), which starts the video when it opens. The video is the
+// same URL as its card's preview (so its first frame is already loaded and it
+// never shows as an empty box while the window fades in).
 export default function ProjectContent({ project }: { project: Project }) {
   return (
     <>
@@ -24,8 +25,8 @@ export default function ProjectContent({ project }: { project: Project }) {
       {/* Demo video, framed */}
       <div className="lx-box mt-5 bg-black p-[2px]">
         <video
-          src={project.video.src}
-          preload="none"
+          src={`${project.video.src}#t=0.1`}
+          preload="metadata"
           muted
           loop
           playsInline

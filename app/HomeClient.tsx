@@ -9,18 +9,13 @@ import Window from "./components/Window";
 import Header from "./components/linux/Header";
 import ResumeButton from "./components/linux/ResumeButton";
 import SkillsLoop from "./components/linux/SkillsLoop";
+import Status from "./components/linux/Status";
 import Uptime from "./components/linux/Uptime";
 import { isBoard, jumpToBoard, settleOnBoard } from "./components/linux/boards";
 import { stack } from "./components/linux/stack";
-import { useEffect, type MouseEvent, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import ProjectView from "./components/ProjectView";
-import {
-  consumeSelfHash,
-  hashProject,
-  openProject,
-  syncProjectFromUrl,
-} from "./lib/project";
-import { projects } from "./projects/data";
+import { consumeSelfHash, hashProject, syncProjectFromUrl } from "./lib/project";
 import ProjectsBoard from "./projects/ProjectsBoard";
 import { hashId, scrollToWindow } from "./lib/windowScroll";
 
@@ -97,26 +92,6 @@ export default function HomeClient({
       window.removeEventListener("hashchange", onHash);
     };
   }, []);
-
-  // Scroll to the projects board. Modified clicks (new tab, etc.) keep the
-  // link's normal behavior.
-  const openProjects = (e: MouseEvent<HTMLAnchorElement>) => {
-    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
-      return;
-    }
-    e.preventDefault();
-    jumpToBoard("projects");
-  };
-
-  // A single project
-  const openFeatured = (slug: string) => (e: MouseEvent<HTMLAnchorElement>) => {
-    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
-      return;
-    }
-    e.preventDefault();
-    // The project's window grows out of this row
-    openProject(slug, e.currentTarget);
-  };
 
   return (
     <main className="relative h-dvh w-full overflow-hidden">
@@ -256,50 +231,16 @@ export default function HomeClient({
               </div>
             </Window>
 
-            {/* Projects: one row per project (they follow data.ts), plus the
-                link to the projects board */}
+            {/* Status: availability, who the work was for, and a strength
+                per project with proof (the projects themselves are the
+                next board) */}
             <Window
-              id="home-projects"
-              title="~/projects"
+              id="status"
+              title="~/status"
               className="md:col-span-2"
-              bodyClassName="flex flex-col gap-2 overflow-hidden"
+              bodyClassName="flex flex-col overflow-hidden"
             >
-              <p className="lx-dim lx-prompt">
-                <span aria-hidden="true">$ </span>ls ~/projects
-              </p>
-              <ul className="@container flex min-h-0 flex-1 flex-col gap-1.5">
-                {projects.map((p) => (
-                  <li key={p.slug} className="min-h-0 flex-1">
-                    <Link
-                      href={`/#projects/${p.slug}`}
-                      onClick={openFeatured(p.slug)}
-                      className="lx-row lx-box flex h-full flex-col justify-center"
-                    >
-                      <span className="flex min-w-0 items-baseline gap-2">
-                        <span className="block min-w-0 truncate font-bold">
-                          <span aria-hidden="true" className="lx-dim">
-                            ▸{" "}
-                          </span>
-                          {p.name}
-                        </span>
-                        <span className="lx-box ml-auto hidden shrink-0 whitespace-nowrap px-2 text-[11px] leading-[1.5] @md:block">
-                          {p.badge}
-                        </span>
-                      </span>
-                      <span className="lx-dim block min-w-0 max-w-full truncate text-[12px]">
-                        {p.summary}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/#projects"
-                onClick={openProjects}
-                className="lx-link self-start"
-              >
-                all projects →
-              </Link>
+              <Status />
             </Window>
 
             {/* Skills: a for loop over the skills, each with its proof */}
@@ -379,7 +320,7 @@ export default function HomeClient({
           </OpenWindows>
         </div>
         </Board>
-        <Board id="projects">
+        <Board id="projects" long>
           <ProjectsBoard />
         </Board>
       </Boards>

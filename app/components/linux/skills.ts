@@ -6,7 +6,7 @@ export type Skill = { name: string; proof: string; usedIn: string };
 export const skills: Skill[] = [
   {
     name: "Database Design & SQL",
-    proof: "14 tables, 6 views, one-transaction signup",
+    proof: "15 tables, 6 views, one-transaction signup",
     usedIn: "Revora, BMS",
   },
   {

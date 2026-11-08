@@ -1,5 +1,5 @@
-// Every project, in one place. Each entry drives both its window on the
-// /projects bento grid and its own page at /projects/<slug>; to add a
+// Every project, in one place. Each entry drives its row on the projects
+// board, its preview there and its window (/#projects/<slug>); to add a
 // project, add an entry here (and its assets under public/assets/projects).
 export type Project = {
   slug: string;
@@ -13,8 +13,8 @@ export type Project = {
   badge: string;
   // One-line pitch; the page title is "<name>: <summary>"
   summary: string;
-  // Bento grid spans on /projects
-  span: string;
+  // When it wrapped up, as the projects list shows it (e.g. "Mar 2026")
+  when: string;
 
   // ── The project page ──
   role: string;
@@ -39,7 +39,7 @@ export const projects: Project[] = [
     event: "HackFest GDG Loyola 2026 · Ateneo De Manila University · March 2026",
     badge: "HackFest GDG Loyola 2026",
     summary: "AI-Powered Source Verification for Student Research Papers",
-    span: "col-span-1 md:col-span-2 md:row-span-2",
+    when: "Mar 2026",
     role: "Lead Developer · Backend & AI Integration",
     video: {
       src: "/assets/projects/VerifAI/VerifAI-demo-loop.mp4",
@@ -95,7 +95,7 @@ export const projects: Project[] = [
     event: "Database Management Course Project · May to August 2026",
     badge: "Database Management course project",
     summary: "Verified Onboarding for a Circular Material Exchange",
-    span: "col-span-1 lg:col-span-2",
+    when: "Aug 2026",
     role: "Lead Developer · Database & Backend",
     video: {
       src: "/assets/projects/Revora/Revora-ssms-demo.mp4",
@@ -106,7 +106,7 @@ export const projects: Project[] = [
       "What was built is the verified onboarding it depends on: a registration portal where people and businesses prove their identity with a government ID or TIN, a user dashboard, and an admin dashboard for approving accounts. I designed and built nearly all of it, focusing on putting the business rules and security in the SQL Server database itself.",
     ],
     highlights: [
-      "Designed a normalized 14-table schema and ER diagram with six reporting views, including a Region, Province, City, and Barangay address hierarchy",
+      "Designed a normalized 15-table schema and ER diagram with six reporting views, including a Region, Province, City, and Barangay address hierarchy",
       "Wrote registration as a single T-SQL transaction that saves the address, ID, branch, entity, and user records together or not at all",
       "Used triggers to hash passwords and write an audit log entry for every submission and status change",
       "Built a least-privilege security model with three SQL Server logins, explicit DENY rules, and Dynamic Data Masking on personal data",
@@ -153,7 +153,7 @@ export const projects: Project[] = [
     event: "Barangay 43, Pasay City · May to August 2026",
     badge: "Barangay 43, Pasay City",
     summary: "Digital Records and Services for a Local Government Unit",
-    span: "col-span-1 lg:col-span-2",
+    when: "Aug 2026",
     role: "Backend Developer · Documents, Households & Security",
     video: {
       src: "/assets/projects/BMS/BMS-contributions-demo.mp4",
