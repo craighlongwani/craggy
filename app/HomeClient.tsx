@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
+import Boards, { Board } from "./components/Boards";
 import GithubCalendar from "./components/GithubCalendar";
 import OpenWindows from "./components/OpenWindows";
 import Window from "./components/Window";
@@ -9,11 +10,13 @@ import Header from "./components/linux/Header";
 import ResumeButton from "./components/linux/ResumeButton";
 import SkillsLoop from "./components/linux/SkillsLoop";
 import Uptime from "./components/linux/Uptime";
+import { isBoard, jumpToBoard } from "./components/linux/boards";
 import { stack } from "./components/linux/stack";
 import { useEffect, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import { curtainAndGo, markProjectOpening } from "./lib/curtain";
 import { projects } from "./projects/data";
+import ProjectsBoard from "./projects/ProjectsBoard";
 import { hashId, scrollToWindow } from "./lib/windowScroll";
 
 // neofetch's color blocks in the Gruvbox Material palette: the soft colors,
@@ -35,7 +38,9 @@ export default function HomeClient() {
     const jump = () => {
       const id = hashId();
       if (!id) return;
-      const frame = requestAnimationFrame(() => scrollToWindow(id));
+      const frame = requestAnimationFrame(() =>
+        isBoard(id) ? jumpToBoard(id) : scrollToWindow(id),
+      );
       return () => cancelAnimationFrame(frame);
     };
 
@@ -58,7 +63,7 @@ export default function HomeClient() {
       return;
     }
     e.preventDefault();
-    curtainAndGo(() => router.push("/projects"));
+    jumpToBoard("projects");
   };
 
   // Same for a single project: its page opens its own curtain.
@@ -81,7 +86,8 @@ export default function HomeClient() {
           About is 2x2; Projects and Skills are 2x1 on the right; GitHub is 2x1
           and Contact 1x1 along the bottom. Below that they stack (two columns
           from 768px) and this area scrolls. */}
-      <div className="h-full overflow-y-auto pb-10">
+      <Boards>
+        <Board id="home">
         <div className="p-3 md:p-4 lg:h-full">
           <OpenWindows
             className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:h-full lg:grid-cols-4 lg:grid-rows-3 lg:gap-4"
@@ -213,7 +219,7 @@ export default function HomeClient() {
             {/* Projects: one row per project (they follow data.ts), plus the
                 link to the full /projects page */}
             <Window
-              id="projects"
+              id="home-projects"
               title="~/projects"
               className="md:col-span-2"
               bodyClassName="flex flex-col gap-2 overflow-hidden"
@@ -248,7 +254,7 @@ export default function HomeClient() {
                 ))}
               </ul>
               <Link
-                href="/projects"
+                href="/#projects"
                 onClick={openProjects}
                 className="lx-link self-start"
               >
@@ -332,7 +338,11 @@ export default function HomeClient() {
             </Window>
           </OpenWindows>
         </div>
-      </div>
+        </Board>
+        <Board id="projects">
+          <ProjectsBoard />
+        </Board>
+      </Boards>
     </main>
   );
 }

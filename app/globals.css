@@ -845,12 +845,124 @@ html[data-theme="light"] [data-skin="linux"] .skill-window::backdrop {
   }
 }
 
+/* Boards (Boards.tsx): the home page's vertical scroll. Scrolling settles
+   onto a board when it ends near one; below 1024px they just stack. */
+@media (min-width: 1024px) {
+  .lx-boards {
+    scroll-snap-type: y proximity;
+  }
+
+  .lx-board {
+    scroll-snap-align: start;
+  }
+}
+
+/* ── Boot intro (BootIntro.tsx) ──────────────────────────────────────────
+   Shown only while <html data-boot="1">, set before first paint on a cold
+   load of the home page. data-boot="footer" is the second half: the real
+   footer, whose contents are hidden until then, types its prompt and fades
+   its buttons in. */
+.lx-boot {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  overflow: hidden;
+  background: var(--lx-bg);
+  color: var(--lx-fg);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+html[data-boot="1"] .lx-boot {
+  display: block;
+}
+
+/* The empty bar: the footer's border and height, starting at the top */
+.lx-boot-bar {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2.5rem;
+  background: var(--lx-bg);
+  border-top: 1px solid var(--lx-line);
+  border-bottom: 1px solid var(--lx-line);
+}
+
+/* The boot log: top-aligned, wrapped on the left, and scrolled to its end by
+   script once it fills the screen */
+.lx-boot-tree {
+  position: absolute;
+  inset: 3.5rem 1.5rem 1rem 1.5rem;
+  margin: 0;
+  overflow: hidden;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: left;
+  /* Long lines wrap at the screen's edge instead of running off it; the log
+     only ever scrolls down */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.lx-boot-ok {
+  color: var(--lx-cal-3);
+  font-weight: 700;
+}
+
+.lx-boot-cursors {
+  position: absolute;
+  inset: 0;
+}
+
+.lx-boot-caret {
+  color: var(--lx-fg);
+}
+
+html[data-boot] .lx-nav > nav,
+html[data-boot] .lx-nav > div,
+html[data-boot] .lx-nav .lx-cursor {
+  visibility: hidden;
+}
+
+html[data-boot] .lx-typed {
+  clip-path: inset(0 100% 0 0);
+}
+
+html[data-boot="footer"] .lx-typed {
+  animation: boot-type 600ms steps(12, end) both;
+}
+
+html[data-boot="footer"] .lx-nav > nav,
+html[data-boot="footer"] .lx-nav > div {
+  visibility: visible;
+  animation: boot-fade 500ms ease-out 250ms both;
+}
+
+@keyframes boot-type {
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes boot-fade {
+  from {
+    opacity: 0;
+  }
+}
+
 /* The theme must come only from the drag: no element colors fading on their
    own while it runs */
 html.theme-switching *,
 html.theme-switching *::before,
 html.theme-switching *::after {
   transition: none !important;
+}
+
+/* During a palette sweep the page is covered by its copy (z 190): a window
+   opening underneath keeps its cursor drag visible above it */
+html.theme-sweeping [data-drag] {
+  z-index: 195 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

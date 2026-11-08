@@ -33,10 +33,8 @@ function dragOverlay(el: HTMLElement) {
   if (r.width === 0 || r.height === 0) return null;
   const layer = document.createElement("div");
   layer.setAttribute("aria-hidden", "true");
-  // A popover puts the overlay in the top layer, so it also shows above a
-  // pop-up <dialog> (the resume window) and its dimmed backdrop
-  layer.popover = "manual";
-  layer.style.cssText = `position:fixed;inset:auto;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;margin:0;padding:0;border:0;overflow:visible;background:transparent;pointer-events:none;z-index:90;`;
+  layer.setAttribute("data-drag", "");
+  layer.style.cssText = `position:fixed;inset:auto;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;margin:0;padding:0;border:0;overflow:visible;background:transparent;pointer-events:none;z-index:65;`;
   const outline = document.createElement("div");
   outline.style.cssText = `position:absolute;left:0;top:0;box-sizing:border-box;border:1px solid ${OUTLINE};background:color-mix(in srgb, var(--lx-fg) 5%, transparent);`;
   const cursor = document.createElement("div");
@@ -46,12 +44,28 @@ function dragOverlay(el: HTMLElement) {
     '<svg width="14" height="20" viewBox="0 0 14 20" style="display:block;overflow:visible"><path d="M0 0v16l4-4 3 7 2.5-1-3-7H13z" fill="#fff" stroke="#000" stroke-width="1" stroke-linejoin="round"/></svg>';
   layer.append(outline, cursor);
   document.body.append(layer);
-  try {
-    layer.showPopover();
-  } catch {
-    // Without the Popover API the overlay just sits in the normal layer
+  // The top layer beats every z-index, the footer's included, so only use it
+  // (as a popover) when a pop-up <dialog> is open, to show above it and its
+  // backdrop; otherwise the overlay sits just under the footer (z 70)
+  if (document.querySelector("dialog[open]")) {
+    try {
+      layer.popover = "manual";
+      layer.showPopover();
+    } catch {
+      // Without the Popover API the overlay just sits in the normal layer
+    }
   }
-  return { layer, outline, cursor, w: r.width, h: r.height };
+  // The window can move while this plays (a board still being scrolled), so
+  // the overlay stays glued to the window's slot until it's removed
+  const follow = () => {
+    if (!layer.isConnected) return;
+    const now = el.getBoundingClientRect();
+    layer.style.left = `${now.left}px`;
+    layer.style.top = `${now.top}px`;
+    requestAnimationFrame(follow);
+  };
+  requestAnimationFrame(follow);
+  return { layer, outline, cursor, w: r.width, h: r.height, x: r.left, y: r.top };
 }
 
 // Plays the overlay in step with the window's own animation `main`, and
@@ -112,6 +126,56 @@ export function openCurtain(
     timing,
   );
   followWith(main, layer, [outlineAnim, cursorAnim], OPEN_MS, delay);
+  return main;
+}
+
+// The boot sequence's version of opening: the cursor starts at `from` (a
+// viewport point, where the intro left it), waits a beat, travels to the
+// window's top-left corner, then drags the outline out as usual. The caller
+// clears the window's hidden state first; this fades it in once dragged.
+const BOOT_HOLD_MS = 150;
+const BOOT_TRAVEL_MS = 520;
+export function bootDrag(
+  el: HTMLElement,
+  from: { x: number; y: number },
+  delay = 0,
+) {
+  const r = el.getBoundingClientRect();
+  // A window below the fold (the stacked layout) has nowhere to be dragged
+  const overlay = r.top < window.innerHeight - 8 ? dragOverlay(el) : null;
+  const total = BOOT_HOLD_MS + BOOT_TRAVEL_MS + DRAG_MS + FADE_MS;
+  const tA = BOOT_HOLD_MS / total;
+  const tB = (BOOT_HOLD_MS + BOOT_TRAVEL_MS) / total;
+  const tC = (BOOT_HOLD_MS + BOOT_TRAVEL_MS + DRAG_MS) / total;
+  const main = el.animate(
+    [{ opacity: 0 }, { opacity: 0, offset: tC }, { opacity: 1 }],
+    { duration: total, delay, fill: "backwards" },
+  );
+  if (!overlay) return main;
+  const { layer, outline, cursor, w, h, x, y } = overlay;
+  const sx = from.x - x;
+  const sy = from.y - y;
+  const timing = { duration: total, delay, fill: "both" as const };
+  const outlineAnim = outline.animate(
+    [
+      { width: "0px", height: "0px", opacity: 0 },
+      { width: "0px", height: "0px", opacity: 1, offset: tB, easing: DRAG_EASE },
+      { width: `${w}px`, height: `${h}px`, opacity: 1, offset: tC },
+      { width: `${w}px`, height: `${h}px`, opacity: 0 },
+    ],
+    timing,
+  );
+  const cursorAnim = cursor.animate(
+    [
+      { transform: `translate(${sx}px,${sy}px)`, opacity: 1 },
+      { transform: `translate(${sx}px,${sy}px)`, opacity: 1, offset: tA, easing: DRAG_EASE },
+      { transform: "translate(0px,0px)", opacity: 1, offset: tB, easing: DRAG_EASE },
+      { transform: `translate(${w}px,${h}px)`, opacity: 1, offset: tC },
+      { transform: `translate(${w}px,${h}px)`, opacity: 0 },
+    ],
+    timing,
+  );
+  followWith(main, layer, [outlineAnim, cursorAnim], total, delay);
   return main;
 }
 
@@ -187,12 +251,24 @@ export function arrivedFromExpand() {
 export function projectWindowRect() {
   const bento = document.querySelector<HTMLElement>("[data-bento]");
   if (!bento) return null;
-  const r = bento.getBoundingClientRect();
   const cs = getComputedStyle(bento);
   const pl = parseFloat(cs.paddingLeft);
   const pr = parseFloat(cs.paddingRight);
   const pt = parseFloat(cs.paddingTop);
-  const pb = parseFloat(cs.paddingBottom);
+  let r = bento.getBoundingClientRect();
+  let pb = parseFloat(cs.paddingBottom);
+  let height = r.height;
+  // On the home page the bento is a board in a scroll, wherever that happens
+  // to be scrolled to. The project page's window sits where the board would
+  // at scroll 0: measure from the scroll area itself, with the page's own
+  // bottom padding (room for the footer).
+  const scroller = bento.closest<HTMLElement>(".lx-boards");
+  if (scroller) {
+    const sr = scroller.getBoundingClientRect();
+    r = new DOMRect(sr.left, sr.top, sr.width, scroller.clientHeight);
+    pb = window.innerWidth >= 768 ? 56 : 52;
+    height = scroller.clientHeight;
+  }
   const contentWidth = r.width - pl - pr;
   const vw = window.innerWidth;
   const wanted = vw >= 1024 ? vw * 0.625 : vw >= 768 ? vw * 0.9375 : contentWidth;
@@ -201,7 +277,7 @@ export function projectWindowRect() {
     left: r.left + pl + (contentWidth - width) / 2,
     top: r.top + pt,
     width,
-    height: r.height - pt - pb,
+    height: height - pt - pb,
   };
 }
 

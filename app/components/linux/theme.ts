@@ -103,17 +103,51 @@ export function switchTo(next: { theme?: Theme; palette?: Palette }) {
     .forEach((el) => (el.textContent = palette));
   document.body.append(overlay);
 
-  // Scroll positions aren't cloned: copy them across
+  // Scroll positions aren't cloned: copy them across, and keep them in step
+  // while the sweep plays (the real page can still be scrolled, or snap), so
+  // both palettes always show the same part of the page
+  const twins = new Map<Element, Element>();
   page.forEach((el, i) => {
     const from = el.querySelectorAll("*");
     const to = copies[i].querySelectorAll("*");
     from.forEach((node, n) => {
+      if (node.scrollHeight > node.clientHeight || node.scrollWidth > node.clientWidth) {
+        twins.set(node, to[n]);
+        (to[n] as HTMLElement).style.scrollSnapType = "none";
+      }
       if (node.scrollTop || node.scrollLeft) {
         to[n].scrollTop = node.scrollTop;
         to[n].scrollLeft = node.scrollLeft;
       }
     });
   });
+  const mirror = (e: Event) => {
+    const twin = twins.get(e.target as Element);
+    const from = e.target as Element;
+    if (twin) {
+      twin.scrollTo({ top: from.scrollTop, left: from.scrollLeft, behavior: "instant" });
+    }
+  };
+  // scroll events don't bubble, so listen in the capture phase
+  document.addEventListener("scroll", mirror, true);
+
+  // A board scrolled into view during the sweep opens its windows for real
+  // (a fade timed by the cursor drag) while the copy still has them shut, so
+  // the copy follows their opacity, and the drag's cursor and outline are
+  // lifted above the copy (see html.theme-sweeping in globals.css)
+  root.classList.add("theme-sweeping");
+  const windowPairs: [Element, HTMLElement][] = [];
+  page.forEach((el, i) => {
+    const from = el.querySelectorAll(".win95-window");
+    const to = copies[i].querySelectorAll<HTMLElement>(".win95-window");
+    from.forEach((w, n) => windowPairs.push([w, to[n]]));
+  });
+  let follow = 0;
+  const syncWindows = () => {
+    for (const [w, c] of windowPairs) c.style.opacity = getComputedStyle(w).opacity;
+    follow = requestAnimationFrame(syncWindows);
+  };
+  syncWindows();
 
   const cursor = document.createElement("div");
   cursor.setAttribute("aria-hidden", "true");
@@ -141,6 +175,9 @@ export function switchTo(next: { theme?: Theme; palette?: Palette }) {
   const finish = () => {
     if (finished) return;
     finished = true;
+    document.removeEventListener("scroll", mirror, true);
+    cancelAnimationFrame(follow);
+    root.classList.remove("theme-sweeping");
     // Change the real page with its transitions off, and apply it before the
     // copy goes, so no frame shows the old page
     root.classList.add("theme-switching");

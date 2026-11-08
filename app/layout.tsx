@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import BootIntro from "./components/BootIntro";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,12 +49,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           dangerouslySetInnerHTML={{
             __html:
-              'try{var d=document.documentElement;if(localStorage.getItem("theme")==="light")d.dataset.theme="light";if(localStorage.getItem("palette")==="mono")d.dataset.palette="mono"}catch(e){}',
+              'try{var d=document.documentElement;if(localStorage.getItem("theme")==="light")d.dataset.theme="light";if(localStorage.getItem("palette")==="mono")d.dataset.palette="mono";if(location.pathname==="/"&&!location.hash&&!matchMedia("(prefers-reduced-motion: reduce)").matches){d.dataset.boot="1";if(sessionStorage.getItem("booted"))d.dataset.bootQuick="1";setTimeout(function(){delete d.dataset.boot},20000)}}catch(e){}',
           }}
         />
       </head>
       {/* The Linux skin (globals.css) covers every page */}
-      <body data-skin="linux">{children}</body>
+      <body data-skin="linux">
+        {children}
+        <BootIntro />
+      </body>
     </html>
   );
 }

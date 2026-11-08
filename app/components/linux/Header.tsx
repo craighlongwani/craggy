@@ -1,9 +1,10 @@
 "use client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { MouseEvent } from "react";
 import { curtainAndGo, type Page } from "../../lib/curtain";
 import Clock from "./Clock";
+import { jumpToBoard, useActiveBoard } from "./boards";
 import LinksMenu from "./LinksMenu";
 import PaletteToggle from "./PaletteToggle";
 import ThemeToggle from "./ThemeToggle";
@@ -11,7 +12,7 @@ import ThemeToggle from "./ThemeToggle";
 // The pages, numbered like tiling-WM workspaces
 const workspaces: { icon: Page; label: string; href: string }[] = [
   { icon: "home", label: "home", href: "/" },
-  { icon: "projects", label: "projects", href: "/projects" },
+  { icon: "projects", label: "projects", href: "/#projects" },
 ];
 
 // A slim bar across the top: the shell prompt, a button per page, the links
@@ -19,6 +20,12 @@ const workspaces: { icon: Page; label: string; href: string }[] = [
 // windows like a curtain first.
 export default function Header({ current }: { current: Page }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const board = useActiveBoard();
+  // On the home page the pages are boards of one scroll, so the footer
+  // scrolls to them and highlights the one on screen
+  const onHome = pathname === "/";
+  const shown = onHome ? board : current;
 
   const open = (
     e: MouseEvent<HTMLAnchorElement>,
@@ -30,14 +37,19 @@ export default function Header({ current }: { current: Page }) {
       return;
     }
     e.preventDefault();
-    if (target === current) return;
+    if (onHome) {
+      jumpToBoard(target);
+      return;
+    }
     curtainAndGo(() => router.push(href));
   };
 
   return (
     <header className="lx-nav fixed inset-x-0 bottom-0 z-[70] flex h-10 items-center gap-2 border-t px-3 md:gap-3">
       <p className="whitespace-nowrap font-bold">
-        jed@renzo:~<span aria-hidden="true">$</span>{" "}
+        <span className="lx-typed">
+          jed@renzo:~<span aria-hidden="true">$</span>
+        </span>{" "}
         <span aria-hidden="true" className="lx-cursor" />
       </p>
 
@@ -47,7 +59,7 @@ export default function Header({ current }: { current: Page }) {
             key={item.icon}
             href={item.href}
             onClick={(e) => open(e, item.href, item.icon)}
-            aria-current={item.icon === current ? "page" : undefined}
+            aria-current={item.icon === shown ? "page" : undefined}
             aria-label={item.label}
             title={item.label}
             className="lx-btn"

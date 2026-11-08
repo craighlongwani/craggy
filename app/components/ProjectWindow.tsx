@@ -17,13 +17,13 @@ import {
   removeExpandGhost,
 } from "../lib/curtain";
 
-// A project's page: one window in the same bento area as /projects, centered,
+// A project's page: one window in the same bento area as the projects board, centered,
 // full height and 25% wider than the old project card (keep the width classes
 // in step with projectWindowRect). When the window just expanded out of
-// /projects, it takes over from that expanding copy and its contents fade in.
+// the projects board, it takes over from that expanding copy and its contents fade in.
 // When the home page jumped here instead, it already closed its windows, so
 // this window opens its own curtain. × plays it in reverse: the contents fade
-// out and the window shrinks back into its slot on /projects.
+// out and the window shrinks back into its slot on the projects board.
 export default function ProjectWindow({
   slug,
   title,
@@ -43,7 +43,7 @@ export default function ProjectWindow({
       return;
     }
     e.preventDefault();
-    closeProject(slug, contentRef.current, () => router.push("/projects"));
+    closeProject(slug, contentRef.current, () => router.push("/#projects"));
   };
 
   useLayoutEffect(() => {
@@ -61,7 +61,7 @@ export default function ProjectWindow({
       return () => a.cancel();
     }
 
-    // Arriving from /projects: take over from the window expanding there
+    // Arriving from the projects board: take over from the window expanding there
     if (!expanded) return;
     const a = contentRef.current?.animate([{ opacity: 0 }, { opacity: 1 }], {
       duration: 200,
@@ -90,7 +90,7 @@ export default function ProjectWindow({
             <span className="min-w-0 flex-1 truncate">{title}</span>
             {/* Title bar close button: back to all projects */}
             <Link
-              href="/projects"
+              href="/#projects"
               onClick={close}
               aria-label="Close"
               className="win95-raised grid h-4 w-5 shrink-0 place-items-center text-xs leading-none"

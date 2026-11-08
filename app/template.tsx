@@ -7,6 +7,7 @@ import {
   arrivedAtProject,
   arrivedFromCurtain,
   arrivedFromExpand,
+  collapsingProject,
 } from "./lib/curtain";
 
 export default function Template({ children }: { children: ReactNode }) {
@@ -43,14 +44,14 @@ export default function Template({ children }: { children: ReactNode }) {
   }, [router]);
 
   // Every page runs its own animation instead: windows opening like a
-  // curtain. /projects always does; home does when you arrive from another
-  // page; a project page does when its window just expanded out of /projects
+  // curtain. Home does when you arrive from another page or back from a
+  // project; a project page does when its window just expanded out of /projects
   // or when the home page closed its windows to open it. Decided once per
   // visit, so a later re-render can't swap the wrapper and remount the page.
   const [ownAnimation] = useState(
     () =>
-      pathname === "/projects" ||
-      (pathname === "/" && arrivedFromCurtain()) ||
+      (pathname === "/" &&
+        (arrivedFromCurtain() || collapsingProject() !== null)) ||
       (pathname.startsWith("/projects/") &&
         (arrivedFromExpand() ||
           arrivedAtProject(
