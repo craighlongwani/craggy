@@ -7,7 +7,7 @@ import HashSync from "./components/HashSync";
 import OpenWindows from "./components/OpenWindows";
 import ProjectView from "./components/ProjectView";
 import Window from "./components/Window";
-import Donut from "./components/linux/Donut";
+import Cat from "./components/linux/Cat";
 import Header from "./components/linux/Header";
 import ResumeButton from "./components/linux/ResumeButton";
 import SkillsLoop from "./components/linux/SkillsLoop";
@@ -27,7 +27,7 @@ const ramp = [
 ];
 
 // The home page, rendered on the server: only its interactive pieces (the
-// footer, windows opening, the donut, links that open projects, the project
+// footer, windows opening, the cat, links that open projects, the project
 // window, HashSync) run in the browser.
 export default function HomePage({
   projectViews,
@@ -177,7 +177,7 @@ export default function HomePage({
               </div>
             </Window>
 
-            {/* The right half, top to bottom: skills; donut.c and contact
+            {/* The right half, top to bottom: skills; cat.c and contact
                 side by side; status (in source order, GitHub fills the
                 bottom-left cell before status) */}
 
@@ -191,14 +191,15 @@ export default function HomePage({
               <SkillsLoop />
             </Window>
 
-            {/* Decoration: the spinning ASCII donut (desktop and tablet) */}
+            {/* Decoration: a sleeping ASCII cat that wakes, watches and
+                stalks the pointer (desktop and tablet) */}
             <Window
-              id="donut"
-              title="donut.c"
+              id="cat"
+              title="cat.c"
               className="max-md:hidden"
               bodyClassName="flex flex-col overflow-hidden"
             >
-              <Donut />
+              <Cat />
             </Window>
 
             {/* Contact */}

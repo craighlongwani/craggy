@@ -23,7 +23,7 @@ const tree: Entry[] = [
               ["ResumeButton.tsx"],
               ["SkillsLoop.tsx", "for skill in skills"],
               ["Status.tsx", "systemctl status jed"],
-              ["Donut.tsx", "donut.c"],
+              ["Cat.tsx", "cat.c"],
               ["Clock.tsx"],
               ["Uptime.tsx"],
               ["theme.ts", "the cursor-drag reveal"],

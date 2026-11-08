@@ -178,7 +178,7 @@ export function switchTo(next: { theme?: Theme; palette?: Palette }) {
       v.replaceWith(videoStill(originals[n], v));
     });
   });
-  // Text that redraws itself (the ASCII donut, marked data-live)
+  // Text that redraws itself (the ASCII cat, marked data-live)
   const livePairs: [Element, Element][] = [];
   page.forEach((el, i) => {
     const to = copies[i].querySelectorAll("[data-live]");
@@ -256,7 +256,7 @@ export function switchTo(next: { theme?: Theme; palette?: Palette }) {
 
   // The rest of what moves keeps moving in the copy too, so nothing freezes
   // in the swept area and jumps when the sweep ends: windows opening (their
-  // opacity) and live text (the donut) are copied across every frame
+  // opacity) and live text (the cat) are copied across every frame
   let follow = 0;
   const syncWindows = () => {
     // Opacity: a window that's animating (opening) needs its computed
