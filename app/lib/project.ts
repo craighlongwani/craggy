@@ -1,5 +1,6 @@
 "use client";
 import { useSyncExternalStore } from "react";
+import { whenSwept } from "../components/linux/theme";
 import { projects } from "../projects/data";
 
 // Which project's window is open over the page, if any. The site is a single
@@ -66,7 +67,13 @@ export function hashProject() {
   return m && projects.some((p) => p.slug === m[1]) ? m[1] : null;
 }
 
+// Opening, closing and following the URL wait for a palette sweep to end
+// (whenSwept, theme.ts)
 export function openProject(slug: string, from?: HTMLElement | null) {
+  whenSwept(() => openNow(slug, from));
+}
+
+function openNow(slug: string, from?: HTMLElement | null) {
   origin = from ?? null;
   if (open === slug) return;
   selfHash = true;
@@ -83,6 +90,10 @@ export function openProject(slug: string, from?: HTMLElement | null) {
 // Closes the open project. When opening added a history entry, this goes
 // back over it (so Back and × agree); `after` runs once that has landed.
 export function closeProject(after?: () => void) {
+  whenSwept(() => closeNow(after));
+}
+
+function closeNow(after?: () => void) {
   if (!open) {
     after?.();
     return;
@@ -101,6 +112,10 @@ export function closeProject(after?: () => void) {
 
 // Back/Forward or a typed hash: follow the URL
 export function syncProjectFromUrl() {
+  whenSwept(syncNow);
+}
+
+function syncNow() {
   const slug = hashProject();
   // Back over the entry opening made: it's gone now
   if (!slug) pushed = false;

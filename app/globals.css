@@ -455,11 +455,15 @@ html[data-theme="light"] [data-skin="linux"] .skill-window::backdrop {
   border-color: var(--lx-fg);
 }
 
+/* Frozen during a palette sweep, like the cards' (see below and theme.ts):
+   only the windows hovered when it started (data-hover) stay lit */
 @media (hover: hover) {
-  [data-skin="linux"] .win95-window:hover {
+  html:not(.theme-sweeping) [data-skin="linux"] .win95-window:hover,
+  [data-skin="linux"] .win95-window[data-hover] {
     border-color: var(--lx-fg);
   }
-  [data-skin="linux"] .win95-window:hover > .win95-titlebar {
+  html:not(.theme-sweeping) [data-skin="linux"] .win95-window:hover > .win95-titlebar,
+  [data-skin="linux"] .win95-window[data-hover] > .win95-titlebar {
     color: var(--lx-fg);
     border-bottom-color: var(--lx-fg);
   }
@@ -542,12 +546,16 @@ html[data-theme="light"] [data-skin="linux"] .skill-window::backdrop {
 }
 
 /* A clickable card (the projects board): its window lights up like the
-   active window while pointed at */
-[data-skin="linux"] .lx-card:hover > .win95-window {
+   active window while pointed at. During a palette sweep the hover is
+   frozen: only the cards hovered when it started (data-hover) stay lit,
+   on the page and in its copy alike (see theme.ts). */
+html:not(.theme-sweeping) [data-skin="linux"] .lx-card:hover > .win95-window,
+[data-skin="linux"] .lx-card[data-hover] > .win95-window {
   border-color: var(--lx-fg);
 }
 
-[data-skin="linux"] .lx-card:hover > .win95-window > .win95-titlebar {
+html:not(.theme-sweeping) [data-skin="linux"] .lx-card:hover > .win95-window > .win95-titlebar,
+[data-skin="linux"] .lx-card[data-hover] > .win95-window > .win95-titlebar {
   color: var(--lx-fg);
   border-bottom-color: var(--lx-fg);
 }

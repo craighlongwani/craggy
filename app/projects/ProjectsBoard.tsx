@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
+import { useEffect } from "react";
 import OpenWindows from "../components/OpenWindows";
+import { isSweeping, SWEEP_END } from "../components/linux/theme";
 import Window from "../components/Window";
 import { openProject } from "../lib/project";
 import { projects } from "./data";
@@ -15,7 +17,28 @@ const CHIPS = 5;
 // hover), when it was done and for what, the pitch, the stack, and links.
 // "open" grows the card into the project's window. The windows open as they
 // scroll into view.
+function play(card: Element) {
+  void card.querySelector("video")?.play().catch(() => {});
+}
+
+function pause(card: Element) {
+  card.querySelector("video")?.pause();
+}
+
 export default function ProjectsBoard() {
+  // Cards ignore the pointer while a palette sweep plays (see theme.ts);
+  // when it ends, each card catches up with where the pointer is now
+  useEffect(() => {
+    const catchUp = () => {
+      document.querySelectorAll(".lx-card").forEach((card) => {
+        if (card.matches(":hover")) play(card);
+        else pause(card);
+      });
+    };
+    window.addEventListener(SWEEP_END, catchUp);
+    return () => window.removeEventListener(SWEEP_END, catchUp);
+  }, []);
+
   return (
     <div className="p-3 md:p-4">
       <h2 className="mb-3 flex items-baseline gap-3 md:mb-4">
@@ -40,8 +63,8 @@ export default function ProjectsBoard() {
               if ((e.target as Element).closest("a")) return;
               openProject(p.slug, e.currentTarget.querySelector<HTMLElement>(".win95-window"));
             }}
-            onMouseEnter={(e) => void e.currentTarget.querySelector("video")?.play().catch(() => {})}
-            onMouseLeave={(e) => e.currentTarget.querySelector("video")?.pause()}
+            onMouseEnter={(e) => !isSweeping() && play(e.currentTarget)}
+            onMouseLeave={(e) => !isSweeping() && pause(e.currentTarget)}
           >
           <Window
             project={p.slug}
