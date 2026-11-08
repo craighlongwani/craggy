@@ -19,6 +19,7 @@ import ProjectView from "./components/ProjectView";
 import { consumeSelfHash, hashProject, syncProjectFromUrl } from "./lib/project";
 import ProjectsBoard from "./projects/ProjectsBoard";
 import { hashId, scrollToWindow } from "./lib/windowScroll";
+import type { Contributions } from "./lib/github";
 
 // neofetch's color blocks in the Gruvbox Material palette: the soft colors,
 // then the deeper ones, shown as two rows of eight
@@ -31,9 +32,12 @@ const ramp = [
 
 export default function HomeClient({
   projectViews,
+  contributions,
 }: {
   // Each project's write-up, rendered on the server
   projectViews: { slug: string; title: string; content: ReactNode }[];
+  // The GitHub calendar, fetched on the server (null if unavailable)
+  contributions: Contributions | null;
 }) {
   // Deep links: /#skills (used by the Start menu) scrolls to that window,
   // /#projects to that board, and /#projects/<slug> opens that project over
@@ -317,7 +321,7 @@ export default function HomeClient({
                 ago&quot;
               </p>
               <div className="lx-box relative min-h-0 w-full flex-1 overflow-hidden p-3">
-                <GithubCalendar />
+                <GithubCalendar contributions={contributions} />
               </div>
             </Window>
 

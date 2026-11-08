@@ -682,71 +682,97 @@ html[data-theme="light"] [data-skin="linux"] .skill-window::backdrop {
   mix-blend-mode: multiply;
 }
 
-/* ── GitHub calendar. The library draws an SVG with a viewBox; its root sets
-   an inline max-content width and its scroll container an inline overflow,
-   which is why some overrides need !important. Below 1024px the calendar
-   takes the box's width and its natural height. From 1024px the box has a
-   fixed height, and the calendar is pinned to its top and bottom: the SVG is
-   as tall as the footer leaves room for and its width follows. When that is
-   wider than the box it scrolls sideways; GithubCalendar.tsx starts the
-   scroll at the right edge, so the cropped part is the oldest weeks (the
-   left). The scrollbar is hidden so it leaves no gap; the wheel scrolls it
-   sideways (see GithubCalendar.tsx). ── */
+/* ── GitHub calendar, drawn as text (GithubCalendar.tsx). The grid's font
+   size is worked out from its box (container query units): as large as fits
+   the width (2 characters per week: about 110 characters, 0.6em each, with
+   the labels) and,
+   from 1024px where the box has a fixed height, the height too (8 lines
+   plus the stats line). Below the smallest size, the cells' column crops its
+   oldest weeks (the left): it's right-aligned and overflows to the left. ── */
 
-[data-skin="linux"] .lx-calendar .react-activity-calendar {
-  width: 100% !important;
+[data-skin="linux"] .lx-heat {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-[data-skin="linux"] .lx-calendar .react-activity-calendar__scroll-container {
-  overflow: hidden !important;
+[data-skin="linux"] .lx-heat-grid {
+  display: flex;
+  justify-content: center;
+  white-space: pre;
+  font-size: clamp(9px, calc(100cqw / 67), 14px);
+  /* As tall as a cell is wide, so the cells are square */
+  line-height: 1.2;
 }
 
-[data-skin="linux"] .lx-calendar .react-activity-calendar__calendar {
-  width: 100%;
-  height: auto;
+[data-skin="linux"] .lx-heat-cells {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  justify-content: flex-end;
 }
 
-[data-skin="linux"] .lx-calendar .react-activity-calendar__footer {
+/* A square cell: two of the grid font's characters wide (0.6em each) and
+   one line tall (1.2em), whatever font draws the glyph, so the weeks line
+   up under the month names. The shade characters come from a fallback font
+   whose blocks are 1em wide and 1.64em tall: drawn at 60% they're about
+   1em of the grid's font tall, and stretched 1.64x sideways they're as
+   wide, a square with an even gap around it. (In the cell's own font size,
+   the cell is 2em square.) */
+[data-skin="linux"] .lx-heat-cell {
+  display: inline-block;
+  font-size: 0.6em;
+  width: 2em;
+  line-height: 2em;
+  text-align: center;
+  vertical-align: top;
+}
+
+[data-skin="linux"] .lx-heat-cell > span {
+  display: inline-block;
+  /* Nudged down to center it: the glyph sits a little high in its line */
+  transform: translateY(0.05em) scaleX(1.64);
+}
+
+[data-skin="linux"] .lx-heat-0 { color: var(--lx-dim); }
+[data-skin="linux"] .lx-heat-1 { color: var(--lx-cal-1); }
+[data-skin="linux"] .lx-heat-2 { color: var(--lx-cal-2); }
+[data-skin="linux"] .lx-heat-3 { color: var(--lx-cal-3); }
+[data-skin="linux"] .lx-heat-4 { color: var(--lx-cal-4); }
+
+[data-skin="linux"] .lx-heat-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 1rem;
   font-size: 12px;
+  line-height: 1.5;
+}
+
+/* The legend only where the stats and it fit on one line */
+@container (max-width: 560px) {
+  [data-skin="linux"] .lx-heat-legend {
+    display: none;
+  }
 }
 
 @media (min-width: 1024px) {
-  [data-skin="linux"] .lx-calendar {
+  [data-skin="linux"] .lx-heat {
     position: absolute;
     inset: 0.75rem;
-    /* Its layout and painting depend on nothing outside the box */
-    contain: layout paint;
+    container-type: size;
+    justify-content: center;
   }
 
-  [data-skin="linux"] .lx-calendar .react-activity-calendar {
-    height: 100% !important;
-  }
-
-  [data-skin="linux"] .lx-calendar .react-activity-calendar__scroll-container {
-    flex: 1 1 0;
-    min-height: 0;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    /* No scrollbar and no padding, so the SVG touches the top and bottom of
-       its box; scroll with the wheel, a trackpad swipe or touch */
-    scrollbar-width: none;
-    padding-top: 0 !important;
-    position: relative;
-  }
-
-  /* Taken out of the flow and given a pixel size by GithubCalendar.tsx, so
-     the scroll container's height comes from the box alone and the SVG can't
-     feed back into it. Left-aligned when wider than the box (it scrolls),
-     centered when narrower. */
-  [data-skin="linux"] .lx-calendar .react-activity-calendar__calendar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    margin-inline: auto;
-    height: var(--lx-cal-h, 100%);
-    width: var(--lx-cal-w, auto);
-    max-width: none;
+  /* 8 lines of grid; the stats line and the gap take about 1.75rem */
+  [data-skin="linux"] .lx-heat-grid {
+    font-size: clamp(
+      9px,
+      min(calc(100cqw / 67), calc((100cqh - 1.75rem) / 9.6)),
+      16px
+    );
   }
 
   /* The Skills list shrinks its entries to the height it is given: when a

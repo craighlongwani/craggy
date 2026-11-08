@@ -75,6 +75,11 @@ export default function Donut() {
       pre.append(probe);
       const charW = probe.getBoundingClientRect().width / 10;
       probe.remove();
+      // Hidden (the window is display:none on phones): nothing to size
+      if (!charW || !box.clientWidth) {
+        cols = rows = 0;
+        return;
+      }
       const lineH = parseFloat(getComputedStyle(pre).lineHeight) || charW * 2;
       cols = Math.max(10, Math.floor(box.clientWidth / charW));
       rows = Math.max(5, Math.floor(box.clientHeight / lineH));
@@ -85,6 +90,7 @@ export default function Donut() {
       raf = requestAnimationFrame(tick);
       if (now - last < FRAME_MS) return;
       last = now;
+      if (!cols) return;
       a += SPIN_A;
       b += SPIN_B;
       pre.textContent = render(cols, rows, a, b);

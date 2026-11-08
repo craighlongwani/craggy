@@ -1,132 +1,159 @@
-'use client';
+import type { Contributions } from "../lib/github";
 
-import dynamic from "next/dynamic";
-import { useEffect, useRef } from "react";
+// The GitHub window's contribution calendar, drawn as text: one character per
+// day (each in a fixed two-character cell: the shade characters aren't in
+// the site font's subset, and the fallback font's are wider), shaded by how much was committed (· ░ ▒ ▓ █, also colored with
+// --lx-cal-1 to --lx-cal-4, so the palette and theme recolor it in place),
+// weeks as columns and weekdays as rows, like GitHub's own. The data comes
+// from GitHub's API, fetched on the server (lib/github.ts).
+//
+// Everything is worked out in UTC from the dates themselves, so the server and
+// the browser draw exactly the same thing (no hydration mismatch, and no
+// waiting for client code). The stylesheet (.lx-heat in globals.css) sizes the
+// text to fill the box; when even the smallest size is too wide, the oldest
+// weeks (the left) are cropped.
 
-// One color per contribution level (0 = none, 4 = most). They're CSS variables
-// (--lx-cal-0 to --lx-cal-4 in globals.css, one set per theme), so switching
-// themes recolors the calendar in place: the component isn't re-rendered, so
-// it can't flicker, lose its scroll position or redraw.
-type ColorPalette = [string, string, string, string, string];
+const GLYPHS = ["·", "░", "▒", "▓", "█"];
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+// GitHub's rows run Sunday to Saturday; label Mon, Wed and Fri
+const WEEKDAYS = ["", "M", "", "W", "", "F", ""];
 
-interface ThemeInput {
-  light: ColorPalette;
-  dark: ColorPalette;
+type Day = Contributions["days"][number];
+
+function utc(date: string) {
+  return new Date(`${date}T00:00:00Z`);
 }
 
-const palette: ColorPalette = [
-  'var(--lx-cal-0)',
-  'var(--lx-cal-1)',
-  'var(--lx-cal-2)',
-  'var(--lx-cal-3)',
-  'var(--lx-cal-4)',
-];
+function label(day: Day) {
+  const d = utc(day.date);
+  const when = `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}`;
+  const what = day.count === 1 ? "1 contribution" : `${day.count} contributions`;
+  return `${what} on ${when}`;
+}
 
-const theme: ThemeInput = {
-  light: palette,
-  dark: palette,
-};
+// Weeks as columns of 7 (null where the year starts or ends midweek), and
+// each month's name over the first week it starts in
+function layout(days: Day[]) {
+  const offset = days.length ? utc(days[0].date).getUTCDay() : 0;
+  const weeks: (Day | null)[][] = [];
+  days.forEach((day, i) => {
+    const slot = i + offset;
+    const week = (weeks[Math.floor(slot / 7)] ??= Array(7).fill(null));
+    week[slot % 7] = day;
+  });
 
-const GitHubCalendar = dynamic(
-  () => import('react-github-calendar').then(mod => mod.GitHubCalendar),
-  {
-    ssr: false,
-    loading: () => <p className="lx-dim">fetching contributions…</p>,
-  },
-);
+  // Two characters per week (the day and a space)
+  const months = Array<string>(weeks.length * 2).fill(" ");
+  let free = 0;
+  let last = -1;
+  weeks.forEach((week, w) => {
+    const first = week.find(Boolean);
+    if (!first) return;
+    const month = utc(first.date).getUTCMonth();
+    if (month === last) return;
+    last = month;
+    const at = w * 2;
+    // Skip a name that would run into the one before it (a partial first week)
+    if (at < free) return;
+    MONTHS[month].split("").forEach((c, n) => (months[at + n] = c));
+    free = at + 4;
+  });
+  return { weeks, months: months.join("") };
+}
 
-// Module-level so the calendar's props stay identical between renders
-const labels = {
-  totalCount: '{{count}} contributions in the last year',
-};
-const style = { color: 'var(--lx-dim)' };
+function stats(days: Day[]) {
+  let longest = 0;
+  let run = 0;
+  const byMonth = new Map<string, number>();
+  for (const day of days) {
+    run = day.count > 0 ? run + 1 : 0;
+    longest = Math.max(longest, run);
+    const key = day.date.slice(0, 7);
+    byMonth.set(key, (byMonth.get(key) ?? 0) + day.count);
+  }
+  let busiest = "";
+  let most = 0;
+  for (const [key, count] of byMonth) {
+    if (count > most) {
+      most = count;
+      busiest = MONTHS[Number(key.slice(5)) - 1];
+    }
+  }
+  return { longest, busiest };
+}
 
-// The whole year, always. The calendar is drawn at one fixed size and the
-// stylesheet (`.lx-calendar`) scales it to its box: the box's width below
-// 1024px, and from there up, when the box has a fixed height, pinned to all
-// four corners of it. Because the scaling is CSS alone, the calendar follows
-// the box exactly as the window resizes, with no measuring or re-rendering.
-export default function GithubCalendar() {
-  const ref = useRef<HTMLDivElement>(null);
+function Unavailable() {
+  return (
+    <div className="text-[12px] leading-[1.5]">
+      <p>fatal: unable to access &apos;github.com/renzoboyy&apos;: contributions unavailable</p>
+      <a href="https://github.com/renzoboyy" target="_blank" className="lx-link">
+        view on github ↗
+      </a>
+    </div>
+  );
+}
 
-  // From 1024px the calendar is as tall as its box and as wide as that makes
-  // it, so it can be wider than the box and scroll sideways. Its size is set
-  // here in pixels (--lx-cal-w and --lx-cal-h, used by globals.css) instead of
-  // being left to percentage and aspect-ratio rules, so it never depends on
-  // how many layout passes the browser needs to settle them. The scroll
-  // starts at the right edge (the newest weeks, so the left is what's
-  // cropped), and keeps the same distance from that edge as the box resizes.
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    let fromRight = 0;
-    const scroller = () =>
-      el.querySelector<HTMLElement>(".react-activity-calendar__scroll-container");
-    const onScroll = (e: Event) => {
-      const s = e.target as HTMLElement;
-      fromRight = s.scrollWidth - s.clientWidth - s.scrollLeft;
-    };
-    const place = () => {
-      const s = scroller();
-      if (s) s.scrollLeft = s.scrollWidth - s.clientWidth - fromRight;
-    };
-    const size = () => {
-      const s = scroller();
-      const box = s
-        ?.querySelector("svg")
-        ?.getAttribute("viewBox")
-        ?.split(" ");
-      if (!s || !box || !s.clientHeight) return;
-      const height = s.clientHeight;
-      el.style.setProperty("--lx-cal-h", `${height}px`);
-      el.style.setProperty(
-        "--lx-cal-w",
-        `${(height * Number(box[2])) / Number(box[3])}px`,
-      );
-      place();
-    };
-    el.addEventListener("scroll", onScroll, true);
-    // The scrollbar is hidden, so let the mouse wheel scroll it sideways
-    const onWheel = (e: WheelEvent) => {
-      const s = scroller();
-      if (!s || s.scrollWidth <= s.clientWidth) return;
-      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-      s.scrollLeft += e.deltaY;
-      e.preventDefault();
-    };
-    el.addEventListener("wheel", onWheel, { passive: false });
-    const resize = new ResizeObserver(size);
-    resize.observe(el);
-    // The calendar is loaded lazily: place it once its SVG appears
-    const appear = new MutationObserver(() => {
-      if (scroller()?.querySelector("svg")) {
-        size();
-        appear.disconnect();
-      }
-    });
-    appear.observe(el, { childList: true, subtree: true });
-    size();
-    return () => {
-      el.removeEventListener("scroll", onScroll, true);
-      el.removeEventListener("wheel", onWheel);
-      resize.disconnect();
-      appear.disconnect();
-    };
-  }, []);
+export default function GithubCalendar({
+  contributions,
+}: {
+  contributions: Contributions | null;
+}) {
+  if (!contributions || !contributions.days.length) return <Unavailable />;
+  const { weeks, months } = layout(contributions.days);
+  const { longest, busiest } = stats(contributions.days);
 
   return (
-    <div ref={ref} className="lx-calendar">
-      <GitHubCalendar
-        username="renzoboyy"
-        theme={theme}
-        colorScheme="dark"
-        blockSize={12}
-        blockMargin={3}
-        blockRadius={0}
-        fontSize={14}
-        labels={labels}
-        style={style}
-      />
+    <div className="lx-heat">
+      <div className="lx-heat-grid" aria-hidden="true">
+        {/* Weekday labels, outside the cropped part */}
+        <div className="lx-dim">
+          <div>{" "}</div>
+          {WEEKDAYS.map((d, i) => (
+            <div key={i}>{d || " "}</div>
+          ))}
+        </div>
+        <div className="lx-heat-cells">
+          <div>
+            <div className="lx-dim">{months}</div>
+            {WEEKDAYS.map((_, row) => (
+              <div key={row}>
+                {weeks.map((week, w) => {
+                  const day = week[row];
+                  if (!day) return <span key={w} className="lx-heat-cell" />;
+                  return (
+                    <span
+                      key={w}
+                      className={`lx-heat-cell lx-heat-${day.level}`}
+                      title={label(day)}
+                    >
+                      <span>{GLYPHS[day.level]}</span>
+                    </span>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="lx-heat-stats">
+        <p>
+          {/* "in the last year": the window's git log --since says so */}
+          {contributions.total} contributions
+          <span className="lx-dim">
+            {" "}· longest streak {longest}d{busiest && ` · busiest ${busiest}`}
+          </span>
+        </p>
+        <p className="lx-heat-legend lx-dim" aria-hidden="true">
+          less{" "}
+          {GLYPHS.map((g, i) => (
+            <span key={i} className={`lx-heat-cell lx-heat-${i}`}>
+              <span>{g}</span>
+            </span>
+          ))}{" "}
+          more
+        </p>
+      </div>
     </div>
   );
 }
