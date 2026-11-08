@@ -8,6 +8,7 @@ import OpenWindows from "./components/OpenWindows";
 import Window from "./components/Window";
 import Header from "./components/linux/Header";
 import ResumeButton from "./components/linux/ResumeButton";
+import Donut from "./components/linux/Donut";
 import SkillsLoop from "./components/linux/SkillsLoop";
 import Status from "./components/linux/Status";
 import Uptime from "./components/linux/Uptime";
@@ -231,17 +232,9 @@ export default function HomeClient({
               </div>
             </Window>
 
-            {/* Status: availability, who the work was for, and a strength
-                per project with proof (the projects themselves are the
-                next board) */}
-            <Window
-              id="status"
-              title="~/status"
-              className="md:col-span-2"
-              bodyClassName="flex flex-col overflow-hidden"
-            >
-              <Status />
-            </Window>
+            {/* The right half, top to bottom: skills; donut.c and contact
+                side by side; status (in source order, GitHub fills the
+                bottom-left cell before status) */}
 
             {/* Skills: a for loop over the skills, each with its proof */}
             <Window
@@ -251,6 +244,49 @@ export default function HomeClient({
               bodyClassName="flex flex-col gap-2 overflow-hidden"
             >
               <SkillsLoop />
+            </Window>
+
+            {/* Decoration: the spinning ASCII donut (desktop and tablet) */}
+            <Window
+              id="donut"
+              title="donut.c"
+              className="max-md:hidden"
+              bodyClassName="flex flex-col overflow-hidden"
+            >
+              <Donut />
+            </Window>
+
+            {/* Contact */}
+            <Window
+              id="contact"
+              title="contact.txt"
+              className="md:col-span-1"
+              bodyClassName="flex flex-col gap-2 overflow-hidden"
+            >
+              <p className="lx-dim lx-prompt">
+                <span aria-hidden="true">$ </span>cat contact.txt
+              </p>
+              <dl className="flex flex-col gap-3 text-[12px]">
+                <div className="min-w-0">
+                  <dt className="lx-dim">email</dt>
+                  <dd className="break-all">
+                    <a
+                      href="mailto:jedlawrence.engbino@gmail.com"
+                      className="lx-link"
+                    >
+                      jedlawrence.engbino@gmail.com
+                    </a>
+                  </dd>
+                </div>
+                <div className="min-w-0">
+                  <dt className="lx-dim">phone</dt>
+                  <dd className="truncate">
+                    <a href="tel:+639498253671" className="lx-link">
+                      +63 949 825 3671
+                    </a>
+                  </dd>
+                </div>
+              </dl>
             </Window>
 
             {/* GitHub: the whole year when it fits the window at a readable
@@ -285,37 +321,16 @@ export default function HomeClient({
               </div>
             </Window>
 
-            {/* Contact */}
+            {/* Status: availability, who the work was for, and a strength
+                per project with proof (the projects themselves are the
+                next board) */}
             <Window
-              id="contact"
-              title="contact.txt"
-              className="md:col-span-2 lg:col-span-1"
-              bodyClassName="flex flex-col gap-2 overflow-hidden"
+              id="status"
+              title="~/status"
+              className="md:col-span-2"
+              bodyClassName="flex flex-col overflow-hidden"
             >
-              <p className="lx-dim lx-prompt">
-                <span aria-hidden="true">$ </span>cat contact.txt
-              </p>
-              <dl className="flex flex-col gap-3 text-[12px]">
-                <div className="min-w-0">
-                  <dt className="lx-dim">email</dt>
-                  <dd className="break-all">
-                    <a
-                      href="mailto:jedlawrence.engbino@gmail.com"
-                      className="lx-link"
-                    >
-                      jedlawrence.engbino@gmail.com
-                    </a>
-                  </dd>
-                </div>
-                <div className="min-w-0">
-                  <dt className="lx-dim">phone</dt>
-                  <dd className="truncate">
-                    <a href="tel:+639498253671" className="lx-link">
-                      +63 949 825 3671
-                    </a>
-                  </dd>
-                </div>
-              </dl>
+              <Status />
             </Window>
           </OpenWindows>
         </div>

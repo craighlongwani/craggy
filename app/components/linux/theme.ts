@@ -118,12 +118,23 @@ export function switchTo(next: { theme?: Theme; palette?: Palette }) {
   // the file again (a blank flash in the swept area, and a burst of
   // downloads). The copy gets a still of each video's current frame instead,
   // one for one, so the copy's elements still line up with the page's.
+  const videoPairs: [HTMLVideoElement, HTMLCanvasElement][] = [];
   page.forEach((el, i) => {
     const originals = el.querySelectorAll("video");
     copies[i].querySelectorAll("video").forEach((v, n) => {
       v.removeAttribute("src");
       v.load();
-      v.replaceWith(videoStill(originals[n], v));
+      const still = videoStill(originals[n], v);
+      v.replaceWith(still);
+      if (originals[n]) videoPairs.push([originals[n], still]);
+    });
+  });
+  // Text that redraws itself (the ASCII donut, marked data-live)
+  const livePairs: [Element, Element][] = [];
+  page.forEach((el, i) => {
+    const to = copies[i].querySelectorAll("[data-live]");
+    el.querySelectorAll("[data-live]").forEach((from, n) => {
+      if (to[n]) livePairs.push([from, to[n]]);
     });
   });
   overlay.append(...copies);
@@ -174,9 +185,23 @@ export function switchTo(next: { theme?: Theme; palette?: Palette }) {
     const to = copies[i].querySelectorAll<HTMLElement>(".win95-window");
     from.forEach((w, n) => windowPairs.push([w, to[n]]));
   });
+  // Everything that moves keeps moving in the copy too, so nothing freezes
+  // in the swept area and jumps when the sweep ends: playing videos are
+  // redrawn into their stills, and live text is copied across
   let follow = 0;
   const syncWindows = () => {
     for (const [w, c] of windowPairs) c.style.opacity = getComputedStyle(w).opacity;
+    for (const [video, still] of videoPairs) {
+      if (video.paused || video.readyState < 2) continue;
+      try {
+        still.getContext("2d")?.drawImage(video, 0, 0, still.width, still.height);
+      } catch {
+        // Not drawable this frame
+      }
+    }
+    for (const [from, to] of livePairs) {
+      if (to.textContent !== from.textContent) to.textContent = from.textContent;
+    }
     follow = requestAnimationFrame(syncWindows);
   };
   syncWindows();
