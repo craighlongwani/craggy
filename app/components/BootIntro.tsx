@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { bootDrag } from "../lib/curtain";
+import { bootDrag, openCurtain } from "../lib/curtain";
 import { bootEnd, bootEvents } from "./linux/bootLog";
 
 // The home page's cold-load intro. layout.tsx's inline script sets
@@ -11,18 +11,22 @@ import { bootEnd, bootEvents } from "./linux/bootLog";
 //      (bootLog.ts): kernel, initramfs, systemd, then `jed` logs in and runs
 //      `tree renzo`
 //   2. near the end of the log, the bar slides down to the bottom, wiping the
-//      screen and uncovering five cursors side by side in the middle
+//      screen and uncovering a cursor for each window on screen (all six on
+//      a wide screen, fewer where the windows stack), side by side
 //   3. as the bar lands (it becomes the real footer: data-boot="footer"), the
 //      prompt types in, the buttons fade in, and the cursors travel to their
 //      windows and drag them open
-// Any click or key skips it.
+// Windows below the fold stay shut and open as they're scrolled to, with the
+// same cursor drag as the projects board's. Any click or key skips the
+// intro (what's on screen shows at once; the rest still opens on scroll).
 
 const WIPE_AT = 0.85; // share of the boot log played when the bar starts sliding
 const WIPE_MS = 800;
 const WIPE_EASE = "cubic-bezier(0.65, 0, 0.35, 1)";
 const FOOTER_MS = 1100; // keep in step with the data-boot="footer" CSS
 const WINDOW_STAGGER_MS = 90;
-const CURSORS = 5;
+// One per home window: README, skills, cat, contact, GitHub, status
+const CURSORS = 6;
 const CURSOR_GAP = 30;
 
 export default function BootIntro() {
@@ -100,17 +104,54 @@ export default function BootIntro() {
     const cursorX = (i: number) => window.innerWidth / 2 + (i - (count - 1) / 2) * CURSOR_GAP - 7;
     const cursorY = () => window.innerHeight / 2 - 10;
 
+    // The windows that are actually there (the résumé pop-up, a window nested
+    // in README, is closed and has nothing to be dragged), split into those
+    // on screen and those below the fold
+    const split = () => {
+      const shown = windows.filter((w) => w.offsetWidth > 0);
+      const onScreen = shown.filter((w) => w.getBoundingClientRect().top < window.innerHeight - 8);
+      return { onScreen, below: shown.filter((w) => !onScreen.includes(w)) };
+    };
+
+    // Windows below the fold stay shut until they scroll into view, then
+    // open with the cursor drag (as OpenWindows does on the projects board);
+    // windows arriving together open one after another
+    const waiting = new Set<HTMLElement>();
+    const scrollAnims: Animation[] = [];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries
+          .filter((e) => e.isIntersecting)
+          .map((e) => e.target as HTMLElement)
+          .sort((a, b) => windows.indexOf(a) - windows.indexOf(b))
+          .forEach((w, i) => {
+            observer.unobserve(w);
+            waiting.delete(w);
+            w.style.opacity = "";
+            scrollAnims.push(openCurtain(w, i));
+          });
+      },
+      { rootMargin: "0px 0px -15% 0px" },
+    );
+    const openOnScroll = (list: HTMLElement[]) =>
+      list.forEach((w) => {
+        if (waiting.has(w)) return;
+        waiting.add(w);
+        observer.observe(w);
+      });
+
     // The bar has landed: it is the real footer from here on
     const land = () => {
       if (landed || ended) return;
       landed = true;
       root.style.display = "none";
       html.dataset.boot = "footer";
-      // One cursor per window that's actually there: the résumé pop-up, a
-      // window nested in README, is closed and has nothing to be dragged
-      const shown = windows.filter((w) => w.offsetWidth > 0);
-      windows.forEach((w) => (w.style.opacity = ""));
-      shown.forEach((w, i) => {
+      // One cursor per window on screen; the ones below the fold wait to be
+      // scrolled to
+      const { onScreen, below } = split();
+      onScreen.forEach((w) => (w.style.opacity = ""));
+      openOnScroll(below);
+      onScreen.forEach((w, i) => {
         anims.push(
           bootDrag(
             w,
@@ -119,7 +160,14 @@ export default function BootIntro() {
           ),
         );
       });
-      timers.push(window.setTimeout(() => delete html.dataset.boot, FOOTER_MS));
+      timers.push(
+        window.setTimeout(() => {
+          delete html.dataset.boot;
+          // The intro is over: clicks and keys no longer skip anything
+          window.removeEventListener("pointerdown", end);
+          window.removeEventListener("keydown", end);
+        }, FOOTER_MS),
+      );
     };
 
     const wipe = () => {
@@ -180,8 +228,16 @@ export default function BootIntro() {
       timers.forEach(clearTimeout);
       anims.forEach((a) => a.cancel());
       root.style.display = "none";
-      windows.forEach((w) => (w.style.opacity = ""));
+      // Skipped before the bar landed: what's below the fold now waits to be
+      // scrolled to (after landing, it already is)
+      if (!landed) openOnScroll(split().below);
+      // Everything else shows at once
+      windows.forEach((w) => {
+        if (!waiting.has(w)) w.style.opacity = "";
+      });
       delete html.dataset.boot;
+      window.removeEventListener("pointerdown", end);
+      window.removeEventListener("keydown", end);
     };
 
     window.addEventListener("pointerdown", end);
@@ -194,6 +250,8 @@ export default function BootIntro() {
       cancelAnimationFrame(raf);
       timers.forEach(clearTimeout);
       anims.forEach((a) => a.cancel());
+      scrollAnims.forEach((a) => a.cancel());
+      observer.disconnect();
       root.style.display = "";
       windows.forEach((w) => (w.style.opacity = ""));
       tree.getAnimations().forEach((a) => a.cancel());

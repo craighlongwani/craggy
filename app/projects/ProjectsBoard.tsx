@@ -37,7 +37,12 @@ export default function ProjectsBoard() {
             className="h-full"
             bodyClassName="flex flex-col gap-2"
           >
-            <Preview src={p.video.src} label={p.video.label} background={p.previewBackground} />
+            <Preview
+              src={p.video.src}
+              poster={p.video.poster}
+              label={p.video.label}
+              background={p.previewBackground}
+            />
 
             <p className="lx-dim mt-1 text-[11px]">
               {p.when} · {p.badge}
@@ -91,12 +96,24 @@ export default function ProjectsBoard() {
 }
 
 // The card's preview: the demo video's first frame (the card plays it while
-// the pointer is over it). Only its first frame's worth is fetched up front.
-function Preview({ src, label, background }: { src: string; label: string; background: string }) {
+// the pointer is over it), shown as its poster until the video has a frame
+// of its own. Only the video's first frame's worth is fetched up front.
+function Preview({
+  src,
+  poster,
+  label,
+  background,
+}: {
+  src: string;
+  poster: string;
+  label: string;
+  background: string;
+}) {
   return (
     <div className="lx-portrait relative aspect-video" style={{ background }}>
       <video
         src={`${src}#t=0.1`}
+        poster={poster}
         preload="metadata"
         muted
         loop

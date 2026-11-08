@@ -3,9 +3,11 @@ import type { Project } from "./data";
 
 // A project's write-up, in the site's monochrome Linux look: flat panels, dim
 // secondary text, and the demo video in full color. Shown in the project's
-// window (ProjectView), which starts the video when it opens. The video is the
-// same URL as its card's preview (so its first frame is already loaded and it
-// never shows as an empty box while the window fades in).
+// window (ProjectView), which starts the video when it opens. The video shows
+// its poster (a still of its opening frame) until it has a frame of its own,
+// and has its 16:9 size from the start: a video that's been hidden may need
+// a moment to decode again when it's shown (Firefox drops a hidden video's
+// frames), which used to flash its black box the first time a project opened.
 export default function ProjectContent({ project }: { project: Project }) {
   return (
     <>
@@ -26,6 +28,9 @@ export default function ProjectContent({ project }: { project: Project }) {
       <div className="lx-box mt-5 bg-black p-[2px]">
         <video
           src={`${project.video.src}#t=0.1`}
+          poster={project.video.poster}
+          width={1920}
+          height={1080}
           preload="metadata"
           muted
           loop

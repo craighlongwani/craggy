@@ -17,7 +17,10 @@ export type Project = {
 
   // ── The project page ──
   role: string;
-  video: { src: string; label: string };
+  // The demo video, and a still of its opening frame (poster.webp beside it,
+  // 1280px wide) that shows instantly, so the video's box is never blank
+  // while the video itself loads or decodes
+  video: { src: string; poster: string; label: string };
   // Paragraphs beside the highlights
   description: string[];
   highlights: string[];
@@ -41,6 +44,7 @@ export const projects: Project[] = [
     role: "Lead Developer · Backend & AI Integration",
     video: {
       src: "/assets/projects/VerifAI/VerifAI-demo-loop.mp4",
+      poster: "/assets/projects/VerifAI/poster.webp",
       label: "VerifAI demo",
     },
     description: [
@@ -96,6 +100,7 @@ export const projects: Project[] = [
     role: "Lead Developer · Database & Backend",
     video: {
       src: "/assets/projects/Revora/Revora-ssms-demo.mp4",
+      poster: "/assets/projects/Revora/poster.webp",
       label: "Revora database and admin dashboard demo",
     },
     description: [
@@ -153,6 +158,7 @@ export const projects: Project[] = [
     role: "Backend Developer · Documents, Households & Security",
     video: {
       src: "/assets/projects/BMS/BMS-contributions-demo.mp4",
+      poster: "/assets/projects/BMS/poster.webp",
       label: "Demo of my contributions to the Barangay Management System",
     },
     description: [

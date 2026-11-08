@@ -51,21 +51,10 @@ export default function ProjectView({
       stopAnims();
       root.hidden = false;
       body.scrollTop = 0;
-      // Opened cold (a deep link, a touch): the video's first frame isn't
-      // decoded yet (see warmProject), so it fades in when it is, rather
-      // than popping in over its black box
+      // Opened cold (a deep link, a touch): start loading the video now. Its
+      // poster shows meanwhile (see ProjectContent), so nothing is hidden.
       const first = video();
-      if (first && first.readyState < 2) {
-        first.preload = "auto";
-        first.style.opacity = "0";
-        const show = () => {
-          clearTimeout(timer);
-          first.style.transition = "opacity 200ms";
-          first.style.opacity = "";
-        };
-        const timer = setTimeout(show, 1500);
-        first.addEventListener("loadeddata", show, { once: true });
-      }
+      if (first && first.preload !== "auto") first.preload = "auto";
       const play = () => void video()?.play().catch(() => {});
       if (prefersReducedMotion()) {
         play();
