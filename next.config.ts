@@ -1,14 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // The site is one page now: the old projects pages are its projects board
-  // and the project windows that open over it
-  async redirects() {
-    return [
-      { source: "/projects", destination: "/#projects", permanent: true },
-      { source: "/projects/:slug", destination: "/#projects/:slug", permanent: true },
-    ];
-  },
+  // Static export for GitHub Pages (served from the root of renzoboy.dev, so
+  // no basePath). Redirects aren't supported in a static export; the old
+  // /projects routes no longer exist as pages.
+  output: "export",
+  images: { unoptimized: true },
 };
 
 export default nextConfig;
