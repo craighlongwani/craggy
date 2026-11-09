@@ -92,7 +92,7 @@ export default function HomePage({
                       </p>
                       <div className="flex items-center gap-2">
                         <h1 className="text-lg font-bold leading-tight tracking-tight @lg:text-xl shorter:text-base shorter:@lg:text-base">
-                          Jed Lawrence Engbino
+                          Jed Lawrence Engbino (renz)
                         </h1>
                         <div className="flex shrink-0 gap-1.5">
                           <ResumeButton />

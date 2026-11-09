@@ -9,12 +9,12 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
-const siteTitle = "Jed Lawrence Engbino · Information Systems";
+const siteTitle = "renz engbino";
 const siteDescription =
-  "Portfolio of Jed Lawrence Engbino, an Information Systems student at De La Salle – College of Saint Benilde building database-driven systems, from SQL Server back ends to full-stack web apps.";
+  "Jed Lawrence Engbino · Information Systems | De La Salle – College of Saint Benilde";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://renzo-dev.vercel.app"),
+  metadataBase: new URL("https://renzoboy.dev"),
   title: siteTitle,
   description: siteDescription,
   openGraph: {
