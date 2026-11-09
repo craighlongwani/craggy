@@ -3,6 +3,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [master]
+  schedule:
+    - cron: "0 20 * * *" # daily, 04:00 Perth: refreshes the contributions calendar
   workflow_dispatch:
 
 permissions:
