@@ -3,10 +3,10 @@ import { useSyncExternalStore } from "react";
 import { prefersReducedMotion } from "../../lib/curtain";
 
 // The home page is a vertical scroll of full-screen "boards" (home, projects,
-// and later others), numbered in the footer like workspaces. This keeps track
-// of which board is on screen and scrolls to one.
-export type BoardId = "home" | "projects";
-export const boardIds: BoardId[] = ["home", "projects"];
+// education, and later others), numbered in the footer like workspaces. This
+// keeps track of which board is on screen and scrolls to one.
+export type BoardId = "home" | "projects" | "education";
+export const boardIds: BoardId[] = ["home", "projects", "education"];
 
 export function isBoard(id: string): id is BoardId {
   return (boardIds as string[]).includes(id);

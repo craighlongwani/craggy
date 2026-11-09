@@ -22,7 +22,7 @@ export const skills: Skill[] = [
   {
     name: "Full-Stack Development",
     proof: "Django REST, React, ASP.NET MVC, PDF certificates",
-    usedIn: "BMS, VerifAI, Revora",
+    usedIn: "BMS, VerifAI, Revora, Inventory",
   },
   {
     name: "Testing & DevOps",

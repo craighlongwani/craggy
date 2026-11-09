@@ -202,4 +202,64 @@ export const projects: Project[] = [
       "This project taught me to extend a system someone else started. Most of my work came from barangay stakeholder feedback, like the official certificate layouts and the rules for who heads a household, so I had to fit new requirements into models and screens that were already in use.",
     source: { note: "Source code available on request" },
   },
+  {
+    slug: "inventory",
+    name: "Supplier & Inventory System",
+    previewBackground: "#1d2021",
+    event: "Enterprise Development Course Project · June to August 2025",
+    badge: "Enterprise Development course project",
+    summary: "Supplier and Product Records for a Small Business",
+    when: "Aug 2025",
+    role: "Solo Developer · Full Stack",
+    video: {
+      src: "/assets/projects/Inventory/Inventory-demo-placeholder.mp4",
+      poster: "/assets/projects/Inventory/poster.webp",
+      label: "Supplier & Inventory System demo (placeholder)",
+    },
+    description: [
+      "A web app for keeping a business's supplier and product records in one place, built on my own for my Enterprise Development course. Staff register and sign in, then add, search, edit, and delete suppliers and products from sortable tables.",
+      "It was my first enterprise-style .NET solution: an ASP.NET Core 8 MVC app over SQL Server, with the data model and repositories split into their own class libraries. The schema also models purchase orders, as groundwork for stock levels to come from orders.",
+    ],
+    highlights: [
+      "Built the schema code-first with Entity Framework Core over four migrations: suppliers, products, ASP.NET Identity, and purchase orders",
+      "Modeled purchase orders as header and detail tables with one-to-many relationships and restricted deletes, so a supplier or product on an order can't be removed",
+      "Added registration and sign-in with ASP.NET Identity, a cookie that expires after 10 idle minutes, and sign-in required for every records page",
+      "Wrote a generic repository in its own class library, with AutoMapper between entities and view models, wired up through dependency injection",
+      "Validated input with data annotations, and added DataTables for search and paging and confirmation dialogs before deletes",
+    ],
+    steps: {
+      heading: "How it's built",
+      items: [
+        {
+          step: "Data",
+          text: "Entity classes in a Suppliers.DataModel library define the SQL Server schema, mapped onto named tables and columns with the Fluent API. Each change ships as an EF Core migration.",
+        },
+        {
+          step: "Access",
+          text: "Products go through IGenericRepo<T>, a reusable add, get, update, and delete layer in its own library, injected into the controller. AutoMapper turns entities into view models and back.",
+        },
+        {
+          step: "Web",
+          text: "MVC controllers and Razor views behind [Authorize], with anti-forgery tokens on sign-in, edits, and deletes, styled with Bootstrap and DataTables.",
+        },
+      ],
+    },
+    tech: [
+      "C#",
+      "ASP.NET Core 8 MVC",
+      "Entity Framework Core",
+      "SQL Server",
+      "ASP.NET Identity",
+      "AutoMapper",
+      "Razor",
+      "Bootstrap",
+      "DataTables",
+    ],
+    closing:
+      "This project taught me how an enterprise solution is layered: keeping the data model, data access, and web app in separate projects made each piece easier to change, and code-first migrations kept the database in step with the code.",
+    source: {
+      href: "https://github.com/renzoboyy/ENTPROG-FFTIS4-Engbino",
+      label: "View on GitHub",
+    },
+  },
 ];

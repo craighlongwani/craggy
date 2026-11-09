@@ -14,6 +14,7 @@ import SkillsLoop from "./components/linux/SkillsLoop";
 import Status from "./components/linux/Status";
 import Uptime from "./components/linux/Uptime";
 import { stack } from "./components/linux/stack";
+import EducationBoard from "./education/EducationBoard";
 import type { Contributions } from "./lib/github";
 import ProjectsBoard from "./projects/ProjectsBoard";
 
@@ -89,11 +90,20 @@ export default function HomePage({
                       >
                         jed@renzo
                       </p>
-                      <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
                         <h1 className="text-lg font-bold leading-tight tracking-tight @lg:text-xl shorter:text-base shorter:@lg:text-base">
                           Jed Lawrence Engbino
                         </h1>
-                        <ResumeButton />
+                        <div className="flex shrink-0 gap-1.5">
+                          <ResumeButton />
+                          <a 
+                          className="lx-btn shrink-0"
+                          href="https://github.com/renzoboyy"
+                          target="_blank" 
+                          rel="noreferrer">
+                            github ↗
+                          </a>
+                        </div>
                       </div>
                       <hr className="lx-rule mt-1.5 shorter:mt-1" />
                     </div>
@@ -232,6 +242,14 @@ export default function HomePage({
                     </a>
                   </dd>
                 </div>
+                <div className="min-w-0">
+                  <dt className="lx-dim">linkedin</dt>
+                  <dd className="truncate">
+                    <a href="https://www.linkedin.com/in/renzoboyy/" className="lx-link" target="_blank">
+                      in/renzoboyy
+                    </a>
+                  </dd>
+                </div>
               </dl>
             </Window>
 
@@ -283,6 +301,9 @@ export default function HomePage({
         </Board>
         <Board id="projects" long>
           <ProjectsBoard />
+        </Board>
+        <Board id="education" long>
+          <EducationBoard />
         </Board>
       </Boards>
       <ProjectView projects={projectViews} />

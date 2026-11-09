@@ -93,7 +93,7 @@ function build() {
   started("Journal Service");
   started("Create Volatile Files and Directories");
   line(ok("Mounted /home/jed/renzo."), 90);
-  line(ok("Started Load projects: VerifAI, Revora, BMS."), 70);
+  line(ok("Started Load projects: VerifAI, Revora, BMS, Inventory."), 70);
   pause(120);
   started("GitHub contributions");
   line(ok("Started Theme service (gruvbox)."), 60);

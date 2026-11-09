@@ -53,11 +53,19 @@ const tree: Entry[] = [
         "projects/",
         "case studies",
         [
-          ["data.ts", "VerifAI, Revora, BMS"],
+          ["data.ts", "VerifAI, Revora, BMS, Inventory"],
           ["ProjectsBoard.tsx"],
           ["ProjectCard.tsx"],
           ["ProjectContent.tsx"],
           ["ProjectLink.tsx"],
+        ],
+      ],
+      [
+        "education/",
+        "schools, coursework",
+        [
+          ["data.ts"],
+          ["EducationBoard.tsx"],
         ],
       ],
       ["HomePage.tsx", "the home page"],
@@ -75,7 +83,7 @@ const tree: Entry[] = [
         "",
         [
           ["icons/", "", [["GitHub.png"]]],
-          ["projects/", "screenshots", [["VerifAI/"], ["Revora/"], ["BMS/"]]],
+          ["projects/", "screenshots", [["VerifAI/"], ["Revora/"], ["BMS/"], ["Inventory/"]]],
           ["me.png"],
         ],
       ],

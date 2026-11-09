@@ -12,6 +12,7 @@ import ThemeToggle from "./ThemeToggle";
 const workspaces: { id: BoardId; href: string }[] = [
   { id: "home", href: "/" },
   { id: "projects", href: "/#projects" },
+  { id: "education", href: "/#education" },
 ];
 
 // The bar along the bottom: the shell prompt, a button per board, the links
