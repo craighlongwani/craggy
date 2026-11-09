@@ -1,12 +1,13 @@
 "use client";
 import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
-import { openCurtain, prefersReducedMotion } from "../lib/curtain";
+import {
+  closeCurtain,
+  CLOSE_TOTAL_MS,
+  fadeDim,
+  openCurtain,
+  prefersReducedMotion,
+} from "../lib/curtain";
 import { closeProject, useLastProject, useOpenProject } from "../lib/project";
-
-const DIM_MS = 200;
-// Closing squishes the window shut like a vertical curtain
-const CLOSE_MS = 180;
-const CLOSE_EASE = "cubic-bezier(0.4, 0, 0.6, 1)";
 
 // The open project's window, over the dimmed page. It opens like every other
 // window on the site: the cursor drags its outline out in the middle of the
@@ -61,10 +62,7 @@ export default function ProjectView({
         return;
       }
       const draw = openCurtain(win);
-      anims.current = [
-        dim.animate([{ opacity: 0 }, { opacity: 1 }], { duration: DIM_MS }),
-        draw,
-      ];
+      anims.current = [fadeDim(dim, true), draw];
       draw.finished.then(play, () => {});
       return;
     }
@@ -83,27 +81,14 @@ export default function ProjectView({
     };
     finishClose.current = finish;
     // Animations stall when the browser stops drawing frames (a hidden tab)
-    const timer = setTimeout(finish, Math.max(CLOSE_MS, DIM_MS) + 150);
+    const timer = setTimeout(finish, CLOSE_TOTAL_MS + 150);
     stopAnims();
     if (prefersReducedMotion()) {
       finish();
       return;
     }
-    const fill = { fill: "forwards" as const };
-    const origin = "50% 50%";
-    const squish = win.animate(
-      [
-        { transform: "scaleY(1)", opacity: 1, transformOrigin: origin },
-        { opacity: 1, offset: 0.4 },
-        { transform: "scaleY(0)", opacity: 0, transformOrigin: origin },
-      ],
-      { duration: CLOSE_MS, easing: CLOSE_EASE, ...fill },
-    );
-    const undim = dim.animate([{ opacity: 1 }, { opacity: 0 }], {
-      duration: DIM_MS,
-      easing: "ease-in",
-      ...fill,
-    });
+    const squish = closeCurtain(win);
+    const undim = fadeDim(dim, false);
     anims.current = [squish, undim];
     Promise.all([squish.finished, undim.finished]).then(finish, () => {});
   }, [want]);
@@ -123,7 +108,7 @@ export default function ProjectView({
   return (
     // Starts hidden; shown and hidden directly by the effect above
     <div ref={rootRef} data-project-view hidden className="fixed inset-0 z-[60]">
-      <div ref={dimRef} onClick={() => closeProject()} className="absolute inset-0 bg-black/60" />
+      <div ref={dimRef} onClick={() => closeProject()} className="lx-scrim absolute inset-0" />
       {/* Centered, full height above the footer */}
       <section
         ref={windowRef}

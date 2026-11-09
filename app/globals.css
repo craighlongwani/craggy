@@ -125,6 +125,10 @@ html[data-theme="light"] [data-skin="linux"] .skill-window::backdrop {
   background: rgb(101 71 53 / 0.5);
 }
 
+html[data-theme="light"] [data-skin="linux"] .lx-scrim {
+  background: rgb(101 71 53 / 0.5);
+}
+
 @media (min-width: 1536px) {
   [data-skin="linux"] {
     font-size: 14px;
@@ -510,15 +514,20 @@ html:not(.theme-sweeping) [data-skin="linux"] .lx-card:hover > .win95-window > .
   border-color: var(--lx-fg);
 }
 
+/* The dim behind a pop-up: the résumé's ::backdrop, and the project
+   window's own layer (.lx-scrim) */
 [data-skin="linux"] .skill-window::backdrop {
-  background: rgb(0 0 0 / 0.7);
+  background: rgb(0 0 0 / 0.6);
 }
 
-/* Repeated for :hover and keyboard focus so the general window rules above
-   (which light the title text up) can't turn it light-on-light */
-[data-skin="linux"] .skill-window.win95-window > .win95-titlebar,
-[data-skin="linux"] .skill-window.win95-window:hover > .win95-titlebar,
-[data-skin="linux"] .skill-window.win95-window:has(:focus-visible) > .win95-titlebar {
+[data-skin="linux"] .lx-scrim {
+  background: rgb(0 0 0 / 0.6);
+}
+
+/* The class is repeated to outrank every general window rule above (hover,
+   keyboard focus, the palette sweep's frozen hover), which light the title
+   text up and would turn this inverted bar light-on-light */
+html [data-skin="linux"] .skill-window.skill-window.skill-window.win95-window > .win95-titlebar {
   background: var(--lx-fg);
   color: var(--lx-bg);
   border-bottom-color: var(--lx-fg);

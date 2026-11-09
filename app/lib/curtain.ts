@@ -13,8 +13,43 @@ const OPEN_STAGGER_MS = 120;
 const DRAG_EASE = "cubic-bezier(0.45, 0, 0.25, 1)";
 const OUTLINE = "var(--lx-fg)";
 
+// Pop-ups (a project's window, the résumé) dim the page behind them, and
+// close like a curtain, squishing toward their middle line
+const DIM_MS = 200;
+const CLOSE_MS = 180;
+const CLOSE_EASE = "cubic-bezier(0.4, 0, 0.6, 1)";
+// How long closing takes, for a fallback timer: animations stall when the
+// browser stops drawing frames (a hidden tab)
+export const CLOSE_TOTAL_MS = Math.max(CLOSE_MS, DIM_MS);
+
 export function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+// Fades a pop-up's dim in or out: an element, or a <dialog>'s ::backdrop
+// (pseudoElement). Fading out holds the end, until the caller hides it.
+export function fadeDim(el: Element, show: boolean, pseudoElement?: string) {
+  return show
+    ? el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: DIM_MS, pseudoElement })
+    : el.animate([{ opacity: 1 }, { opacity: 0 }], {
+        duration: DIM_MS,
+        easing: "ease-in",
+        fill: "forwards",
+        pseudoElement,
+      });
+}
+
+// Squishes a pop-up shut, holding it shut until the caller hides it
+export function closeCurtain(el: HTMLElement) {
+  const origin = "50% 50%";
+  return el.animate(
+    [
+      { transform: "scaleY(1)", opacity: 1, transformOrigin: origin },
+      { opacity: 1, offset: 0.4 },
+      { transform: "scaleY(0)", opacity: 0, transformOrigin: origin },
+    ],
+    { duration: CLOSE_MS, easing: CLOSE_EASE, fill: "forwards" },
+  );
 }
 
 // The cursor and the outline are temporary overlays above the page, placed

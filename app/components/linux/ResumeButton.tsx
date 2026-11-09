@@ -1,6 +1,12 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { openCurtain, prefersReducedMotion } from "../../lib/curtain";
+import {
+  closeCurtain,
+  CLOSE_TOTAL_MS,
+  fadeDim,
+  openCurtain,
+  prefersReducedMotion,
+} from "../../lib/curtain";
 
 const RESUME = "/Jed-Lawrence-Engbino-Resume.pdf";
 
@@ -15,13 +21,20 @@ function windowWidth() {
 }
 
 // The résumé button beside the name, and the window it opens: the PDF in a
-// pop-up over the dimmed page. The window is drawn in with the same cursor
-// drag as the page windows. Built on <dialog>, so focus trapping and the top
+// pop-up over the dimmed page. It opens and closes like a project's window:
+// the page dims as the cursor drags the window out, and closing squishes it
+// shut as the dim fades. Built on <dialog>, so focus trapping and the top
 // layer come from the browser; Escape and clicking outside also close it.
 export default function ResumeButton() {
   const ref = useRef<HTMLDialogElement>(null);
   const [opened, setOpened] = useState(false);
-  const animation = useRef<Animation | null>(null);
+  const anims = useRef<Animation[]>([]);
+  const closing = useRef(false);
+
+  const stopAnims = () => {
+    anims.current.forEach((a) => a.cancel());
+    anims.current = [];
+  };
 
   // The PDF loads on the first open, so the page isn't weighed down by it
   const open = () => {
@@ -30,15 +43,36 @@ export default function ResumeButton() {
     setOpened(true);
     dialog.style.width = `${windowWidth()}px`;
     dialog.showModal();
-    if (!prefersReducedMotion()) {
-      animation.current?.cancel();
-      animation.current = openCurtain(dialog);
-    }
+    if (prefersReducedMotion()) return;
+    stopAnims();
+    anims.current = [openCurtain(dialog), fadeDim(dialog, true, "::backdrop")];
   };
 
-  const close = () => ref.current?.close();
+  // Plays the close, then closes the dialog for real (onClose cleans up)
+  const close = () => {
+    const dialog = ref.current;
+    if (!dialog?.open || closing.current) return;
+    if (prefersReducedMotion()) {
+      dialog.close();
+      return;
+    }
+    closing.current = true;
+    stopAnims();
+    const squish = closeCurtain(dialog);
+    const undim = fadeDim(dialog, false, "::backdrop");
+    anims.current = [squish, undim];
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      dialog.close();
+    };
+    const timer = setTimeout(finish, CLOSE_TOTAL_MS + 150);
+    Promise.all([squish.finished, undim.finished]).then(finish, () => {});
+  };
 
-  useEffect(() => () => animation.current?.cancel(), []);
+  useEffect(() => () => anims.current.forEach((a) => a.cancel()), []);
 
   return (
     <>
@@ -55,7 +89,15 @@ export default function ResumeButton() {
         ref={ref}
         className="skill-window win95-window m-auto h-[calc(100dvh-2rem)] max-h-[calc(100dvh-2rem)] flex-col open:flex"
         aria-labelledby="resume-window-title"
-        onClose={() => animation.current?.cancel()}
+        onCancel={(e) => {
+          // Escape: play the close instead of vanishing
+          e.preventDefault();
+          close();
+        }}
+        onClose={() => {
+          stopAnims();
+          closing.current = false;
+        }}
         onClick={(e) => {
           if (e.target === e.currentTarget) close();
         }}

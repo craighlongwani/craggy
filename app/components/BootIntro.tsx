@@ -43,8 +43,12 @@ export default function BootIntro() {
     const bar = barRef.current;
     if (!root || !tree || !row || !bar || !html.dataset.boot) return;
 
+    // The home board's windows, not the résumé pop-up nested in README (a
+    // <dialog>, which opens itself, with its own cursor drag): the intro
+    // hides these until they're dragged in, and must never leave the pop-up
+    // hidden
     const windows = Array.from(
-      document.querySelectorAll<HTMLElement>("#home .win95-window"),
+      document.querySelectorAll<HTMLElement>("#home .win95-window:not(dialog)"),
     );
     windows.forEach((w) => (w.style.opacity = "0"));
 
@@ -104,9 +108,8 @@ export default function BootIntro() {
     const cursorX = (i: number) => window.innerWidth / 2 + (i - (count - 1) / 2) * CURSOR_GAP - 7;
     const cursorY = () => window.innerHeight / 2 - 10;
 
-    // The windows that are actually there (the résumé pop-up, a window nested
-    // in README, is closed and has nothing to be dragged), split into those
-    // on screen and those below the fold
+    // The windows that are actually there (the cat's is hidden on phones),
+    // split into those on screen and those below the fold
     const split = () => {
       const shown = windows.filter((w) => w.offsetWidth > 0);
       const onScreen = shown.filter((w) => w.getBoundingClientRect().top < window.innerHeight - 8);
