@@ -9,7 +9,7 @@ import {
 } from "../../lib/curtain";
 import { withBasePath } from "../../lib/site";
 
-const RESUME = withBasePath("/Jed-Lawrence-Engbino-Resume.pdf");
+const RESUME = withBasePath("/Craig_Hlongwani.pdf");
 
 // 25% wider than a project's page window (62.5vw on wide screens, 93.75vw on
 // tablets, the full width on phones), never wider than the screen
@@ -108,7 +108,7 @@ export default function ResumeButton() {
             id="resume-window-title"
             className="min-w-0 flex-1 text-sm leading-tight md:text-base"
           >
-            Jed-Lawrence-Engbino-Resume.pdf
+            Craig_Hlongwani.pdf
           </h2>
           <a
             href={RESUME}

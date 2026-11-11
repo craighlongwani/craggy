@@ -87,7 +87,7 @@ const tree: Entry[] = [
           ["me.png"],
         ],
       ],
-      ["Jed-Lawrence-Engbino-Resume.pdf"],
+      ["Craig_Hlongwani.pdf"],
     ],
   ],
   [".claude/", "", [["launch.json"]]],

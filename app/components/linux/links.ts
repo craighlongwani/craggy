@@ -14,5 +14,9 @@ export const links = [
     href: "mailto:clkhlongwani2@gmail.com",
     external: false,
   },
-  { label: "resume.pdf", href: withBasePath("/Jed-Lawrence-Engbino-Resume.pdf"), external: true },
+  {
+    label: "Craig_Hlongwani.pdf",
+    href: withBasePath("/Craig_Hlongwani.pdf"),
+    external: true,
+  },
 ] as const;
