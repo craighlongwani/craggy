@@ -85,8 +85,8 @@ function stats(days: Day[]) {
 function Unavailable() {
   return (
     <div className="text-[12px] leading-[1.5]">
-      <p>fatal: unable to access &apos;github.com/renzoboyy&apos;: contributions unavailable</p>
-      <a href="https://github.com/renzoboyy" target="_blank" className="lx-link">
+      <p>fatal: unable to load contributions for &apos;github.com/craighlongwani&apos;</p>
+      <a href="https://github.com/craighlongwani" target="_blank" rel="noreferrer" className="lx-link">
         view on github ↗
       </a>
     </div>

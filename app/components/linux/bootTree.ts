@@ -113,7 +113,7 @@ export interface BootLine {
 }
 
 function flatten(): BootLine[] {
-  const lines: BootLine[] = [{ head: "renzo/", note: "", parent: -1, prev: -1 }];
+  const lines: BootLine[] = [{ head: "craggy/", note: "", parent: -1, prev: -1 }];
   const walk = (entries: Entry[], prefix: string, parent: number) => {
     let prev = -1;
     entries.forEach(([name, note = "", children], i) => {

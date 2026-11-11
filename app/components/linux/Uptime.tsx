@@ -1,9 +1,9 @@
 "use client";
 import { useSyncExternalStore } from "react";
 
-// BS Information Systems began in September 2024 (month index 8)
-const SINCE = { year: 2024, month: 8 };
-const SINCE_LABEL = "since Sep 2024";
+// BS Information Systems began in January 2025 (month index 0)
+const SINCE = { year: 2025, month: 1 };
+const SINCE_LABEL = "since Jan 2025";
 
 // Whole months since then, written out ("2 years, 2 months")
 function elapsed() {

@@ -84,10 +84,7 @@ export const projects: Project[] = [
     ],
     closing:
       "The main lesson I took from this project was how to make LLM output dependable: rather than trusting the model's answers directly, I validated them against an authoritative source before showing them to the user.",
-    source: {
-      href: "https://github.com/renzoboyy/Verifork",
-      label: "View on GitHub",
-    },
+    source: { note: "Source repository not linked" },
   },
   {
     slug: "revora",
@@ -142,10 +139,7 @@ export const projects: Project[] = [
     ],
     closing:
       "My biggest takeaway was treating the database as the last line of defense. Constraints, transactions, and permissions keep the data correct and private even if the application layer gets something wrong.",
-    source: {
-      href: "https://github.com/renzoboyy/INFODBM_REVORA",
-      label: "View on GitHub",
-    },
+    source: { note: "Source repository not linked" },
   },
   {
     slug: "barangay",
@@ -257,9 +251,6 @@ export const projects: Project[] = [
     ],
     closing:
       "This project taught me how an enterprise solution is layered: keeping the data model, data access, and web app in separate projects made each piece easier to change, and code-first migrations kept the database in step with the code.",
-    source: {
-      href: "https://github.com/renzoboyy/ENTPROG-FFTIS4-Engbino",
-      label: "View on GitHub",
-    },
+    source: { note: "Source repository not linked" },
   },
 ];

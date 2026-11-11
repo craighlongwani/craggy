@@ -74,7 +74,7 @@ export default function HomePage({
                   <div className="lx-portrait aspect-[4/3] @md:aspect-auto @md:min-h-0">
                     <Image
                       src="/assets/me.png"
-                      alt="Portrait of Jed Lawrence Engbino"
+                      alt="Portrait of Craig Hlongwani"
                       fill
                       priority
                       sizes="(min-width: 1024px) 15vw, 100vw"
@@ -88,17 +88,17 @@ export default function HomePage({
                         aria-hidden="true"
                         className="lx-dim mb-0.5 text-[11px] shorter:hidden"
                       >
-                        jed@renzo
+                        craggy@hlongs
                       </p>
                       <div className="flex items-center gap-2">
                         <h1 className="text-lg font-bold leading-tight tracking-tight @lg:text-xl shorter:text-base shorter:@lg:text-base">
-                          Jed Lawrence Engbino (renz)
+                          Craig Hlongwani
                         </h1>
                         <div className="flex shrink-0 gap-1.5">
                           <ResumeButton />
                           <a 
                           className="lx-btn shrink-0"
-                          href="https://github.com/renzoboyy"
+                          href="https://github.com/craighlongwani"
                           target="_blank" 
                           rel="noreferrer">
                             github ↗
@@ -112,20 +112,20 @@ export default function HomePage({
                       <dt className="lx-dim">role</dt>
                       <dd>Full-stack &amp; Database</dd>
                       <dt className="lx-dim">school</dt>
-                      <dd>De La Salle – College of Saint Benilde</dd>
+                      <dd>EDUVOS - South Africa&apos;s Largest Independent Institution</dd>
                       <dt className="lx-dim">study</dt>
-                      <dd>Information Systems, 3rd year · Dean&apos;s Lister</dd>
+                      <dd>Computer Science, 2nd year</dd>
                       <dt className="lx-dim">uptime</dt>
                       <dd>
                         <Uptime />
                       </dd>
                       <dt className="lx-dim">based</dt>
-                      <dd>Manila, Philippines | Jeddah, Saudi Arabia</dd>
+                      <dd>Gauteng, South Africa | Midrand, Johannesburg</dd>
                       <dt className="lx-dim">speaks</dt>
-                      <dd>English, Tagalog</dd>
+                      <dd>English, Zulu, Tsonga</dd>
                       <dt className="lx-dim">seeking</dt>
                       <dd>
-                        IS / software engineering internships · Metro Manila /
+                        IS / software engineering internships · on-site /
                         remote
                       </dd>
                     </dl>
@@ -164,10 +164,12 @@ export default function HomePage({
                     <span aria-hidden="true">$ </span>cat about.txt
                   </p>
                   <p className="text-[12px] leading-[1.6]">
-                    Information Systems student building database-driven web
-                    systems end to end. Led Revora, a verified-onboarding system
-                    with its rules and security inside SQL Server, and the
-                    backend and AI integration for VerifAI.
+                    Motivated BSc Computer Science student with hands-on
+                    experience designing and developing end-to-end,
+                    database-driven web applications.
+                    Developed KayKay, an e-commerce platform incorporating
+                    database-enforced business rules,
+                     security controls, backend development, and AI integration.
                   </p>
 
                   <p className="lx-dim lx-prompt mb-1 mt-2">
@@ -227,26 +229,26 @@ export default function HomePage({
                   <dt className="lx-dim">email</dt>
                   <dd className="break-all">
                     <a
-                      href="mailto:jedlawrence.engbino@gmail.com"
+                      href="mailto:clkhlongwani2@gmail.com"
                       className="lx-link"
                     >
-                      jedlawrence.engbino@gmail.com
+                      clkhlongwani2@gmail.com
                     </a>
                   </dd>
                 </div>
                 <div className="min-w-0">
                   <dt className="lx-dim">phone</dt>
                   <dd className="truncate">
-                    <a href="tel:+639498253671" className="lx-link">
-                      +63 949 825 3671
+                    <a href="tel:+27658328829" className="lx-link">
+                      +27 65 832 8829
                     </a>
                   </dd>
                 </div>
                 <div className="min-w-0">
                   <dt className="lx-dim">linkedin</dt>
                   <dd className="truncate">
-                    <a href="https://www.linkedin.com/in/renzoboyy/" className="lx-link" target="_blank">
-                      in/renzoboyy
+                    <a href="https://www.linkedin.com/in/craig-hlongwani-447920359" className="lx-link" target="_blank">
+                      in/craighlongwani
                     </a>
                   </dd>
                 </div>
@@ -259,7 +261,7 @@ export default function HomePage({
               id="github"
               title={
                 <Link
-                  href="https://github.com/renzoboyy"
+                  href="https://github.com/craighlongwani"
                   target="_blank"
                   className="inline-flex items-center gap-1.5 hover:underline"
                 >
@@ -270,7 +272,7 @@ export default function HomePage({
                     alt=""
                     className="h-3.5 w-3.5"
                   />
-                  github.com/renzoboyy
+                  github.com/craighlongwani
                 </Link>
               }
               className="md:col-span-2"

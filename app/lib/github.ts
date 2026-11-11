@@ -1,24 +1,19 @@
 import "server-only";
 
 // GitHub's contribution calendar for the GitHub window, straight from GitHub's
-// GraphQL API (the same numbers as the profile page). It runs on the server
-// only: the token (GITHUB_TOKEN in .env.local and on the host; a fine-grained
-// token with no permissions is enough) never reaches the browser.
-//
-// The response is cached and refreshed at most once an hour, in the
-// background. If GitHub is down when a refresh is due, the error is thrown in
-// production so Next keeps serving the last good page instead of replacing it
-// with an empty calendar.
+// GraphQL API (the same numbers as the profile page). It runs at build time
+// for the static export. GH_CONTRIBUTIONS_TOKEN must belong to USER and have
+// permission to read that account's profile; it never reaches the browser.
 
 export type Contributions = {
   total: number;
   days: { date: string; count: number; level: number }[];
 };
 
-const USER = "renzoboyy";
-export const CONTRIBUTIONS_REVALIDATE = 3600;
+const USER = "craighlongwani";
 
 const QUERY = `query($login: String!) {
+  viewer { login }
   user(login: $login) {
     contributionsCollection {
       contributionCalendar {
@@ -39,6 +34,7 @@ const LEVELS: Record<string, number> = {
 
 type Response = {
   data?: {
+    viewer: { login: string };
     user: {
       contributionsCollection: {
         contributionCalendar: {
@@ -65,10 +61,15 @@ async function load(token: string): Promise<Contributions> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ query: QUERY, variables: { login: USER } }),
-    next: { revalidate: CONTRIBUTIONS_REVALIDATE },
   });
   if (!res.ok) throw new Error(`GitHub GraphQL: HTTP ${res.status}`);
   const json = (await res.json()) as Response;
+  const viewer = json.data?.viewer?.login;
+  if (viewer?.toLowerCase() !== USER.toLowerCase()) {
+    throw new Error(
+      `GitHub GraphQL: expected token for ${USER}, got ${viewer ?? "unknown user"}`,
+    );
+  }
   const calendar = json.data?.user?.contributionsCollection.contributionCalendar;
   if (!calendar) {
     throw new Error(`GitHub GraphQL: ${json.errors?.[0]?.message ?? "no calendar"}`);
@@ -85,18 +86,21 @@ async function load(token: string): Promise<Contributions> {
   };
 }
 
-// null when there's no token, or GitHub fails while building or in dev (the
-// window then says the contributions are unavailable)
+// Without a token or a successful GitHub response, the static page shows that
+// contributions are unavailable and the build log records the failure.
 export async function getContributions(): Promise<Contributions | null> {
-  const token = process.env.GITHUB_TOKEN;
-  if (!token) return null;
+  const token = process.env.GH_CONTRIBUTIONS_TOKEN;
+  if (!token) {
+    if (process.env.NODE_ENV === "production") {
+      console.warn(
+        `GitHub contributions unavailable: set the GH_CONTRIBUTIONS_TOKEN Actions secret to a read:user token for ${USER}.`,
+      );
+    }
+    return null;
+  }
   try {
     return await load(token);
   } catch (err) {
-    const regenerating =
-      process.env.NODE_ENV === "production" &&
-      process.env.NEXT_PHASE !== "phase-production-build";
-    if (regenerating) throw err;
     console.error(err);
     return null;
   }

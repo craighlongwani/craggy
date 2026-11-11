@@ -9,7 +9,7 @@ import { bootEnd, bootEvents } from "./linux/bootLog";
 // Then:
 //   1. an empty bar sits at the top while an Arch Linux boot log scrolls by
 //      (bootLog.ts): kernel, initramfs, systemd, then `jed` logs in and runs
-//      `tree renzo`
+//      `tree craggy`
 //   2. near the end of the log, the bar slides down to the bottom, wiping the
 //      screen and uncovering a cursor for each window on screen (all six on
 //      a wide screen, fewer where the windows stack), side by side

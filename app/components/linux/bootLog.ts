@@ -1,6 +1,6 @@
 // The boot log BootIntro.tsx plays: an Arch Linux boot, from the bootloader
 // through the kernel, the initramfs and systemd to a login prompt, where
-// `jed` logs in and runs `tree renzo` (this project's folders, from
+// `jed` logs in and runs `tree craggy` (this project's folders, from
 // bootTree.ts). Lines print instantly and scroll like a console; only the
 // login and the two shell commands are typed.
 import { bootLines } from "./bootTree";
@@ -67,8 +67,8 @@ function build() {
   kernel("pci 0000:00:02.0: [8086:5917] type 00 class 0x030000", 0.03);
   kernel("usb 1-1: new high-speed USB device number 2 using xhci_hcd", 0.05);
   kernel("nvme nvme0: pci function 0000:01:00.0", 0.02);
-  kernel("renzo: jed lawrence engbino, information systems, 3rd year", 0.01);
-  kernel("renzo: seeking IS / software engineering internships", 0.001);
+  kernel("craggy: jed lawrence engbino, information systems, 3rd year", 0.01);
+  kernel("craggy: seeking IS / software engineering internships", 0.001);
   kernel("EXT4-fs (nvme0n1p2): mounted filesystem with ordered data mode", 0.03);
   pause(160);
 
@@ -92,7 +92,7 @@ function build() {
   line(ok("Reached target Local File Systems."), 55);
   started("Journal Service");
   started("Create Volatile Files and Directories");
-  line(ok("Mounted /home/jed/renzo."), 90);
+  line(ok("Mounted /home/jed/craggy."), 90);
   line(ok("Started Load projects: VerifAI, Revora, BMS, Inventory."), 70);
   pause(120);
   started("GitHub contributions");
@@ -109,17 +109,17 @@ function build() {
   t += 280;
   events.push({
     at: t,
-    typed: { prefix: "renzo login: ", text: "jed", charMs: 110 },
+    typed: { prefix: "craggy login: ", text: "jed", charMs: 110 },
   });
   t += 3 * 110 + 220;
   line("Password: ", 10);
   pause(520);
 
-  // tree renzo
-  const prompt = `[<span style="font-weight:bold">jed@renzo</span> ~]$ `;
+  // tree craggy
+  const prompt = `[<span style="font-weight:bold">jed@craggy</span> ~]$ `;
   events.push({
     at: t,
-    typed: { prefix: prompt, text: "tree renzo", charMs: 70 },
+    typed: { prefix: prompt, text: "tree craggy", charMs: 70 },
   });
   t += 10 * 70 + 180;
   let dirs = 0;

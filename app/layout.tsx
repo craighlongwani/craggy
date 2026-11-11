@@ -9,19 +9,19 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
-const siteTitle = "renz engbino";
+const siteTitle = "Craig Hlongwani";
 const siteDescription =
-  "Jed Lawrence Engbino · Information Systems | De La Salle – College of Saint Benilde";
+  "Craig Hlongwani · Computer Science student and full-stack developer";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://renzoboy.dev"),
+  metadataBase: new URL("https://craighlongwani.dev"),
   title: siteTitle,
   description: siteDescription,
   openGraph: {
     title: siteTitle,
     description: siteDescription,
     url: "/",
-    siteName: "renzo",
+    siteName: "craggy",
     type: "website",
   },
 };
@@ -68,5 +68,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
-
 

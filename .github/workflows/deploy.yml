@@ -2,9 +2,9 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [master]
+    branches: [master, main]
   schedule:
-    - cron: "0 20 * * *" # daily, 04:00 Perth: refreshes the contributions calendar
+    - cron: "0 20 * * *" # daily at 22:00 South Africa time: refreshes the calendar
   workflow_dispatch:
 
 permissions:
@@ -28,8 +28,8 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
-          # for the GitHub contributions calendar (lib/github.ts)
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Add this repository secret using a read:user token for craighlongwani.
+          GH_CONTRIBUTIONS_TOKEN: ${{ secrets.GH_CONTRIBUTIONS_TOKEN }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out
