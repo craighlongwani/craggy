@@ -25,7 +25,7 @@ const WIPE_MS = 800;
 const WIPE_EASE = "cubic-bezier(0.65, 0, 0.35, 1)";
 const FOOTER_MS = 1100; // keep in step with the data-boot="footer" CSS
 const WINDOW_STAGGER_MS = 90;
-// One per home window: README, skills, cat, contact, GitHub, status
+// One per home window: README, skills, robot, contact, GitHub, status
 const CURSORS = 6;
 const CURSOR_GAP = 30;
 
@@ -108,7 +108,7 @@ export default function BootIntro() {
     const cursorX = (i: number) => window.innerWidth / 2 + (i - (count - 1) / 2) * CURSOR_GAP - 7;
     const cursorY = () => window.innerHeight / 2 - 10;
 
-    // The windows that are actually there (the cat's is hidden on phones),
+    // The windows that are actually there (the robot's is hidden on phones),
     // split into those on screen and those below the fold
     const split = () => {
       const shown = windows.filter((w) => w.offsetWidth > 0);
