@@ -1,3 +1,5 @@
+import { withBasePath } from "../lib/site";
+
 // Every project, in one place. Each entry drives its row on the projects
 // board, its preview there and its window (/#projects/<slug>); to add a
 // project, add an entry here (and its assets under public/assets/projects).
@@ -43,8 +45,8 @@ export const projects: Project[] = [
     when: "Mar 2026",
     role: "Lead Developer · Backend & AI Integration",
     video: {
-      src: "/assets/projects/VerifAI/VerifAI-demo-loop.mp4",
-      poster: "/assets/projects/VerifAI/poster.webp",
+      src: withBasePath("/assets/projects/VerifAI/VerifAI-demo-loop.mp4"),
+      poster: withBasePath("/assets/projects/VerifAI/poster.webp"),
       label: "VerifAI demo",
     },
     description: [
@@ -96,8 +98,8 @@ export const projects: Project[] = [
     when: "Aug 2026",
     role: "Lead Developer · Database & Backend",
     video: {
-      src: "/assets/projects/Revora/Revora-ssms-demo.mp4",
-      poster: "/assets/projects/Revora/poster.webp",
+      src: withBasePath("/assets/projects/Revora/Revora-ssms-demo.mp4"),
+      poster: withBasePath("/assets/projects/Revora/poster.webp"),
       label: "Revora database and admin dashboard demo",
     },
     description: [
@@ -151,8 +153,8 @@ export const projects: Project[] = [
     when: "Aug 2026",
     role: "Backend Developer · Documents, Households & Security",
     video: {
-      src: "/assets/projects/BMS/BMS-contributions-demo.mp4",
-      poster: "/assets/projects/BMS/poster.webp",
+      src: withBasePath("/assets/projects/BMS/BMS-contributions-demo.mp4"),
+      poster: withBasePath("/assets/projects/BMS/poster.webp"),
       label: "Demo of my contributions to the Barangay Management System",
     },
     description: [
@@ -206,8 +208,8 @@ export const projects: Project[] = [
     when: "Aug 2025",
     role: "Solo Developer · Full Stack",
     video: {
-      src: "/assets/projects/Inventory/Inventory-demo-placeholder.mp4",
-      poster: "/assets/projects/Inventory/poster.webp",
+      src: withBasePath("/assets/projects/Inventory/Inventory-demo-placeholder.mp4"),
+      poster: withBasePath("/assets/projects/Inventory/poster.webp"),
       label: "Supplier & Inventory System demo (placeholder)",
     },
     description: [

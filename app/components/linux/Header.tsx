@@ -36,7 +36,7 @@ export default function Header() {
     <header className="lx-nav fixed inset-x-0 bottom-0 z-[70] flex h-10 items-center gap-2 border-t px-3 md:gap-3">
       <p className="whitespace-nowrap font-bold">
         <span className="lx-typed">
-          jed@craggy:~<span aria-hidden="true">$</span>
+          craig@craggy:~<span aria-hidden="true">$</span>
         </span>{" "}
         <span aria-hidden="true" className="lx-cursor" />
       </p>

@@ -16,6 +16,7 @@ import Uptime from "./components/linux/Uptime";
 import { stack } from "./components/linux/stack";
 import EducationBoard from "./education/EducationBoard";
 import type { Contributions } from "./lib/github";
+import { withBasePath } from "./lib/site";
 import ProjectsBoard from "./projects/ProjectsBoard";
 
 // neofetch's color blocks in the Gruvbox Material palette: the soft colors,
@@ -73,7 +74,7 @@ export default function HomePage({
                 <div className="grid shrink-0 gap-3 @md:grid-cols-[minmax(0,2fr)_minmax(0,5fr)]">
                   <div className="lx-portrait aspect-[4/3] @md:aspect-auto @md:min-h-0">
                     <Image
-                      src="/assets/me.png"
+                      src={withBasePath("/assets/me.png")}
                       alt="Portrait of Craig Hlongwani"
                       fill
                       priority
@@ -266,7 +267,7 @@ export default function HomePage({
                   className="inline-flex items-center gap-1.5 hover:underline"
                 >
                   <Image
-                    src="/assets/icons/GitHub.png"
+                    src={withBasePath("/assets/icons/GitHub.png")}
                     width={14}
                     height={14}
                     alt=""

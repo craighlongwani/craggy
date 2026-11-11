@@ -7,8 +7,9 @@ import {
   openCurtain,
   prefersReducedMotion,
 } from "../../lib/curtain";
+import { withBasePath } from "../../lib/site";
 
-const RESUME = "/Jed-Lawrence-Engbino-Resume.pdf";
+const RESUME = withBasePath("/Jed-Lawrence-Engbino-Resume.pdf");
 
 // 25% wider than a project's page window (62.5vw on wide screens, 93.75vw on
 // tablets, the full width on phones), never wider than the screen
