@@ -12,6 +12,7 @@ const WAKE_MS = 450;
 const POUNCE_MS = 350;
 const COLUMNS = 15;
 const ROWS = 8;
+const SLEEP_SIGNALS = ["z", "z z", "Z z", " z"];
 
 type Mode = "sleep" | "wake" | "idle" | "walk" | "pounce" | "home";
 
@@ -31,8 +32,9 @@ function center(line: string) {
   return `${" ".repeat(Math.floor(padding / 2))}${line}${" ".repeat(Math.ceil(padding / 2))}`;
 }
 
-function drawRobot(mode: Mode, look: [number, number], blink: boolean) {
+function drawRobot(mode: Mode, look: [number, number], blink: boolean, now: number) {
   const awake = mode !== "sleep" && mode !== "home";
+  const sleepSignal = SLEEP_SIGNALS[Math.floor(now / 850) % SLEEP_SIGNALS.length];
   const sensor = !awake || blink
     ? "-"
     : mode === "pounce"
@@ -46,7 +48,14 @@ function drawRobot(mode: Mode, look: [number, number], blink: boolean) {
             : look[1] > 0
               ? "v"
               : "o";
-  const signal = mode === "wake" ? "!" : mode === "pounce" ? "*" : "o";
+  const signal =
+    mode === "sleep"
+      ? sleepSignal
+      : mode === "wake"
+        ? "!"
+        : mode === "pounce"
+          ? "*"
+          : "o";
 
   return [
     center(`   ${signal}   `),
@@ -113,13 +122,14 @@ export default function Robot() {
     };
 
     const render = (now: number) => {
+      robot.dataset.mode = mode;
       robot.style.left = `${pos.x}px`;
       robot.style.top = `${pos.y}px`;
       robot.style.width = `${spriteW}px`;
       robot.style.height = `${spriteH}px`;
       robot.style.opacity = "1";
       const blink = mode !== "sleep" && mode !== "home" && now < blinkUntil;
-      robot.textContent = drawRobot(mode, look, blink);
+      robot.textContent = drawRobot(mode, look, blink, now);
       if (bubbleUntil && now >= bubbleUntil) {
         bubbleNode.style.opacity = "0";
         bubbleUntil = 0;
@@ -298,7 +308,7 @@ export default function Robot() {
       <pre
         ref={robotRef}
         aria-hidden="true"
-        className="pointer-events-none absolute m-0 overflow-visible text-center text-[11px] leading-[1.15] text-[var(--lx-fg)]"
+        className="lx-robot pointer-events-none absolute m-0 overflow-visible text-center text-[11px] leading-[1.15] text-[var(--lx-fg)]"
         style={{ fontFamily: "inherit", whiteSpace: "pre" }}
       />
       <span

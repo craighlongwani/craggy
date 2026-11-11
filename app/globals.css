@@ -366,6 +366,21 @@ html:not(.theme-sweeping) [data-skin="linux"] .lx-card:hover > .win95-window > .
   }
 }
 
+[data-skin="linux"] .lx-robot[data-mode="sleep"] {
+  animation: lx-robot-sleep 2.8s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+
+@keyframes lx-robot-sleep {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-2px) rotate(1deg);
+  }
+}
+
 /* ── Portrait: a halftone dot screen over the photo (only here) ── */
 
 [data-skin="linux"] .lx-portrait {
@@ -677,7 +692,8 @@ html.theme-sweeping [data-drag] {
 
 @media (prefers-reduced-motion: reduce) {
   [data-skin="linux"] .lx-cursor,
-  [data-skin="linux"] .window-target {
+  [data-skin="linux"] .window-target,
+  [data-skin="linux"] .lx-robot {
     animation: none;
   }
 }
