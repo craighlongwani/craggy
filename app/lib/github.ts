@@ -91,11 +91,6 @@ async function load(token: string): Promise<Contributions> {
 export async function getContributions(): Promise<Contributions | null> {
   const token = process.env.GH_CONTRIBUTIONS_TOKEN;
   if (!token) {
-    if (process.env.GITHUB_ACTIONS === "true") {
-      throw new Error(
-        `GitHub contributions unavailable: set the GH_CONTRIBUTIONS_TOKEN Actions secret to a read:user token for ${USER}.`,
-      );
-    }
     if (process.env.NODE_ENV === "production") {
       console.warn(
         `GitHub contributions unavailable: set the GH_CONTRIBUTIONS_TOKEN Actions secret to a read:user token for ${USER}.`,

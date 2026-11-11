@@ -27,17 +27,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Validate GitHub contributions token
-        run: |
-          if [ -z "$GH_CONTRIBUTIONS_TOKEN" ]; then
-            echo "::error::Add the GH_CONTRIBUTIONS_TOKEN repository secret with read:user access for craighlongwani."
-            exit 1
-          fi
-        env:
-          GH_CONTRIBUTIONS_TOKEN: ${{ secrets.GH_CONTRIBUTIONS_TOKEN }}
       - run: npm run build
         env:
-          # A user token with read:user access; never expose it to client code.
+          # Optional user token with read:user access; never reaches client code.
           GH_CONTRIBUTIONS_TOKEN: ${{ secrets.GH_CONTRIBUTIONS_TOKEN }}
       - uses: actions/upload-pages-artifact@v3
         with:
