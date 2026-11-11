@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import BootIntro from "./components/BootIntro";
-import { BASE_PATH } from "./lib/site";
+import { SITE_BASE_PATH } from "./lib/site";
 
 // The site's only font (the linux skin uses it everywhere, globals.css)
 const jetbrainsMono = JetBrains_Mono({
@@ -44,12 +44,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           dangerouslySetInnerHTML={{
             __html:
-              `addEventListener("popstate",function(e){if(location.pathname==="${BASE_PATH}/"){e.stopImmediatePropagation();dispatchEvent(new Event("lx-popstate"))}});` +
+              `addEventListener("popstate",function(e){if(location.pathname==="${SITE_BASE_PATH}/"){e.stopImmediatePropagation();dispatchEvent(new Event("lx-popstate"))}});` +
               // A refresh always starts over on the home board: the hash
               // (an open project, another board) is dropped before anything
               // reads it, so it boots like a fresh visit. Shared links
               // (not a reload) still open where they point.
-              `try{var n=performance.getEntriesByType("navigation")[0];if(n&&n.type==="reload"&&location.pathname==="${BASE_PATH}/"&&location.hash){history.replaceState(null,"","${BASE_PATH}/"+location.search)}history.scrollRestoration="manual"}catch(e){}`,
+              `try{var n=performance.getEntriesByType("navigation")[0];if(n&&n.type==="reload"&&location.pathname==="${SITE_BASE_PATH}/"&&location.hash){history.replaceState(null,"","${SITE_BASE_PATH}/"+location.search)}history.scrollRestoration="manual"}catch(e){}`,
           }}
         />
         {/* Applies the saved theme before first paint, so light mode never
@@ -57,7 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           dangerouslySetInnerHTML={{
             __html:
-              `try{var d=document.documentElement;if(localStorage.getItem("theme")==="light")d.dataset.theme="light";if(localStorage.getItem("palette")==="mono")d.dataset.palette="mono";if(location.pathname==="${BASE_PATH}/"&&!location.hash&&!matchMedia("(prefers-reduced-motion: reduce)").matches){d.dataset.boot="1";if(sessionStorage.getItem("booted"))d.dataset.bootQuick="1";setTimeout(function(){delete d.dataset.boot},20000)}}catch(e){}`,
+              `try{var d=document.documentElement;if(localStorage.getItem("theme")==="light")d.dataset.theme="light";if(localStorage.getItem("palette")==="mono")d.dataset.palette="mono";if(location.pathname==="${SITE_BASE_PATH}/"&&!location.hash&&!matchMedia("(prefers-reduced-motion: reduce)").matches){d.dataset.boot="1";if(sessionStorage.getItem("booted"))d.dataset.bootQuick="1";setTimeout(function(){delete d.dataset.boot},20000)}}catch(e){}`,
           }}
         />
       </head>

@@ -1,7 +1,7 @@
 "use client";
 import { useSyncExternalStore } from "react";
 import { prefersReducedMotion } from "../../lib/curtain";
-import { BASE_PATH } from "../../lib/site";
+import { SITE_BASE_PATH } from "../../lib/site";
 
 // The home page is a vertical scroll of full-screen "boards" (home, projects,
 // education, and later others), numbered in the footer like workspaces. This
@@ -66,7 +66,7 @@ export function jumpToBoard(id: BoardId, smooth = true) {
   history.replaceState(
     null,
     "",
-    id === "home" ? `${BASE_PATH}/` : `${BASE_PATH}/#${id}`,
+    id === "home" ? `${SITE_BASE_PATH}/` : `${SITE_BASE_PATH}/#${id}`,
   );
   return true;
 }

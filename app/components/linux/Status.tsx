@@ -1,28 +1,27 @@
 import type { ReactNode } from "react";
-import ProjectLink from "../../projects/ProjectLink";
 
-// Who the work was for, as `who` would list logged-in users
+// Experience drawn from the résumé
 const who = [
-  { name: "barangay-43", what: "Pasay City LGU · demoed & approved" },
-  { name: "hackfest", what: "GDG Loyola 2026 · 4 devs, 1 week" },
+  { name: "CareerLaunch-Africa", what: "Founder · full-stack · 2025 · remote" },
+  { name: "EngFind", what: "Founder · full-stack · 2025 · remote" },
 ];
 
-// One strength per project, each with the countable proof from its repo
+// Representative work with evidence from the résumé
 const strengths = [
   {
-    area: "databases",
-    slug: "revora",
-    proof: "15 tables · 7 procs · 4 triggers · masked PII",
+    area: "AI + SaaS",
+    name: "CareerLaunch-Africa",
+    proof: "AI CV tools · interview prep · job alerts · mobile-ready",
   },
   {
-    area: "backend",
-    slug: "barangay",
-    proof: "certificate PDFs · audit trail · role access",
+    area: "full-stack",
+    name: "EngFind",
+    proof: "Firebase auth · listings & auctions · admin roles",
   },
   {
-    area: "ai + apis",
-    slug: "verifai",
-    proof: "Gemini → CrossRef · 3-tier claim check",
+    area: "real-time",
+    name: "Glitchy Chats",
+    proof: "Django · PostgreSQL · WebSockets · privacy controls",
   },
 ];
 
@@ -37,28 +36,26 @@ function Prompt({ children }: { children: ReactNode }) {
 
 // The home board's status window: what an employer needs first. Whether
 // I'm available and for what (as `systemctl status`), who the work was for
-// (`who`), and one strength per project with proof from its repo (`grep`);
-// each project name opens that project.
+// (`who`), and representative work with proof from the résumé (`grep`).
 export default function Status() {
   return (
     <div className="lx-scroll @container flex min-h-0 flex-1 flex-col justify-between gap-0.5 overflow-y-auto text-[12px] leading-[1.3]">
       <section>
-        <Prompt>systemctl status jed</Prompt>
+        <Prompt>systemctl status craig</Prompt>
         {/* The service line repeats README's name and role: it goes first
             when the screen is short */}
         <p className="shorter:hidden">
           <span className="lx-boot-ok" aria-hidden="true">● </span>
-          <span className="font-bold">jed</span>
-          <span className="lx-dim"> · IS student · full-stack &amp; databases</span>
+          <span className="font-bold">craig</span>
+          <span className="lx-dim"> · Computer Science student · full-stack &amp; AI</span>
         </p>
         <dl className="grid grid-cols-[4.5rem_minmax(0,1fr)] pl-4">
           <dt className="lx-dim">Active:</dt>
           <dd>
-            <span className="lx-boot-ok font-bold">active (seeking)</span> · 6-mo internship ·
-            available now
+            <span className="lx-boot-ok font-bold">active (seeking)</span> · software engineering internship
           </dd>
           <dt className="lx-dim">Where:</dt>
-          <dd>remote, or on-site near Manila</dd>
+          <dd>Midrand, Gauteng · remote or on-site</dd>
         </dl>
       </section>
 
@@ -75,17 +72,13 @@ export default function Status() {
       </section>
 
       <section>
-        <Prompt>grep strength ~/projects</Prompt>
+        <Prompt>grep strength ~/resume</Prompt>
         {/* In a narrow window the area labels go, so each line still fits */}
         <dl className="grid grid-cols-[5rem_minmax(0,1fr)] gap-x-2 @[34rem]:grid-cols-[4.5rem_5rem_minmax(0,1fr)]">
           {strengths.map((s) => (
-            <div key={s.slug} className="contents">
+            <div key={s.name} className="contents">
               <dt className="lx-dim hidden @[34rem]:block">{s.area}</dt>
-              <dd>
-                <ProjectLink slug={s.slug} className="lx-link font-bold">
-                  {s.slug}/
-                </ProjectLink>
-              </dd>
+              <dd className="font-bold">{s.name}</dd>
               <dd>{s.proof}</dd>
             </div>
           ))}
